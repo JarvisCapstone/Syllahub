@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Index{% endblock %}
+
+{% block app_content %}
+    <h1>All Users</h1>
+    <p>ToDo. add users listed here info here. <br>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quis quod, quibusdam natus! Vero sapiente voluptatum, ducimus. Molestias, nam, libero! Id tenetur aliquid minus, dignissimos delectus fuga repellat consectetur praesentium magni.</p>
+
+<div class="list-group">
+    {% for user in users %}
+        <a href="{{ url_for('home.user', username=user.username) }}" class="list-group-item list-group-item-action">
+            Username: {{ user.username }} <br>
+            Email: {{ user.email }} <br>
+            Password: ****
+        </a>
+
+        <p></p>
+    {% endfor %}
+</div>
+{% endblock %}
