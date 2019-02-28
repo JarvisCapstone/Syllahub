@@ -27,6 +27,12 @@ def login():
     print("not validated")
     return render_template('auth/login.html', title='Login', form=form)
 
+@bp.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('home.index'))
+
+
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
