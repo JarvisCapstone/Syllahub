@@ -20,18 +20,18 @@
 </ul>
 
 <hr>
-<h3>Flask Instalation instructions</h3>
+<h3>Flask Instalation Instructions</h3>
 Once you clone the git repository, you must do a couple things to get this working on your local machine. 
 <ul>
     <li>
         cd to Syllahub directory
     </li>
     <li>
-        Create Virtual Environment <br>
+        Create Virtual Environment: <br>
         <code>$ python -m venv venv</code><br>
     </li> 
     <li>
-        Activate virtual environment <br>
+        Activate virtual environment: <br>
         <code>$ source venv/bin/activate</code><br>
         <code>(venv) $ _</code>
     </li>
@@ -42,7 +42,7 @@ Once you clone the git repository, you must do a couple things to get this worki
         <code>(venv) $ pip freeze > requirements.txt</code>
     </li>   
     <li>
-        Run local server with <br>
+        Run local server with: <br>
         <code>$ flask run</code>
     </li>
 </ul>
@@ -53,13 +53,13 @@ Once you clone the git repository, you must do a couple things to get this worki
 
 <p>This project implements database migrations with flask-migrate.</p>
 
-Create a migration with <br>
+Create a migration with: <br>
 <code>(venv) $ flask db migrate -m "migration name"</code>
 
-upgrade migration with <br>
+upgrade migration with: <br>
 <code>(venv) $ flask db upgrade</code>
 
-downgrade migration with <br>
+downgrade migration with: <br>
 <code>(venv) $ flask db downgrade</code>
 
 <hr>
