@@ -79,7 +79,3 @@ class Instructor(db.Model):
     email = db.Column(db.String(120), index=True, unique=True)
     #perfered_office_hours = db.Column(db.String(256))
     
-
-
-
-

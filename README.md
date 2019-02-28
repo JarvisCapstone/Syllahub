@@ -63,5 +63,6 @@ downgrade migration with: <br>
 <code>(venv) $ flask db downgrade</code>
 
 <hr>
-<h3>Related Flask Tutorial</h3>
+<h3>Related Flask Tutorials</h3>
 <p><a href="https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world">The Flask Mega Tutorial</a> is a good start if anything here confuses you.</p>
+<p><a href="http://exploreflask.com/en/latest/index.html">Explore Flask</a> is the best resourse for the design patterns we will be using. Check it out.</p>
