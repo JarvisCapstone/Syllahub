@@ -19,6 +19,7 @@
     <li>$ py3 -V</li>
 </ul>
 
+<hr>
 <h3>Flask Instalation instructions</h3>
 Once you clone the git repository, you must do a couple things to get this working on your local machine. 
 <ul>
@@ -40,7 +41,26 @@ Once you clone the git repository, you must do a couple things to get this worki
         <strong>Note:</strong> if you change the packages you must update requirements.txt with: <br>
         <code>(venv) $ pip freeze > requirements.txt</code>
     </li>   
+    <li>
+        Run local server with <br>
+        <code>$ flask run</code>
+    </li>
 </ul>
+
+<hr>
+<h3>Database</h3>
+<p>For development try to use mysql. if you know how to set it up, a sqlite database will be made automatically, but this will likely cause problems later. So don't rely on it. For production we will use a mysql server from the school.</p>
+
+<p>This project implements database migrations with flask-migrate.</p>
+
+Create a migration with <br>
+<code>(venv) $ flask db migrate -m "migration name"</code>
+
+upgrade migration with <br>
+<code>(venv) $ flask db upgrade</code>
+
+downgrade migration with <br>
+<code>(venv) $ flask db downgrade</code>
 
 <hr>
 <h3>Related Flask Tutorial</h3>
