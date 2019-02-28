@@ -26,19 +26,19 @@ Once you clone the git repository, you must do a couple things to get this worki
         cd to Syllahub directory
     </li>
     <li>
-        Create Virtual Environment
-        $ python -m venv venv<br>
+        Create Virtual Environment <br>
+        <code>$ python -m venv venv</code><br>
     </li> 
     <li>
         Activate virtual environment <br>
-        $ source venv/bin/activate<br>
-        (venv) $ _
+        <code>$ source venv/bin/activate</code><br>
+        <code>(venv) $ _</code>
     </li>
     <li>
         install all required packages from requirements.txt<br>
-        (venv) $ pip install -r requirements.txt<br>
+        <code>(venv) $ pip install -r requirements.txt</code><br>
         <strong>Note:</strong> if you change the packages you must update requirements.txt with: <br>
-        (venv) $ pip freeze > requirements.txt
+        <code>(venv) $ pip freeze > requirements.txt</code>
     </li>   
 </ul>
 
