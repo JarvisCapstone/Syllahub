@@ -33,6 +33,21 @@ def create_app(config_class=Config):
     from app.auth import bp as auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')
 
+    from app.clo import bp as clo_bp
+    app.register_blueprint(clo_bp, url_prefix='/clo')
+
+    from app.user import bp as user_bp
+    app.register_blueprint(user_bp, url_prefix='/user')
+
+    from app.instructor import bp as instructor_bp
+    app.register_blueprint(instructor_bp, url_prefix='/instructor')
+
+    from app.course import bp as course_bp
+    app.register_blueprint(course_bp, url_prefix='/course')
+
+    from app.syllabus import bp as syllabus_bp
+    app.register_blueprint(syllabus_bp, url_prefix='/syllabus')
+
     return app
 
 from app import models

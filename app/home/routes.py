@@ -8,19 +8,17 @@ def index():
     return render_template('home/index.html')
 
 
-@bp.route('/user/<username>', methods=['GET', 'POST'])
+@bp.route('/olduser/<username>', methods=['GET', 'POST'])
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
     return render_template('home/user.html', user=user)
 
-@bp.route('/user/index', methods=['GET', 'POST'])
+@bp.route('/olduserindex', methods=['GET', 'POST'])
 def userIndex():
     users = User.query.all()
     return render_template('home/userindex.html', users = users)
 
-
-
-#def userDelete():
-
-#def user
+@bp.route('/site_map', methods=['GET', 'POST'])
+def site_map():
+    return render_template('home/site_map.html')
