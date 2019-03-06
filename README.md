@@ -1,3 +1,11 @@
+<h1>ToDo</h1>
+<h3>Unit tests</h3>
+<p>create a testing environment. create stubs. Check if inputs create outputs. create test for each unit test
+</p>
+
+
+
+<hr>
 <h1>Syllahub</h1>
 <p>Revamping the syllabus management system</p>
 
@@ -32,8 +40,9 @@ Once you clone the git repository, you must do a couple things to get this worki
     </li> 
     <li>
         Activate virtual environment: <br>
-        <code>$ source venv/bin/activate</code><br>
-        <code>(venv) $ _</code>
+        For Windows: <code>$ venv/Source/activate</code><br>
+        For Mac: <code>$ source venv/bin/activate</code><br>
+        <code>(venv) $ _</code> <-- you should see this if enviroment is activated
     </li>
     <li>
         install all required packages from requirements.txt<br>

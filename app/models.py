@@ -30,6 +30,7 @@ class Syllabus(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     section = db.Column(db.Integer, primary_key=True)
     version = db.Column(db.Integer, primary_key=True)
+    #state = db.Column(db.Integer, foreign_key=True)
     #course_id = db.Column(db.Integer, foreign_key=True)
     #required_materials = db.Column(db.String(256))
     #pdf = db.Column(???)
@@ -45,6 +46,10 @@ class Syllabus(db.Model):
     #meeting_dates = db.Column(???)
     #static_information_version_id = db.Column(???)
     #timestamp = db.Column(???)
+    
+    def getPDF(): 
+        #ToDo
+        return "pdf"
     
 
 class SyllabusStaticInfo(db.Model):
@@ -65,7 +70,7 @@ class Course(db.Model):
     #is_elr = db.Column(db.Integer)
     #is_diversity = db.Column(db.Integer)
     #prerequisites = db.Column(db.String(256))
-    
+
 class CLO(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(256), unique=True)
