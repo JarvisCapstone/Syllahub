@@ -1,0 +1,27 @@
+Our group requires:
+
+A web domain.
+
+- This is a MPA so multiple pages are required. If necessary, we may require the ability to change the .htaccess file for our domain.
+
+
+
+A web server. We are running a server on Flask 1.0.2. Required software:
+- Python 3.x. perferably most current stable release. 
+
+- Pip. Perferably the most current stable release
+
+- We usually create a virtual environment for local pip installations with 
+  $python -m venv venv
+
+
+
+A MySql server
+- 15 gigs
+- ability to create roles and views. 
+- ability to create multiple privlage. levels. 
+- ability to create multiple users and grant them privlages. Our project has 6 developers that may need access. 
+
+
+
+We intend on testing with Cypress IO and Travis CI. Do you see any issues with us using these services?
