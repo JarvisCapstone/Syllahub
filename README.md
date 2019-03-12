@@ -1,3 +1,4 @@
+
 <h1>ToDo</h1>
 <h3>Unit tests</h3>
 <p>create a testing environment. create stubs. Check if inputs create outputs. create test for each unit test
@@ -75,3 +76,4 @@ downgrade migration with: <br>
 <h3>Related Flask Tutorials</h3>
 <p><a href="https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world">The Flask Mega Tutorial</a> is a good start if anything here confuses you.</p>
 <p><a href="http://exploreflask.com/en/latest/index.html">Explore Flask</a> is the best resourse for the design patterns we will be using. Check it out.</p>
+
