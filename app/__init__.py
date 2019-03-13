@@ -1,5 +1,5 @@
 from config import Config
-from flask import Flask
+from flask import Flask, current_app
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -14,15 +14,27 @@ login.login_message = 'Please log in to access this page.'
 def create_app(config_class=Config):
     app = Flask(__name__)
 
-    """ Default config is the variables in the Config class in config.py. 
+    """ Default config is the variables in the Config class in config.py.
     Use a different argument for testing"""
     app.config.from_object(config_class)
 
-    #Initalize app with 
+    #Initalize app with
+    #with app.app_context():
+    #    db.init_app(app)
+    #    migrate.init_app(app, db)
+    #    login.init_app(app)
+
+
+    app.app_context().push()
+    print("current app = ", current_app)
     db.init_app(app)
     migrate.init_app(app, db)
     login.init_app(app)
 
+
+
+
+    print("db in app init", db)
 
 
     # register blueprints with application
