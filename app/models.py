@@ -72,7 +72,7 @@ class Course(db.Model):
 
 class CLO(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    description = db.Column(db.String(256), unique=True)
+    description = db.Column(db.String(256))
     #permission = db.Column(db.Integer, default=1)
 
 

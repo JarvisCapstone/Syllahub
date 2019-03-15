@@ -22,7 +22,6 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('description', sa.String(length=256), nullable=True),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('description')
     )
     op.create_table('course',
     sa.Column('id', sa.Integer(), nullable=False),
