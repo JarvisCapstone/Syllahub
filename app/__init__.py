@@ -18,24 +18,12 @@ def create_app(config_class=Config):
     Use a different argument for testing"""
     app.config.from_object(config_class)
 
-    #Initalize app with
-    #with app.app_context():
-    #    db.init_app(app)
-    #    migrate.init_app(app, db)
-    #    login.init_app(app)
-
-
     app.app_context().push()
-    print("current app = ", current_app)
     db.init_app(app)
     migrate.init_app(app, db)
     login.init_app(app)
 
-
-
-
-    print("db in app init", db)
-
+    print("test")
 
     # register blueprints with application
     # import blueprints here to avoid circular references
@@ -60,6 +48,6 @@ def create_app(config_class=Config):
     from app.syllabus import bp as syllabus_bp
     app.register_blueprint(syllabus_bp, url_prefix='/syllabus')
 
-    return app
+    return app 
 
 from app import models
