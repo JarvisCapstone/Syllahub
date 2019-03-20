@@ -4,10 +4,10 @@ from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from app.models import User
 
 class DeleteUserForm(FlaskForm):
-    username = StringField('Email', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired()])
     submit = SubmitField('Delete User')
-    
+
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
-        if user is not None:
+        if user is None:
             raise ValidationError('Please use a different email address.')

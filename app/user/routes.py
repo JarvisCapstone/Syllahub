@@ -1,8 +1,9 @@
 from app.user import bp
-from flask import render_template
+from flask import render_template, flash
 from flask_login import current_user, login_required
 from app.models import User
-
+from app import db
+from app.user.forms import DeleteUserForm
 
 @bp.route('/user/<username>', methods=['GET', 'POST'])
 @login_required
@@ -37,5 +38,13 @@ def update(username):
 
 
 @bp.route('/delete/<username>', methods=['GET', 'POST'])
+@login_required
 def delete(username):
-    return render_template('/user/delete.html')
+    form = DeleteUserForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first_or_404()
+        print(user)
+        db.session.delete(user)
+        db.session.commit()
+        flash('User Deleted')
+    return render_template('/user/delete.html', title='Delete User', form=form)
