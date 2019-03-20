@@ -1,5 +1,4 @@
 app.db
-.gitignore
 config.py
 .flaskenv
 
