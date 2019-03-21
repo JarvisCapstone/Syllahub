@@ -3,13 +3,13 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config(object):
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
-
+    
     dialectDriver = "mysql"
     username = "root"
-    password = "newpassword"
+    password = "rootpw"
     host = "localhost"
     port = "3306"
-    database = "syllahub"
+    database = "Syllahub"
     
     SQLALCHEMY_ECHO = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -18,6 +18,4 @@ class Config(object):
                               password + "@" + \
                               host + ":" + \
                               port + "/" + \
-                              database
-    
-    
+                              database 

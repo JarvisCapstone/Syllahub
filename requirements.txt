@@ -1,5 +1,7 @@
 -f /usr/share/pip-wheels
 alembic==1.0.7
+beautifulsoup4==4.6.0
+behave==1.2.6
 Click==7.0
 Flask==1.0.2
 Flask-Login==0.4.1
@@ -15,6 +17,7 @@ PyMySQL==0.9.3
 python-dateutil==2.8.0
 python-dotenv==0.10.1
 python-editor==1.0.4
+selenium==3.141.0
 six==1.12.0
 SQLAlchemy==1.2.18
 Werkzeug==0.14.1
