@@ -2,6 +2,7 @@ from app.home import bp
 from flask import render_template
 from flask_login import current_user, login_required
 from app.models import User
+#from app.models import *
 
 @bp.route('/', methods=['GET', 'POST'])
 def index():
@@ -21,4 +22,10 @@ def userIndex():
 
 @bp.route('/site_map', methods=['GET', 'POST'])
 def site_map():
+    print("3333333333333333333333333 site map called ")
     return render_template('home/site_map.html')
+
+@bp.route('/run', methods=['GET', 'POST'])
+def run():
+    print('run called')
+    return 'success'

@@ -1,0 +1,28 @@
+# see the sql output of a migration's upgrade or downgrade
+# flask db upgrade <previous>:<current> --sql
+
+flask db upgrade 5227cc04a220:1b28549721c7 --sql
+flask db downgrade 1b28549721c7:5227cc04a220 --sql
+
+
+
+# get database info from flask shell
+flask shell
+>>> from app import db
+>>> meta = db.metadata
+>>> engine = db.engine
+>>> from sqlalchemy.engine import reflection
+>>> insp = reflection.Inspector.from_engine(engine)
+
+>>> insp.get_table_names()
+>>> insp.get_columns('user')
+
+
+#print a list nicely
+from pprint import pprint
+pprint(obj)
+pprint(list(obj))
+
+#list all items in a list
+list(obj)
+

@@ -12,6 +12,7 @@ login.login_message = 'Please log in to access this page.'
 
 #Application Factory function
 def create_app(config_class=Config):
+    print("create_app called")
     app = Flask(__name__)
 
     """ Default config is the variables in the Config class in config.py.
@@ -23,7 +24,6 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
     login.init_app(app)
 
-    print("test")
 
     # register blueprints with application
     # import blueprints here to avoid circular references
