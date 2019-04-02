@@ -1,4 +1,5 @@
 from app.instructor import bp
+from app.instructor.forms import createInstructorForm
 from flask import render_template
 from flask_login import current_user, login_required
 
@@ -10,7 +11,8 @@ def index():
 
 @bp.route('/create', methods=['GET', 'POST'])
 def create():
-    return render_template('instructor/create.html')
+    form = createInstructorForm()
+    return render_template('instructor/create.html', form=form)
 
 
 

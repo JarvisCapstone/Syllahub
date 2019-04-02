@@ -14,7 +14,7 @@ class Config(object):
     database = "syllahub"
 
     SQLALCHEMY_ECHO = True
-    SQLALCHEMY_DATABASE_URI = "mysql://root:newpassword@localhost:3306/syllahub"
+    SQLALCHEMY_DATABASE_URI = "mysql://root:Winston@localhost:3306/Syllahub"
     #SQLALCHEMY_DATABASE_URI = "mysql://nick:temppassword@localhost:3306/syllahub"
     #SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:temppassword@localhost:3306/syllahub"
     #SQLALCHEMY_DATABASE_URI = "mysql://root:9UfhC%DHbC.G=tY.@localhost:3306/syllahub"

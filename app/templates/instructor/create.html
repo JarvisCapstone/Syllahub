@@ -3,5 +3,28 @@
 {% block title %}Index{% endblock %}
 
 {% block app_content %}
-    <h1>Stub instructor create</h1>
+    <h1>Instructor Creation</h1>
+
+    <form method="post">
+        {{ form.hidden_tag() }}
+        Instructor Name:<br>
+        <input type="text" name="InstructorName"><br>
+        Phone Number:<br>
+        <input type="number" name="PhoneNumber"><br>
+        Email:<br>
+        <input type="text" name="Email"><br>
+        Office Hours:<br>
+        <input type="text" name="OfficeHours"><br>
+        <input type="submit" value="Submit">
+    </form>
 {% endblock %}
+
+<!-- Prompt for:
+    1. Instructor Name/ID
+    2. Phone Number
+    3. Email
+    4. Office Hours
+
+    Give 4 submit fields to store in database
+    No password
+-->
