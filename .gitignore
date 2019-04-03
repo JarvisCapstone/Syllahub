@@ -1,5 +1,6 @@
 app.db
-
+config.py
+.flaskenv
 
 ##################################Standard python stuff#######################
 # Byte-compiled / optimized / DLL files
