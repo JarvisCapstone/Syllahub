@@ -1,13 +1,16 @@
 from app.course import bp
-from flask import render_template, flash
+from flask import render_template, flash, jsonify
 from flask_login import current_user, login_required
 from app.models import Course
 from app.course.forms import createCourseForm
 from app import db
 
-@bp.route('/index', methods=['GET', 'POST'])
+@bp.route('/index', methods=['GET'])
 def index():
-    return render_template('course/index.html')
+    courses = Course.query.all()
+    print (courses)
+    #return jsonify(courses)
+    return render_template('course/index.html', courses=courses)
 
 
 
@@ -32,7 +35,7 @@ def create():
 
 
 
-@bp.route('/read/<id>', methods=['GET', 'POST'])
+@bp.route('/read/<id>', methods=['GET'])
 def read(id):
     return render_template('/course/read.html')
 
