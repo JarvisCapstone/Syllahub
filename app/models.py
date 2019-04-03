@@ -391,7 +391,8 @@ class User(UserMixin, db.Model, Timestamp):
     # TODO: remove id and username from db 
 
     # Primary Keys
-    id = Column(Integer, primary_key=True) 
+    #id = Column(Integer, primary_key=True) 
+    email = Column(String(120), primary_key=True)
 
     # Foreign Keys
     instructor_id = Column(Integer, ForeignKey('instructor.id'), nullable=True)
@@ -400,11 +401,10 @@ class User(UserMixin, db.Model, Timestamp):
     instructor = relationship("Instructor", back_populates="user")
 
     # Non Key Columns
-    email = Column(String(120), nullable=False, index=True, unique=True)
     password_hash = Column(String(128), nullable=False)
     permission = Column(Enum('admin', 'instructor'), nullable=False, 
                         server_default=text("instructor"))
-    username = Column(String(64),  nullable=False, index=True, unique=True)
+    #username = Column(String(64),  nullable=False, index=True, unique=True)
     
 
     def set_password(self, password):
