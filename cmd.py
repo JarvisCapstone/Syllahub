@@ -1,3 +1,8 @@
+'''Random useful commands I wanted a shortcut for. 
+
+put commands you can't remember here
+'''
+
 from app import db
 from sqlalchemy.engine import reflection
 from pprint import pprint

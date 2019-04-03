@@ -1,3 +1,9 @@
+'''creates fake models and adds them to the database. 
+
+call commands like these from the flask shell
+>>>factory.addFakeUserToDB()
+
+'''
 from app import db
 from app.models import *
 from sqlalchemy.sql.expression import func
