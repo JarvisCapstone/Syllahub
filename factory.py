@@ -341,6 +341,56 @@ def createRandCloCourseAssociation():
     temp_course.clos.append(temp_clo)
     db.session.commit()
 
+def createRandInstructorSyllabusAssociation():
+    # TODO: fix this
+    temp_syllabus = Syllabus.query.order_by(func.rand()).first()
+    temp_job = SyllabusInstructorAssociation()
+    temp_job.job_on_syllabus = 'grader'
+    temp_instructor = Instructor.query.order_by(func.rand()).first()
+    print(temp_syllabus)
+    print(temp_instructor)
+    print(temp_job)
+    print('-------3')
 
-def generateData(num=3):
-    pass
+    #temp_job.instructor = temp_instructor
+    temp_instructor.syllabi.append(temp_job)
+    print(temp_syllabus)
+    print(temp_instructor.syllabi)
+    print(temp_job)
+    #print(temp_job)
+    #print('===1')
+
+    #temp_syllabus.instructors.append(temp_job)
+
+    '''
+    temp_instructor.syllabi.append(temp_job)
+    print(temp_syllabus)
+    print(temp_instructor)
+    print(temp_job)
+    print('-------5')
+    
+    temp_syllabus.instructors.append(temp_job)
+    print(temp_syllabus)
+    print(temp_instructor)
+    print(temp_job)
+    '''
+
+    print('-------6')
+    #db.session.commit()
+
+
+def generateData(num=None):
+    if not num: 
+        num = 3
+    else:
+        num = int(num)
+
+    for x in range(num):
+        addFakeCourseToDB()
+        addFakeInstructorToDB()
+        addFakeUserToDB()
+        addFakeCloToDB()
+        addFakeSyllabusToDB()
+        createRandCloCourseAssociation()
+
+    print("added", num, "fake data entries to each table in db")
