@@ -39,6 +39,7 @@ def upgrade():
     )
     op.create_index(op.f('ix_instructor_email'), 'instructor', ['email'], unique=True)
     op.create_index(op.f('ix_instructor_name'), 'instructor', ['name'], unique=False)
+    
     op.create_table('syllabus',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('section', sa.Integer(), nullable=False),

@@ -11,7 +11,7 @@ class Config(object):
     port = "3306"
     database = "syllahub"
     
-    SQLALCHEMY_ECHO = True
+    #SQLALCHEMY_ECHO = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = dialectDriver + "://" + \
                               username + ":" + \
