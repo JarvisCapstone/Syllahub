@@ -19,7 +19,7 @@ def load_user(id):
     '''
     return User.query.get(int(id))
 
-
+# Association Tables/Objects --------------------------------------------------
 class SyllabusInstructorAssociation(db.Model):
     ''' Association object relating Instructor and Syllabus
 
@@ -70,12 +70,12 @@ class SyllabusInstructorAssociation(db.Model):
         primaryjoin="SyllabusInstructorAssociation.instructor_id "
                         "== Instructor.id",
 
-        foreign_keys="Instructor.id",
-        
-        # complementary property should back_populate to this relationship
-        backref="syllabi")
+        remote_side="Instructor.id",
+        foreign_keys="SyllabusInstructorAssociation.instructor_id",
 
-    syllabus =  relationship(    
+        back_populates="syllabi")
+
+    syllabus =  relationship(
         # use strings in relationships to avoid reference errors
         
         "Syllabus", # mapped class representing target of relationship
@@ -94,13 +94,28 @@ class SyllabusInstructorAssociation(db.Model):
                  "SyllabusInstructorAssociation.syllabus_course_version"
                       " == Syllabus.course_version)",
 
-        foreign_keys="[Syllabus.section, Syllabus.semester, "
-                      "Syllabus.year, Syllabus.version, "
-                      "Syllabus.course_number, Syllabus.course_version]",
-        
-        # complementary property should back_populate to this relationship
-        backref="instructors")   
-        
+        remote_side=
+            "["
+                "Syllabus.section, "
+                "Syllabus.semester, "
+                "Syllabus.year, "
+                "Syllabus.version, "
+                "Syllabus.course_number, "
+                "Syllabus.course_version,"
+            "]",
+
+        foreign_keys= 
+            "["
+                "SyllabusInstructorAssociation.syllabus_section,"
+                "SyllabusInstructorAssociation.syllabus_semester,"
+                "SyllabusInstructorAssociation.syllabus_year,"
+                "SyllabusInstructorAssociation.syllabus_version,"
+                "SyllabusInstructorAssociation.syllabus_course_number,"
+                "SyllabusInstructorAssociation.syllabus_course_version,"
+            "]",
+
+        back_populates="instructors")
+
     # Non Key Columns
     job_on_syllabus = Column(String(120))
 
@@ -138,52 +153,133 @@ course_clo_table = db.Table(
     
     # Foreign Keys for Course
     ForeignKeyConstraint(['course_number', 'course_version'], 
-                         ['course.number', 'course.version'])
-)
+                         ['course.number', 'course.version']))
 
+# Models ----------------------------------------------------------------------
+class Clo(db.Model, Timestamp):
+    '''CLO model
 
-class User(UserMixin, db.Model, Timestamp):
-    '''User Model
+    No Foreign Keys
     '''
-    # TODO: make email primary key
-    # TODO: remove id and username from db 
 
-    # Primary Keys
-    id = Column(Integer, primary_key=True) 
+    # Primary Key
+    id = db.Column(db.Integer, primary_key=True)
 
-    # Foreign Keys
-    instructor_id = Column(Integer, ForeignKey('instructor.id'), nullable=True)
-    
     # Relationships    
-    instructor = relationship("Instructor")
-
-    # Non Key Columns
-    email = Column(String(120), nullable=False, index=True, unique=True)
-    password_hash = Column(String(128), nullable=False)
-    permission = Column(Enum('admin', 'instructor'), nullable=False, 
-                        server_default=text("instructor"))
-    username = Column(String(64),  nullable=False, index=True, unique=True)
+    courses = db.relationship('Course', secondary=course_clo_table,
+                              back_populates='clos')
     
+    # Non Key Columns
+    general = db.Column(db.String(256))
+    specific = db.Column(db.String(256))
 
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
 
     def __repr__(self):
         '''returns a printable representation of the object. 
 
         Determines the result of when class is called in Print()
         '''
-        return '<User email={}>'.format(self.email)    
+        return '<CLO id={}>'.format(self.id)
+
+
+
+class Course(db.Model, Timestamp):
+    '''Course Model
+
+    No Foreign Keys
+    Relationship with Syllabus
+        one to many
+        Course is Parent and Syllabus is Child
+    '''
+
+    # Primary Keys
+    number = Column(Integer, primary_key=True)
+    version = Column(Integer, primary_key=True) # TODO: autoincrement
+    
+    # Relationships    
+    clos = relationship('Clo', secondary=course_clo_table,
+                        back_populates='courses')
+    
+    syllabi = relationship(
+        "Syllabus", 
+        primaryjoin="and_(Course.number == Syllabus.course_number, "
+                         "Course.version == Syllabus.course_version)",
+        foreign_keys="[Syllabus.course_number, Syllabus.course_version]",
+        remote_side="[Syllabus.course_number, Syllabus.course_version]",
+        back_populates="course")   
+
+    # Non Key Columns
+    building = Column(String(70))
+    description = Column(String(256))
+    is_core = Column(Boolean)
+    is_diversity = Column(Boolean)
+    is_elr = Column(Boolean)
+    is_wi = Column(Boolean)
+    name = Column(String(50))
+    prerequisites = Column(String(256))
+    room = Column(String(50))
+
+
+    def __repr__(self):
+        '''returns a printable representation of the object. 
+
+        Determines the result of when class is called in Print()
+        '''
+        return '<Course number={} version={}>'.format(self.number, self.version)
+
+
+
+class Instructor(db.Model, Timestamp):
+    '''Instructor Model
+
+    No Foreign Keys
+    Relationship with Syllabus
+        many to many
+        Relatiohship to SyllabusInstructorAssociation
+            one to many
+            Parent is SyllabusInstructorAssociation
+            Child is Instructor
+    
+    Relationship with User
+        one to zero/one
+    '''
+
+    # Primary Key
+    id = Column(Integer, primary_key=True)
+    
+    # Relationships
+    user = relationship("User", uselist=False, back_populates="instructor")
+    
+    syllabi = relationship(
+        "SyllabusInstructorAssociation",
+        primaryjoin="Instructor.id == SyllabusInstructorAssociation.instructor_id ",
+        foreign_keys="SyllabusInstructorAssociation.instructor_id",
+        remote_side="SyllabusInstructorAssociation.instructor_id",
+        back_populates="instructor")
+
+
+    # Non Key Columns
+    email = Column(String(120), index=True, unique=True)
+    name = Column(String(64), index=True)
+    phone = Column(Integer)
+    perfered_office_hours = Column(String(256))
+    
+
+    def __repr__(self):
+        '''returns a printable representation of the object. 
+
+        Determines the result of when class is called in Print()
+        '''
+        return '<Instructor id={} name={}>'.format(self.id, self.name)
+
 
 
 class Syllabus(db.Model, Timestamp):
     '''Syllabus Model
 
-    Relationships backrefed in SyllabusInstructorAssociation
-
+    Relationship with Course
+        many to one
+        course is parent and syllabus is child
     '''
 
     # Primary Keys
@@ -197,6 +293,58 @@ class Syllabus(db.Model, Timestamp):
     # Foreign Keys
     ForeignKeyConstraint(['course_number', 'course_version'], 
                          ['course.number', 'course.version'])
+
+    # Relationships  
+    course = relationship(
+        "Course", 
+        primaryjoin="and_(Syllabus.course_number == Course.number, "
+                         "Syllabus.course_version == Course.version)",
+        #uselist=False
+        remote_side="[Course.number, Course.version]",
+        foreign_keys="[Syllabus.course_number, Syllabus.course_version]",
+        
+        back_populates="syllabi")   
+    
+    instructors = relationship(
+        # use strings in relationships to avoid reference errors
+        
+        "SyllabusInstructorAssociation", # mapped class representing target of relationship
+        
+        primaryjoin=
+            "and_(SyllabusInstructorAssociation.syllabus_section"
+                      " == Syllabus.section, "
+                 "SyllabusInstructorAssociation.syllabus_semester"
+                      " == Syllabus.semester, "
+                 "SyllabusInstructorAssociation.syllabus_year"
+                      " == Syllabus.year, "
+                 "SyllabusInstructorAssociation.syllabus_version"
+                      " == Syllabus.version, "
+                 "SyllabusInstructorAssociation.syllabus_course_number"
+                      " == Syllabus.course_number, "
+                 "SyllabusInstructorAssociation.syllabus_course_version"
+                      " == Syllabus.course_version)",
+
+        remote_side=
+            "["
+                "SyllabusInstructorAssociation.syllabus_section,"
+                "SyllabusInstructorAssociation.syllabus_semester,"
+                "SyllabusInstructorAssociation.syllabus_year,"
+                "SyllabusInstructorAssociation.syllabus_version,"
+                "SyllabusInstructorAssociation.syllabus_course_number,"
+                "SyllabusInstructorAssociation.syllabus_course_version,"
+            "]",
+
+        foreign_keys= 
+            "["
+                "SyllabusInstructorAssociation.syllabus_section,"
+                "SyllabusInstructorAssociation.syllabus_semester,"
+                "SyllabusInstructorAssociation.syllabus_year,"
+                "SyllabusInstructorAssociation.syllabus_version,"
+                "SyllabusInstructorAssociation.syllabus_course_number,"
+                "SyllabusInstructorAssociation.syllabus_course_version,"
+            "]",
+
+        back_populates="syllabus")   
 
     # Non Key Columns
     attendance_policy = Column(String(500), nullable=True)
@@ -234,95 +382,42 @@ class Syllabus(db.Model, Timestamp):
 
 
 
-class Course(db.Model, Timestamp):
-    '''Course Model
-
-    No Foreign Keys
+class User(UserMixin, db.Model, Timestamp):
+    '''User Model
+    Relationship with Instructor
+        one to one
     '''
+    # TODO: make email primary key
+    # TODO: remove id and username from db 
 
     # Primary Keys
-    number = Column(Integer, primary_key=True)
-    version = Column(Integer, primary_key=True) # TODO: autoincrement
+    id = Column(Integer, primary_key=True) 
+
+    # Foreign Keys
+    instructor_id = Column(Integer, ForeignKey('instructor.id'), nullable=True)
     
     # Relationships    
-    clos = relationship('Clo', secondary=course_clo_table,
-                        back_populates='courses')
-    #TODO: add syllabus relationship
-    #syllabi = db.relationship('Syllabus', backref='course', lazy=True)
+    instructor = relationship("Instructor", back_populates="user")
 
     # Non Key Columns
-    building = Column(String(70))
-    description = Column(String(256))
-    is_core = Column(Boolean)
-    is_diversity = Column(Boolean)
-    is_elr = Column(Boolean)
-    is_wi = Column(Boolean)
-    name = Column(String(50))
-    prerequisites = Column(String(256))
-    room = Column(String(50))
+    email = Column(String(120), nullable=False, index=True, unique=True)
+    password_hash = Column(String(128), nullable=False)
+    permission = Column(Enum('admin', 'instructor'), nullable=False, 
+                        server_default=text("instructor"))
+    username = Column(String(64),  nullable=False, index=True, unique=True)
+    
 
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
     def __repr__(self):
         '''returns a printable representation of the object. 
 
         Determines the result of when class is called in Print()
         '''
-        return '<Course number={} version={}>'.format(self.number, self.version)
-
-
-
-class Clo(db.Model, Timestamp):
-    '''CLO model
-
-    No Foreign Keys
-    '''
-
-    # Primary Key
-    id = db.Column(db.Integer, primary_key=True)
-
-    # Relationships    
-    courses = db.relationship('Course', secondary=course_clo_table,
-                              back_populates='clos')
-    
-    # Non Key Columns
-    general = db.Column(db.String(256))
-    specific = db.Column(db.String(256))
-
-
-    def __repr__(self):
-        '''returns a printable representation of the object. 
-
-        Determines the result of when class is called in Print()
-        '''
-        return '<CLO id={}>'.format(self.id)
-
-
-
-class Instructor(db.Model, Timestamp):
-    '''Instructor Model
-
-    No Foreign Keys
-    '''
-
-    # Primary Key
-    id = db.Column(db.Integer, primary_key=True)
-    
-    # Relationships
-    user    = db.relationship("User", uselist=False, 
-                              back_populates="instructor")
-
-    # Non Key Columns
-    email = db.Column(db.String(120), index=True, unique=True)
-    name = db.Column(db.String(64), index=True)
-    phone = db.Column(db.Integer)
-    perfered_office_hours = db.Column(db.String(256))
-    
-
-    def __repr__(self):
-        '''returns a printable representation of the object. 
-
-        Determines the result of when class is called in Print()
-        '''
-        return '<Instructor id={} name={}>'.format(self.id, self.name)
+        return '<User email={}>'.format(self.email)    
 
 
