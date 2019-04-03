@@ -3,92 +3,167 @@ from enum import Enum
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from sqlalchemy_utils import Timestamp
-from sqlalchemy import ForeignKeyConstraint, MetaData, and_
+from sqlalchemy import and_, Boolean, Column, Enum, ForeignKey, ForeignKeyConstraint, Integer, LargeBinary, MetaData, String, text
+from sqlalchemy.orm import relationship
 
 
 @login.user_loader
 def load_user(id):
-    print('id=', id)
+    ''' Used by Flask-Login to login user
+
+    Args: 
+        primary key of User
+    
+    Returns: 
+        User with primary key = to Args
+    '''
     return User.query.get(int(id))
 
 
-
 class SyllabusInstructorAssociation(db.Model):
+    ''' Association object relating Instructor and Syllabus
+
+    Since instructors have a jobs such as teacher, grader, ect that may
+    appear on many syllabi, SqlAlchemy requires an association object
+
+    TODO: consider making this not a model but share Base
+    '''
+
     __tablename__ = 'syllabus_instructor'
     
-    instructor_id =  db.Column(db.Integer, db.ForeignKey('Instructor.id'), primary_key=True)
-    syllabus_section =            db.Column(db.Integer, primary_key=True)
-    syllabus_semester =           db.Column(db.Enum('spring', 'summer', 'fall'), primary_key=True)
-    syllabus_year =               db.Column(db.Integer, primary_key=True)
-    syllabus_version =            db.Column(db.Integer, primary_key=True)
-    syllabus_course_number =      db.Column(db.Integer, primary_key=True)
-    syllabus_course_version =     db.Column(db.Integer, primary_key=True)
+    # Primary Keys for Syllabus    
+    syllabus_course_number = Column(Integer, primary_key=True)
+    syllabus_course_version = Column(Integer, primary_key=True)
+    syllabus_section = Column(Integer, primary_key=True)
+    syllabus_semester = Column(Enum('spring', 'summer', 'fall'), 
+                               primary_key=True)
+    syllabus_version = Column(Integer, primary_key=True)
+    syllabus_year = Column(Integer, primary_key=True)
 
-    job_on_syllabus =             db.Column(db.String(120))
+    # Primary and Foreign Key for Instructor    
+    instructor_id = Column(Integer, ForeignKey('Instructor.id'), 
+                           primary_key=True)
 
+    # Foreign Keys for Syllabus    
     ForeignKeyConstraint(
-        ['syllabus_section',
-         'syllabus_semester',
-         'syllabus_year',
-         'syllabus_version',
-         'syllabus_course_number',
-         'syllabus_course_version'],
+        [
+            'syllabus_section',
+            'syllabus_semester',
+            'syllabus_year',
+            'syllabus_version',
+            'syllabus_course_number',
+            'syllabus_course_version',
+        ],
 
-        ['syllabus.section',
-         'syllabus.semester',
-         'syllabus.year',
-         'syllabus.version',
-         'syllabus.course_number',
-         'syllabus.course_version']
-        )
+        [
+            'syllabus.section',
+            'syllabus.semester',
+            'syllabus.year',
+            'syllabus.version',
+            'syllabus.course_number',
+            'syllabus.course_version',
+        ])
 
+    # Relationships
+    instructor = relationship(
+        "Instructor", # mapped class representing target of relationship
+        primaryjoin="SyllabusInstructorAssociation.instructor_id "
+                        "== Instructor.id",
 
-    instructor = db.relationship(
-        "Instructor",               # argument : mapped class representing target of relationship
-        primaryjoin="SyllabusInstructorAssociation.instructor_id == Instructor.id",
         foreign_keys="Instructor.id",
-        backref="syllabi"    # takes a string. complementary property should back_populate to this relationship
-        )
+        
+        # complementary property should back_populate to this relationship
+        backref="syllabi")
+
+    syllabus =  relationship(    
+        # use strings in relationships to avoid reference errors
+        
+        "Syllabus", # mapped class representing target of relationship
+        
+        primaryjoin=
+            "and_(SyllabusInstructorAssociation.syllabus_section"
+                      " == Syllabus.section, "
+                 "SyllabusInstructorAssociation.syllabus_semester"
+                      " == Syllabus.semester, "
+                 "SyllabusInstructorAssociation.syllabus_year"
+                      " == Syllabus.year, "
+                 "SyllabusInstructorAssociation.syllabus_version"
+                      " == Syllabus.version, "
+                 "SyllabusInstructorAssociation.syllabus_course_number"
+                      " == Syllabus.course_number, "
+                 "SyllabusInstructorAssociation.syllabus_course_version"
+                      " == Syllabus.course_version)",
+
+        foreign_keys="[Syllabus.section, Syllabus.semester, "
+                      "Syllabus.year, Syllabus.version, "
+                      "Syllabus.course_number, Syllabus.course_version]",
+        
+        # complementary property should back_populate to this relationship
+        backref="instructors")   
+        
+    # Non Key Columns
+    job_on_syllabus = Column(String(120))
 
 
-    syllabus =  db.relationship(    # use strings in relationships to avoid reference errors
-        "Syllabus",                    # argument : mapped class representing target of relationship
-        primaryjoin="and_(SyllabusInstructorAssociation.syllabus_section == Syllabus.section, "
-                         "SyllabusInstructorAssociation.syllabus_semester == Syllabus.semester, "
-                         "SyllabusInstructorAssociation.syllabus_year == Syllabus.year, "
-                         "SyllabusInstructorAssociation.syllabus_version == Syllabus.version, "
-                         "SyllabusInstructorAssociation.syllabus_course_number == Syllabus.course_number, "
-                         "SyllabusInstructorAssociation.syllabus_course_version == Syllabus.course_version)"
-        ,
-        foreign_keys="[Syllabus.section, Syllabus.semester, Syllabus.year, Syllabus.version, Syllabus.course_number, Syllabus.course_version]",
-        backref="instructors"    # takes a string. complementary property should back_populate to this relationship
-        )
+    def __repr__(self):
+        '''returns a printable representation of the object. 
+
+        Determines the result of when class is called in Print()
+        '''
+        return "<SyllabusInstructorAssociation " \
+            "\tcourse_number={} \n" \
+            "\tcourse_version={} \n" \
+            "\tsection={} \n" \
+            "\tsemester={} \n" \
+            "\tversion={} \n" \
+            "\tyear={}\n" \
+            "\tinstructor_id={} \n>" \
+            .format(self.course_number, self.course_version, 
+                    self.section, self.semester, 
+                    self.version, self.year,
+                    self.instructor_id)
 
 
-course_clo_table = db.Table('course_clo',
-    # used to define the many to many relationship between course and clo
-    db.Column('course_number',  db.Integer, primary_key=True),
-    db.Column('course_version', db.Integer, primary_key=True),
+# SqlAlchemy requires a table define the many to many relationship between 
+# course and clo
+course_clo_table = db.Table(
+    'course_clo', # Table Name
+
+    # Primary Keys for Course
+    Column('course_number', Integer, primary_key=True),
+    Column('course_version', Integer, primary_key=True),
     
-    db.Column('clo_id', db.Integer, db.ForeignKey('clo.id'), primary_key=True),
-
+    # Primary and Foreign Key for Clo
+    Column('clo_id', Integer, ForeignKey('clo.id'), primary_key=True),
+    
+    # Foreign Keys for Course
     ForeignKeyConstraint(['course_number', 'course_version'], 
                          ['course.number', 'course.version'])
 )
 
 
 class User(UserMixin, db.Model, Timestamp):
-    id =            db.Column(db.Integer, primary_key=True)
-    username =      db.Column(db.String(64),  nullable=False, index=True, unique=True)
-    email =         db.Column(db.String(120), nullable=False, index=True, unique=True)
-    password_hash = db.Column(db.String(128), nullable=False)
-    permission =    db.Column(db.Enum('admin', 'instructor'), 
-                              nullable=False, 
-                              server_default=db.text("instructor")) #default='instructor')
-    instructor_id = db.Column(db.Integer, 
-                              db.ForeignKey('instructor.id'), 
-                              nullable=True)
-    instructor = db.relationship("Instructor")
+    '''User Model
+    '''
+    # TODO: make email primary key
+    # TODO: remove id and username from db 
+
+    # Primary Keys
+    id = Column(Integer, primary_key=True) 
+
+    # Foreign Keys
+    instructor_id = Column(Integer, ForeignKey('instructor.id'), nullable=True)
+    
+    # Relationships    
+    instructor = relationship("Instructor")
+
+    # Non Key Columns
+    email = Column(String(120), nullable=False, index=True, unique=True)
+    password_hash = Column(String(128), nullable=False)
+    permission = Column(Enum('admin', 'instructor'), nullable=False, 
+                        server_default=text("instructor"))
+    username = Column(String(64),  nullable=False, index=True, unique=True)
+    
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -97,126 +172,157 @@ class User(UserMixin, db.Model, Timestamp):
         return check_password_hash(self.password_hash, password)
 
     def __repr__(self):
-        return '<User {}>'.format(self.username)    
+        '''returns a printable representation of the object. 
+
+        Determines the result of when class is called in Print()
+        '''
+        return '<User email={}>'.format(self.email)    
+
 
 class Syllabus(db.Model, Timestamp):
-    section =            db.Column(db.Integer, primary_key=True)
-    semester =           db.Column(db.Enum('spring', 'summer', 'fall'), 
-                                    primary_key=True)
-    year =               db.Column(db.Integer, primary_key=True)
-    version =            db.Column(db.Integer, primary_key=True)
-    course_number =      db.Column(db.Integer, primary_key=True)
-    course_version =     db.Column(db.Integer, primary_key=True)
-    state =              db.Column(db.Enum('approved', 'draft'), 
-                                   default='draft')
-    pdf =                db.Column(db.LargeBinary, nullable=True)
-    calender =           db.Column(db.LargeBinary, nullable=True)
-    schedule =           db.Column(db.LargeBinary, nullable=True)
-    required_materials = db.Column(db.String(256), nullable=True)
-    optional_materials = db.Column(db.String(256), nullable=True)
-    withdrawl_date =     db.Column(db.String(100), nullable=True)
-    grading_policy =     db.Column(db.String(500), nullable=True)
-    attendance_policy =  db.Column(db.String(500), nullable=True)
-    cheating_policy =    db.Column(db.String(500), nullable=True)
-    extra_policies =     db.Column(db.String(500), nullable=True)
-    meeting_time =       db.Column(db.String(100), nullable=True)
-    meeting_dates =      db.Column(db.String(100), nullable=True)
-    University_cheating_policy = db.Column(db.String(500))
-    Students_with_disabilities = db.Column(db.String(500))
+    '''Syllabus Model
 
+    Relationships backrefed in SyllabusInstructorAssociation
+
+    '''
+
+    # Primary Keys
+    course_number = Column(Integer, primary_key=True)
+    course_version = Column(Integer, primary_key=True)
+    section = Column(Integer, primary_key=True)
+    semester = Column(Enum('spring', 'summer', 'fall'), primary_key=True)
+    version = Column(Integer, primary_key=True)
+    year = Column(Integer, primary_key=True)
+    
+    # Foreign Keys
     ForeignKeyConstraint(['course_number', 'course_version'], 
                          ['course.number', 'course.version'])
 
-    def getPDF(): 
-        #ToDo
-        return "pdf"
-    
+    # Non Key Columns
+    attendance_policy = Column(String(500), nullable=True)
+    calender = Column(LargeBinary, nullable=True)
+    cheating_policy = Column(String(500), nullable=True)
+    extra_policies = Column(String(500), nullable=True)
+    grading_policy = Column(String(500), nullable=True)
+    meeting_dates = Column(String(100), nullable=True)
+    meeting_time = Column(String(100), nullable=True)
+    optional_materials = Column(String(256), nullable=True)
+    pdf = Column(LargeBinary, nullable=True)
+    required_materials = Column(String(256), nullable=True)
+    schedule = Column(LargeBinary, nullable=True)
+    state = Column(Enum('approved', 'draft'), default='draft')
+    Students_with_disabilities = Column(String(500))
+    University_cheating_policy = Column(String(500))
+    withdrawl_date = Column(String(100), nullable=True)
+
+
+    def __repr__(self):
+        '''returns a printable representation of the object. 
+
+        Determines the result of when class is called in Print()
+        '''
+        return "<Syllabus " \
+            "\tcourse_number={} \n" \
+            "\tcourse_version={} \n" \
+            "\tsection={} \n" \
+            "\tsemester={} \n" \
+            "\tversion={} \n" \
+            "\tyear={}\n>" \
+            .format(self.course_number, self.course_version, 
+                    self.section, self.semester, 
+                    self.version, self.year)
+
+
+
 class Course(db.Model, Timestamp):
-    number =        db.Column(db.Integer, primary_key=True)
-    version =       db.Column(db.Integer, primary_key=True)
-    name =          db.Column(db.String(50))
-    description =   db.Column(db.String(256))
-    prerequisites = db.Column(db.String(256))
-    building =      db.Column(db.String(70))
-    room =          db.Column(db.String(50))
-    is_core =       db.Column(db.Boolean)
-    is_wi =         db.Column(db.Boolean)
-    is_elr =        db.Column(db.Boolean)
-    is_diversity =  db.Column(db.Boolean)
+    '''Course Model
+
+    No Foreign Keys
+    '''
+
+    # Primary Keys
+    number = Column(Integer, primary_key=True)
+    version = Column(Integer, primary_key=True) # TODO: autoincrement
     
-    #syllabi =       db.relationship('Syllabus', backref='course', lazy=True)
-    
-    clos =          db.relationship('Clo', 
-                                     secondary=course_clo_table,
-                                     back_populates='courses')
+    # Relationships    
+    clos = relationship('Clo', secondary=course_clo_table,
+                        back_populates='courses')
+    #TODO: add syllabus relationship
+    #syllabi = db.relationship('Syllabus', backref='course', lazy=True)
+
+    # Non Key Columns
+    building = Column(String(70))
+    description = Column(String(256))
+    is_core = Column(Boolean)
+    is_diversity = Column(Boolean)
+    is_elr = Column(Boolean)
+    is_wi = Column(Boolean)
+    name = Column(String(50))
+    prerequisites = Column(String(256))
+    room = Column(String(50))
+
+
+    def __repr__(self):
+        '''returns a printable representation of the object. 
+
+        Determines the result of when class is called in Print()
+        '''
+        return '<Course number={} version={}>'.format(self.number, self.version)
+
+
 
 class Clo(db.Model, Timestamp):
-    id =       db.Column(db.Integer, primary_key=True)
-    general =  db.Column(db.String(256))
+    '''CLO model
+
+    No Foreign Keys
+    '''
+
+    # Primary Key
+    id = db.Column(db.Integer, primary_key=True)
+
+    # Relationships    
+    courses = db.relationship('Course', secondary=course_clo_table,
+                              back_populates='clos')
+    
+    # Non Key Columns
+    general = db.Column(db.String(256))
     specific = db.Column(db.String(256))
 
-    courses =  db.relationship('Course', 
-                               secondary=course_clo_table,
-                               back_populates='clos')
+
+    def __repr__(self):
+        '''returns a printable representation of the object. 
+
+        Determines the result of when class is called in Print()
+        '''
+        return '<CLO id={}>'.format(self.id)
+
+
 
 class Instructor(db.Model, Timestamp):
-    id =                    db.Column(db.Integer, primary_key=True)
-    name =                  db.Column(db.String(64), index=True)
-    phone =                 db.Column(db.Integer)
-    email =                 db.Column(db.String(120), index=True, unique=True)
-    perfered_office_hours = db.Column(db.String(256))
+    '''Instructor Model
+
+    No Foreign Keys
+    '''
+
+    # Primary Key
+    id = db.Column(db.Integer, primary_key=True)
     
+    # Relationships
     user    = db.relationship("User", uselist=False, 
                               back_populates="instructor")
 
+    # Non Key Columns
+    email = db.Column(db.String(120), index=True, unique=True)
+    name = db.Column(db.String(64), index=True)
+    phone = db.Column(db.Integer)
+    perfered_office_hours = db.Column(db.String(256))
+    
+
     def __repr__(self):
+        '''returns a printable representation of the object. 
+
+        Determines the result of when class is called in Print()
+        '''
         return '<Instructor id={} name={}>'.format(self.id, self.name)
 
 
-
-
-
-
-
-'''
-class SyllabusInstructorAssociation(db.Model):
-    # Since instructors have a jobs such as teacher, grader, ect that may
-    # appear on many syllabi, SqlAlchemy requires an association object
-    __tablename__ = 'syllabus_instructor'
-
-    #syllabus_section =            db.Column(db.Integer, primary_key=True)
-    #syllabus_semester =           db.Column(db.Enum('spring', 
-    #                                                'summer', 
-    #                                                'fall'), 
-    #                                        primary_key=True)
-    syllabus_year =               db.Column(db.Integer, primary_key=True)
-    ###syllabus_year =               db.Column(db.Integer, db.ForeignKey('syllabus.year'), primary_key=True)
-    #syllabus_version =            db.Column(db.Integer, primary_key=True)
-    #syllabus_course_number =      db.Column(db.Integer, primary_key=True) 
-    #syllabus_course_version =     db.Column(db.Integer, primary_key=True) 
-
-    instructor_id =               db.Column(db.Integer, 
-                                            db.ForeignKey('instructor.id'), 
-                                            primary_key=True)
-
-    job_on_syllabus =             db.Column(db.String(120))
-
-    ForeignKeyConstraint([#'syllabus_section',       'syllabus_semester', 
-                          'syllabus_year',        #  'syllabus_version', 
-                          #'syllabus_course_number', 'syllabus_course_version'
-                          ], 
-
-                         [#'syllabus.section',       'syllabus.semester', 
-                          'syllabus.year',        #  'syllabus.version', 
-                          #'syllabus.course_number', 'syllabus.course_version'
-                          ])
-    
-    instructor = db.relationship("Instructor", back_populates="syllabi")
-    syllabus   = db.relationship("Syllabus", 
-        #primaryjoin= db.text('syllabus_instructor.syllabus_year == syllabus.year'),
-        #primaryjoin= syllabus_year == syllabus.c.year,
-        #primaryjoin= and_(syllabus_year == ),
-        foreign_keys=syllabus_year, 
-        #foreign_keys=[syllabus_year, syllabus_version], 
-        back_populates="instructors")
-    '''
