@@ -41,7 +41,7 @@ class SyllabusInstructorAssociation(db.Model):
     syllabus_year = Column(Integer, primary_key=True)
 
     # Primary and Foreign Key for Instructor    
-    instructor_id = Column(Integer, ForeignKey('Instructor.id'), 
+    instructor_id = Column(Integer, ForeignKey('instructor.id'), 
                            primary_key=True)
 
     # Foreign Keys for Syllabus    
