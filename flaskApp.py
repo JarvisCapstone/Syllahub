@@ -20,9 +20,3 @@ def make_shell_context():
 
         'factory': factory, 
     }
-
-def view_routes():
-    for name, func in app.view_functions.items():
-        print(name)
-        print(func)
-        print()

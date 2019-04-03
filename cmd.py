@@ -21,3 +21,9 @@ def inspectModel(model):
     #pprint(list(inspectUser.columns))
     inspectUser.relationships
 
+
+def viewRoutes():
+    for name, func in app.view_functions.items():
+        print(name)
+        print(func)
+        print()
