@@ -35,10 +35,10 @@ def create():
 
 
 
-@bp.route('/read/<id>', methods=['GET'])
-def read(id):
-    courses = Course.query.filter_by(number=id)
-    return render_template('/course/read.html', courses=courses, id=id)
+@bp.route('/read/<number>/<version>', methods=['GET'])
+def read(number, version):
+    course = Course.query.filter_by(number=number, version=version).first()
+    return render_template('/course/read.html', course=course, number=number, version=version)
 
 
 
