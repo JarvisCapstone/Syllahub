@@ -9,10 +9,7 @@ from app import db
 def index():
     courses = Course.query.all()
     print (courses)
-    #return jsonify(courses)
     return render_template('course/index.html', courses=courses)
-
-
 
 @bp.route('/create', methods=['GET', 'POST'])
 def create():
@@ -33,20 +30,23 @@ def create():
         flash("Course Created!")
     return render_template('course/create.html', title="Create Course", form=form)
 
-
-
 @bp.route('/read/<number>/<version>', methods=['GET'])
 def read(number, version):
     course = Course.query.filter_by(number=number, version=version).first()
     return render_template('/course/read.html', course=course, number=number, version=version)
 
-
+@bp.route('/search/<number>/<sortBy>', methods=['GET'])
+def search(number, sortBy):
+    courses = Course.query.filter_by(number=number).all()
+    if (sortBy == 'old'):
+        courses.sort(key=lambda x : x.version, reverse=False)
+    elif (sortBy == 'new' or form.sortBy == None):
+        courses.sort(key=lambda x : x.version, reverse=True)
+    return render_template('/course/search.html', courses=courses)
 
 @bp.route('/update/<id>', methods=['GET', 'POST'])
 def update(id):
     return render_template('/course/update.html')
-
-
 
 @bp.route('/delete/<id>', methods=['GET', 'POST'])
 def delete(id):
