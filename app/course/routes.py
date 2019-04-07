@@ -67,7 +67,7 @@ def update(number, version):
                     'prerequisites':form.coursePrereqs.data, 'room':form.courseRoomNo.data,
                     'version':form.courseVersion.data, 'is_core':form.isCore.data,
                     'is_diversity':form.isDiversity.data, 'is_elr':form.isELR.data, 'is_wi':form.isWI.data}
-            print(db.session.query(Course).filter_by(number=number, version=version).update(data))
+            db.session.query(Course).filter_by(number=number, version=version).update(data)
             db.session.commit()
             flash("Course Updated")
     return render_template('/course/update.html', form=form)
