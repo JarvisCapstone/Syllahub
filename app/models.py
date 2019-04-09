@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship
 
 
 @login.user_loader
-def load_user(id):
+def load_user(emails):
     '''Used by Flask-Login to login user
 
     Args: 
@@ -17,7 +17,7 @@ def load_user(id):
     Returns: 
         User with primary key = to Args
     '''
-    return User.query.get(int(id))
+    return User.query.get(email)
 
 # Association Tables/Objects --------------------------------------------------
 class SyllabusInstructorAssociation(db.Model):
