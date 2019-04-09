@@ -3,5 +3,18 @@
 {% block title %}Index{% endblock %}
 
 {% block app_content %}
-    <h1>Stub syllabus index</h1>
+<h1>All Courses</h1>
+<ul class="list-group">
+    {% for syllabus in syllabi %}
+        <li class="list-group-item">
+            <h3> Syllabus for {{ syllabus.course_number }} </h3>
+            <p>Course Version: {{ syllabus.course_version }}</p>
+            <p>Section: {{ syllabus.section }}</p>
+            <p>Semester: {{ syllabus.semester }}</p>
+            <p>Version: {{ syllabus.version }}</p>
+            <p>Year: {{ syllabus.year }}</p>
+            <p>Version: {{ syllabus.version }}</p>
+        </li>
+    {% endfor %}
+</ul>
 {% endblock %}
