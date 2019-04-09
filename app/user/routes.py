@@ -37,14 +37,11 @@ def update(username):
 
 
 
-@bp.route('/delete/<username>', methods=['GET', 'POST'])
+@bp.route('/delete/<email>', methods=['GET', 'POST'])
 @login_required
-def delete(username):
-    form = DeleteUserForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first_or_404()
-        print(user)
-        db.session.delete(user)
-        db.session.commit()
-        flash('User Deleted')
-    return render_template('/user/delete.html', title='Delete User', form=form)
+def delete(email):
+    user = User.query.filter_by(email=email).first_or_404()
+    db.session.delete(user)
+    db.session.commit()
+    flash('User Deleted')
+    return render_template('/user/delete.html', title='Delete User')

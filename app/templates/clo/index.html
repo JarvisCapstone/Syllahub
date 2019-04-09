@@ -4,4 +4,15 @@
 
 {% block app_content %}
     <h1>Stub clo index</h1>
+<ul class="list-group">
+    {% for clo in clos %}
+        <li class="list-group-item">
+            <h3> {{ clo.id }} </h3>
+            <h3>General Description:</h3>
+                <p> {{ clo.general }}</p>
+            <h3>Specific Description:</h3>
+                <p> {{ clo.specific }}</p>
+        </li>
+    {% endfor %}
+</ul>
 {% endblock %}
