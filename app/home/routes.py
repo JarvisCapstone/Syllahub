@@ -22,12 +22,12 @@ def userIndex():
 
 @bp.route('/site_map', methods=['GET', 'POST'])
 def site_map():
-    print("3333333333333333333333333 site map called ")
+    #print("3333333333333333333333333 site map called ")
     return render_template('home/site_map.html')
 
 @bp.route('/run', methods=['GET', 'POST'])
 def run():
     '''used for debugging
     '''
-    print('run called')
+    #print('run called')
     return 'success'
