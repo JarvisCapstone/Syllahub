@@ -15,9 +15,12 @@ def index():
 def create():
     form = createCourseForm()
     if form.validate_on_submit():
-        course = Course(number = int(form.courseNumber.data), version = int(form.courseVersion.data), 
-                        name = form.courseName.data, description = form.courseDescription.data, 
-                        prerequisites = form.coursePrereqs.data, building = form.courseBuilding.data, 
+        course = Course(number = int(form.courseNumber.data), 
+                        version = int(form.courseVersion.data), 
+                        name = form.courseName.data, 
+                        description = form.courseDescription.data, 
+                        prerequisites = form.coursePrereqs.data, 
+                        building = form.courseBuilding.data, 
                         room = form.courseRoomNo.data)
       
         course.is_core = form.isCore.data
@@ -28,12 +31,14 @@ def create():
         db.session.add(course)
         db.session.commit()
         flash("Course Created!")
-    return render_template('course/create.html', title="Create Course", form=form)
+    return render_template('course/create.html', title="Create Course", 
+                           form=form)
 
 @bp.route('/read/<number>/<version>', methods=['GET'])
 def read(number, version):
     course = Course.query.filter_by(number=number, version=version).first()
-    return render_template('/course/read.html', course=course, number=number, version=version)
+    return render_template('/course/read.html', course=course, number=number, 
+                           version=version)
 
 @bp.route('/search/<number>/<sortBy>', methods=['GET'])
 def search(number, sortBy):
@@ -50,12 +55,22 @@ def update(number, version):
     form = updateCourseForm()
     if course is not None:
         if form.validate_on_submit():
-            data = {'name':form.courseName.data, 'number':form.courseNumber.data, 
-                    'building':form.courseBuilding.data, 'description':form.courseDescription.data,
-                    'prerequisites':form.coursePrereqs.data, 'room':form.courseRoomNo.data,
-                    'version':form.courseVersion.data, 'is_core':form.isCore.data,
-                    'is_diversity':form.isDiversity.data, 'is_elr':form.isELR.data, 'is_wi':form.isWI.data}
-            db.session.query(Course).filter_by(number=number, version=version).update(data)
+            data = {
+                'name':form.courseName.data, 
+                'number':form.courseNumber.data, 
+                'building':form.courseBuilding.data, 
+                'description':form.courseDescription.data,
+                'prerequisites':form.coursePrereqs.data, 
+                'room':form.courseRoomNo.data,
+                'version':form.courseVersion.data, 
+                'is_core':form.isCore.data,
+                'is_diversity':form.isDiversity.data, 
+                'is_elr':form.isELR.data, 
+                'is_wi':form.isWI.data
+            }
+            db.session.query(Course) \
+                      .filter_by(number=number, version=version) \
+                      .update(data)
             db.session.commit()
             flash("Course Updated")
         elif request.method == 'GET':
