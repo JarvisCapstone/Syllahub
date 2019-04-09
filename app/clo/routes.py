@@ -1,8 +1,8 @@
 from app.clo import bp
-from flask import render_template, flash, jsonify
+from flask import render_template, flash, jsonify, redirect, url_for, request
 from flask_login import current_user, login_required
 from app.models import Clo
-from app.clo.forms import CreateCloForm, DeleteCloForm, ReadCloForm, UpdateCloForm
+from app.clo.forms import CreateCloForm, UpdateCloForm
 from app import db
 
 @bp.route('/index', methods=['GET', 'POST'])
@@ -27,12 +27,9 @@ def create():
 
 @bp.route('/read/<id>', methods=['GET', 'POST'])
 def read(id):
-    form = ReadCloForm()
-    if form.validate_on_submit():
-        clo = Clo.query.filter_by(id = int(form.cloID.data)).one()
-        #print(clos)
-        flash("CLO Read!")
-    return render_template('/clo/read.html', title="CLO Read", form=form)
+    clo = Clo.query.filter_by(id = id).one()
+    flash("CLO Read!")
+    return render_template('/clo/read.html', title="CLO Read", clo=clo)
 
 
 
@@ -53,10 +50,8 @@ def update(id):
 
 @bp.route('/delete/<id>', methods=['GET', 'POST'])
 def delete(id):
-    form = DeleteCloForm()
-    if form.validate_on_submit():
-        clo = Clo.query.filter_by(id = int(form.cloID.data)).one()
-        db.session.delete(clo)
-        db.session.commit()
-        flash("CLO removed! " + form.cloID.data)
-    return render_template('/clo/delete.html', title="CLO Delete", form=form)
+    clo = Clo.query.filter_by(id = id).one()
+    db.session.delete(clo)
+    db.session.commit()
+    flash("CLO removed!")
+    return redirect(url_for('home.index'))

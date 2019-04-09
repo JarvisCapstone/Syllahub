@@ -8,12 +8,6 @@ class CreateCloForm(FlaskForm):
     cloGeneral = StringField('general', validators=[DataRequired()])
     cloSpecific = StringField('specific', validators=[DataRequired()])
 
-class DeleteCloForm(FlaskForm):
-    cloID = StringField('ID', validators=[DataRequired()])
-
-class ReadCloForm(FlaskForm):
-    cloID = StringField('ID', validators=[DataRequired()])
-
 class UpdateCloForm(FlaskForm):
     cloID = StringField('ID', validators=[DataRequired()])
     cloGeneral = StringField('general')
