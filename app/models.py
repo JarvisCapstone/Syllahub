@@ -4,7 +4,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from sqlalchemy_utils import Timestamp
 from sqlalchemy import and_, Boolean, Column, Enum, ForeignKey, ForeignKeyConstraint, Integer, LargeBinary, MetaData, String, text
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
+from sqlalchemy.ext.associationproxy import association_proxy
 
 
 @login.user_loader
@@ -28,6 +29,11 @@ class SyllabusInstructorAssociation(db.Model):
 
     TODO: consider making this not a model but share Base
     '''
+    def __init__(self, keyword=None, user=None, special_key=None):
+        self.user = user
+        self.keyword = keyword
+        self.special_key = special_key
+
 
     __tablename__ = 'syllabus_instructor'
     
@@ -73,7 +79,8 @@ class SyllabusInstructorAssociation(db.Model):
         remote_side="Instructor.id",
         foreign_keys="SyllabusInstructorAssociation.instructor_id",
 
-        back_populates="syllabi")
+        backref=backref("instructor_syllabi"))
+        #back_populates="syllabi")
 
     syllabus =  relationship(
         # use strings in relationships to avoid reference errors
@@ -125,17 +132,18 @@ class SyllabusInstructorAssociation(db.Model):
 
         Determines the result of when class is called in Print()
         '''
-        return "<SyllabusInstructorAssociation " \
-            "\tcourse_number={} \n" \
-            "\tcourse_version={} \n" \
-            "\tsection={} \n" \
-            "\tsemester={} \n" \
-            "\tversion={} \n" \
-            "\tyear={}\n" \
+        return "<SyllabusInstructorAssociation \n" \
+            "\tsyllabus_course_number={} \n" \
+            "\tsyllabus_course_version={} \n" \
+            "\tsyllabus_section={} \n" \
+            "\tsyllabus_semester={} \n" \
+            "\tsyllabus_version={} \n" \
+            "\tsyllabus_year={}\n" \
             "\tinstructor_id={} \n>" \
-            .format(self.course_number, self.course_version, 
-                    self.section, self.semester, 
-                    self.version, self.year,
+            .format(self.syllabus_course_number, 
+                    self.syllabus_course_version, 
+                    self.syllabus_section, self.syllabus_semester, 
+                    self.syllabus_version, self.syllabus_year,
                     self.instructor_id)
 
 
@@ -200,6 +208,7 @@ class Course(db.Model, Timestamp):
     clos = relationship('Clo', secondary=course_clo_table,
                         back_populates='courses')
     
+    
     syllabi = relationship(
         "Syllabus", 
         primaryjoin="and_(Course.number == Syllabus.course_number, "
@@ -207,6 +216,7 @@ class Course(db.Model, Timestamp):
         foreign_keys="[Syllabus.course_number, Syllabus.course_version]",
         remote_side="[Syllabus.course_number, Syllabus.course_version]",
         back_populates="course")   
+    
 
     # Non Key Columns
     building = Column(String(70))
@@ -247,16 +257,19 @@ class Instructor(db.Model, Timestamp):
     # Primary Key
     id = Column(Integer, primary_key=True)
     
+    # Association Proxy
+    my_syllabi = association_proxy('instructor_syllabi', 'syllabus')
+
     # Relationships
     user = relationship("User", uselist=False, back_populates="instructor")
-    
+    '''
     syllabi = relationship(
         "SyllabusInstructorAssociation",
         primaryjoin="Instructor.id == SyllabusInstructorAssociation.instructor_id ",
         foreign_keys="SyllabusInstructorAssociation.instructor_id",
         remote_side="SyllabusInstructorAssociation.instructor_id",
         back_populates="instructor")
-
+    '''
 
     # Non Key Columns
     email = Column(String(120), index=True, unique=True)
@@ -369,7 +382,7 @@ class Syllabus(db.Model, Timestamp):
 
         Determines the result of when class is called in Print()
         '''
-        return "<Syllabus " \
+        return "<Syllabus \n" \
             "\tcourse_number={} \n" \
             "\tcourse_version={} \n" \
             "\tsection={} \n" \

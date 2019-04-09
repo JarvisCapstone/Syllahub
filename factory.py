@@ -19,6 +19,31 @@ fake.add_provider(lorem)
 fake.add_provider(misc)
 fake.add_provider(address)
 
+
+class Factory:
+    def __init__(self, model):
+        self.model = model
+        self.data = []
+
+    def setDefaultData():
+        pass
+
+    def create():
+        pass
+
+    def addToDB(num=None):
+        if not num: 
+            num = 3
+        else:
+            num = int(num)
+        return "TODO"
+
+
+class UserFactory(Factory):
+    def __init__(self):
+        Factory.__init__(self, User)
+
+
 def createFakeUser(username=None, email=None, password=None, permission=None, instructor_id=None):
     p = fake.simple_profile()
     u = User()
@@ -341,26 +366,36 @@ def createRandCloCourseAssociation():
     temp_course.clos.append(temp_clo)
     db.session.commit()
 
+def test():
+    temp_syllabus = Syllabus.query.order_by(func.rand()).first()
+    temp_instructor = Instructor.query.order_by(func.rand()).first()
+    temp_job = SyllabusInstructorAssociation(temp_syllabus, temp_instructor, job_on_syllabus='teacher')
+    #temp_instructor.my_syllabi.append(temp_syllabus)
+    print(temp_job)
+    #print(temp_instructor.my_syllabi)
+
 def createRandInstructorSyllabusAssociation():
     # TODO: fix this
     temp_syllabus = Syllabus.query.order_by(func.rand()).first()
-    temp_job = SyllabusInstructorAssociation()
-    temp_job.job_on_syllabus = 'grader'
     temp_instructor = Instructor.query.order_by(func.rand()).first()
     print(temp_syllabus)
     print(temp_instructor)
+    temp_job = SyllabusInstructorAssociation()
+    temp_job.job_on_syllabus = 'grader'
     print(temp_job)
-    print('-------3')
+    print('before append')
 
     #temp_job.instructor = temp_instructor
-    temp_instructor.syllabi.append(temp_job)
+    temp_syllabus.instructors.append(temp_job)
+    #temp_instructor.syllabi.append(temp_job)
     print(temp_syllabus)
-    print(temp_instructor.syllabi)
-    print(temp_job)
+    print(temp_syllabus.instructors)
     #print(temp_job)
-    #print('===1')
+    #print(temp_job)
+    print('===1')
 
     #temp_syllabus.instructors.append(temp_job)
+    print(temp_syllabus.instructors)
 
     '''
     temp_instructor.syllabi.append(temp_job)

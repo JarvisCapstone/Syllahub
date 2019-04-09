@@ -1,6 +1,7 @@
 app.db
 config.py
 .flaskenv
+app/static/fakeSyllabus.pdf
 
 ##################################Standard python stuff#######################
 # Byte-compiled / optimized / DLL files
