@@ -1,5 +1,5 @@
 from app.course import bp
-from flask import render_template, flash, jsonify, request
+from flask import render_template, flash, jsonify, request, redirect, url_for
 from flask_login import current_user, login_required
 from app.models import Course
 from app.course.forms import createCourseForm, updateCourseForm
@@ -9,7 +9,6 @@ from sqlalchemy import update
 @bp.route('/index', methods=['GET'])
 def index():
     courses = Course.query.all()
-    print (courses)
     return render_template('course/index.html', courses=courses)
 
 @bp.route('/create', methods=['GET', 'POST'])
@@ -73,6 +72,10 @@ def update(number, version):
             form.isWI.data = course.is_wi
     return render_template('/course/update.html', form=form)
 
-@bp.route('/delete/<id>', methods=['GET', 'POST'])
-def delete(id):
-    return render_template('/course/delete.html')
+@bp.route('/delete/<number>/<version>', methods=['GET', 'POST'])
+def delete(number,version):
+    course = Course.query.filter_by(number=number, version=version).first()
+    db.session.delete(course)
+    db.session.commit()
+    flash('Course Deleted')
+    return redirect(url_for('home.index'))
