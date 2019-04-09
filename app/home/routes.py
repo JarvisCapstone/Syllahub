@@ -27,5 +27,7 @@ def site_map():
 
 @bp.route('/run', methods=['GET', 'POST'])
 def run():
+    '''used for debugging
+    '''
     print('run called')
     return 'success'
