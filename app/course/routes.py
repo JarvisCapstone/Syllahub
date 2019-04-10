@@ -12,7 +12,9 @@ def index():
     return render_template('course/index.html', courses=courses)
 
 @bp.route('/create', methods=['GET', 'POST'])
+@login_required
 def create():
+    # TODO authenticate user
     form = createCourseForm()
     if form.validate_on_submit():
         course = Course(number = int(form.courseNumber.data), 
@@ -36,7 +38,7 @@ def create():
 
 @bp.route('/read/<number>/<version>', methods=['GET'])
 def read(number, version):
-    course = Course.query.filter_by(number=number, version=version).first()
+    course = Course.query.filter_by(number=number, version=version).first_or_404()
     return render_template('/course/read.html', course=course, number=number, 
                            version=version)
 
@@ -49,47 +51,61 @@ def search(number, sortBy):
         courses.sort(key=lambda x : x.version, reverse=True)
     return render_template('/course/search.html', courses=courses)
 
+
 @bp.route('/update/<number>/<version>', methods=['GET', 'POST'])
+#@login_required
 def update(number, version):
-    course = Course.query.filter_by(number=number, version=version).first()
+    # TODO authenticate user
+    course = Course.query.filter_by(number=number, version=version).first_or_404()
     form = updateCourseForm()
-    if course is not None:
-        if form.validate_on_submit():
-            data = {
-                'name':form.courseName.data, 
-                'number':form.courseNumber.data, 
-                'building':form.courseBuilding.data, 
-                'description':form.courseDescription.data,
-                'prerequisites':form.coursePrereqs.data, 
-                'room':form.courseRoomNo.data,
-                'version':form.courseVersion.data, 
-                'is_core':form.isCore.data,
-                'is_diversity':form.isDiversity.data, 
-                'is_elr':form.isELR.data, 
-                'is_wi':form.isWI.data
-            }
-            db.session.query(Course) \
-                      .filter_by(number=number, version=version) \
-                      .update(data)
-            db.session.commit()
-            flash("Course Updated")
-        elif request.method == 'GET':
-            form.courseName.data = course.name
-            form.courseNumber.data = course.number
-            form.courseBuilding.data = course.building
-            form.courseDescription.data = course.description
-            form.coursePrereqs.data = course.prerequisites
-            form.courseRoomNo.data = course.room
-            form.courseVersion.data = course.version
-            form.isCore.data = course.is_core
-            form.isDiversity.data = course.is_diversity
-            form.isELR.data = course.is_elr
-            form.isWI.data = course.is_wi
-    return render_template('/course/update.html', form=form)
+    # if this is a validated post request
+    if form.validate_on_submit():
+        # update course in database
+        data = {
+            'name':form.courseName.data, 
+            'number':form.courseNumber.data, 
+            'building':form.courseBuilding.data, 
+            'description':form.courseDescription.data,
+            'prerequisites':form.coursePrereqs.data, 
+            'room':form.courseRoomNo.data,
+            'version':form.courseVersion.data, 
+            'is_core':form.isCore.data,
+            'is_diversity':form.isDiversity.data, 
+            'is_elr':form.isELR.data, 
+            'is_wi':form.isWI.data
+        }
+        db.session.query(Course) \
+                  .filter_by(number=number, version=version) \
+                  .update(data)
+        db.session.commit()
+        flash("Course Updated")
+        # After a successful update, redirect to the read page to show the user
+        # the result of their update
+        return redirect(url_for('course.read', number=number, version=version))
+    # if not validated and not a post request, send the standards
+    return redirect(url_for('course.read', number=number, version=version))
+
+    # if this is a get request then the user should recieve a form to use for
+    # a future post request
+    elif request.method == 'GET':
+        form.courseName.data = course.name
+        form.courseNumber.data = course.number
+        form.courseBuilding.data = course.building
+        form.courseDescription.data = course.description
+        form.coursePrereqs.data = course.prerequisites
+        form.courseRoomNo.data = course.room
+        form.courseVersion.data = course.version
+        form.isCore.data = course.is_core
+        form.isDiversity.data = course.is_diversity
+        form.isELR.data = course.is_elr
+        form.isWI.data = course.is_wi
+        return render_template('/course/update.html', form=form)
 
 @bp.route('/delete/<number>/<version>', methods=['GET', 'POST'])
+@login_required
 def delete(number,version):
-    course = Course.query.filter_by(number=number, version=version).first()
+    # TODO authenticate user
+    course = Course.query.filter_by(number=number, version=version).first_or_404()
     db.session.delete(course)
     db.session.commit()
     flash('Course Deleted')
