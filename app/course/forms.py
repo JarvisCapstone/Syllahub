@@ -16,6 +16,8 @@ class createCourseForm(FlaskForm):
     isELR = BooleanField('Satisfies experimental learning requirement?')
     isDiversity = BooleanField('Satisfies diversity requirement?')
 
+    # TODO Add Type Validators
+
 class updateCourseForm(FlaskForm):
     courseName = StringField('Course Name', validators=[DataRequired()])
     courseNumber = StringField('Course Number', validators=[DataRequired()])
@@ -28,3 +30,5 @@ class updateCourseForm(FlaskForm):
     isWI = BooleanField('Satisfies writing intensive requirement?')
     isELR = BooleanField('Satisfies experimental learning requirement?')
     isDiversity = BooleanField('Satisfies diversity requirement?')
+
+    # TODO Add Type Validators

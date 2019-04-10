@@ -53,7 +53,7 @@ def search(number, sortBy):
 
 
 @bp.route('/update/<number>/<version>', methods=['GET', 'POST'])
-#@login_required
+@login_required
 def update(number, version):
     # TODO authenticate user
     course = Course.query.filter_by(number=number, version=version).first_or_404()
@@ -82,8 +82,6 @@ def update(number, version):
         # After a successful update, redirect to the read page to show the user
         # the result of their update
         return redirect(url_for('course.read', number=number, version=version))
-    # if not validated and not a post request, send the standards
-    return redirect(url_for('course.read', number=number, version=version))
 
     # if this is a get request then the user should recieve a form to use for
     # a future post request
@@ -100,6 +98,9 @@ def update(number, version):
         form.isELR.data = course.is_elr
         form.isWI.data = course.is_wi
         return render_template('/course/update.html', form=form)
+    # if not validated and not a post request, send the standards
+    # TODO consider changing this to an error message
+    return render_template('/course/update.html', form=form)
 
 @bp.route('/delete/<number>/<version>', methods=['GET', 'POST'])
 @login_required
