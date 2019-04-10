@@ -3,7 +3,7 @@ from app.models import Instructor
 from flask import render_template, jsonify, flash, redirect, url_for, request
 from flask_login import current_user, login_required
 from app import db
-from app.instructor.forms import createInstructorForm, deleteInstructorForm, readInstructorForm, updateInstructorForm
+from app.instructor.forms import createInstructorForm, deleteInstructorForm, updateInstructorForm
 
 @bp.route('/index', methods=['GET', 'POST'])
 def index():
@@ -24,14 +24,10 @@ def create():
     return render_template('instructor/create.html', title="Create Instructor", form=form)
 
 
-@bp.route('/read/<id>', methods=['GET', 'POST'])
+@bp.route('/read/<id>', methods=['GET'])
 def read(id):
-    form = readInstructorForm()
-    if form.validate_on_submit():
-        instructor = Instructor.query.filter_by(id=int(form.id.data)).one()
-        flash("Instructor read!")
-        print(instructor)
-    return render_template('/instructor/read.html', form=form)
+    instructor = Instructor.query.filter_by(id=id).first()
+    return render_template('/instructor/read.html', instructor=instructor)
 
 
 @bp.route('/update/<id>', methods=['GET', 'POST'])
@@ -58,7 +54,6 @@ def delete(id):
         print(instructor)
         db.session.delete(instructor)
         db.session.commit()
-
     return render_template('/instructor/delete.html', form=form)
 
      
