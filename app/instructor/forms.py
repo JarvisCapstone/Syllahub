@@ -15,7 +15,7 @@ class deleteInstructorForm(FlaskForm):
     submit = SubmitField('Submit')
 
 class readInstructorForm(FlaskForm):
-    id = IntegerField('Id', validators=[DataRequired])
+    id = IntegerField('Id', validators=[DataRequired()])
 
 class updateInstructorForm(FlaskForm):
     id = IntegerField('Id,', validators=[DataRequired()])

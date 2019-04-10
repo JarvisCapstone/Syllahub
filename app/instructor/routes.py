@@ -28,10 +28,10 @@ def create():
 def read(id):
     form = readInstructorForm()
     if form.validate_on_submit():
-        instructor = Instructor.query.filter_by(id = int(form.id.data)).one()
+        instructor = Instructor.query.filter_by(id=int(form.id.data)).one()
         flash("Instructor read!")
-    return render_template('/instructor/read.html', title="Instructor read!", form=form, instructor=instructor)
-
+        print(instructor)
+    return render_template('/instructor/read.html', form=form, instructor=instructor)
 
 
 @bp.route('/update/<id>', methods=['GET', 'POST'])
