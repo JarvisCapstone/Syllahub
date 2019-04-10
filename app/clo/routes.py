@@ -35,15 +35,22 @@ def read(id):
 
 @bp.route('/update/<id>', methods=['GET', 'POST'])
 def update(id):
+    clo = Clo.query.filter_by(id = id).one()
     form = UpdateCloForm()
     if form.validate_on_submit():
-        clo = Clo.query.filter_by(id = int(form.cloID.data)).one()
         if form.cloGeneral.data != '':
             clo.general = form.cloGeneral.data
         if form.cloSpecific.data != '':
             clo.specific = form.cloSpecific.data
         db.session.commit()
         flash("CLO Updated!")
+        return redirect(url_for('clo.read', id=id))
+
+    elif request.method == 'GET':
+        form.cloGeneral.data = clo.general
+        form.cloSpecific.data = clo.specific
+        #return render_template('/clo/update.html', title="CLO Update", form=form)
+
     return render_template('/clo/update.html', title="CLO Update", form=form)
 
 
