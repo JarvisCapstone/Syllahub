@@ -4,10 +4,10 @@ from wtforms.validators import ValidationError, DataRequired, Email
 from app.models import Instructor
 
 class createInstructorForm(FlaskForm):
-    name = StringField('InstructorName', validators=[DataRequired()])
-    phone = IntegerField('PhoneNumber', validators=[DataRequired()])
+    name = StringField('Instructor Name', validators=[DataRequired()])
+    phone = StringField('Phone Number', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired()])
-    hours = StringField('OfficeHours')
+    hours = StringField('Office Hours')
     submit = SubmitField('Submit')
 
 class deleteInstructorForm(FlaskForm):
@@ -16,3 +16,7 @@ class deleteInstructorForm(FlaskForm):
 
 class readInstructorForm(FlaskForm):
     id = IntegerField('Id', validators=[DataRequired])
+
+class updateInstructorForm(FlaskForm):
+    id = IntegerField('Id,', validators=[DataRequired])
+name = StringField('Instructor')    
