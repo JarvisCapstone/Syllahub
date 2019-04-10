@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Update Course{% endblock %}
+
+{% block app_content %}
+    <h1>Update Course</h1>
+    {% from "_formhelpers.html" import render_field%}
+
+    <form action="" class="my-3" method="post">
+        {{ form.hidden_tag() }}
+
+        {{ render_field(form.courseName) }}
+        {{ render_field(form.courseNumber) }}
+        {{ render_field(form.courseVersion) }}
+        {{ render_field(form.courseDescription) }}
+        {{ render_field(form.coursePrereqs) }}
+        {{ render_field(form.courseBuilding) }}
+        {{ render_field(form.courseRoomNo) }}
+        {{ render_field(form.isCore) }}
+        {{ render_field(form.isWI) }}
+        {{ render_field(form.isELR) }}
+        {{ render_field(form.isDiversity) }}
+        <button class="btn btn-primary" type="submit">Update</button>
+    </form>
+
+{% endblock %}

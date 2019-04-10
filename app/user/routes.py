@@ -5,10 +5,10 @@ from app.models import User
 from app import db
 from app.user.forms import DeleteUserForm
 
-@bp.route('/user/<username>', methods=['GET', 'POST'])
+@bp.route('/user/<emial>', methods=['GET', 'POST'])
 @login_required
-def user(username):
-    user = User.query.filter_by(username=username).first_or_404()
+def user(email):
+    user = User.query.filter_by(email=email).first_or_404()
     return render_template('user/user.html', user=user)
 
 
@@ -25,26 +25,23 @@ def create():
 
 
 
-@bp.route('/read/<username>', methods=['GET', 'POST'])
-def read(username):
-    user = User.query.filter_by(username=username).first_or_404()
+@bp.route('/read/<email>', methods=['GET', 'POST'])
+def read(email):
+    user = User.query.filter_by(email=email).first_or_404()
     return render_template('user/read.html', user=user)
 
 
-@bp.route('/update/<username>', methods=['GET', 'POST'])
-def update(username):
+@bp.route('/update/<email>', methods=['GET', 'POST'])
+def update(email):
     return render_template('/user/update.html')
 
 
 
-@bp.route('/delete/<username>', methods=['GET', 'POST'])
+@bp.route('/delete/<email>', methods=['GET', 'POST'])
 @login_required
-def delete(username):
-    form = DeleteUserForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first_or_404()
-        print(user)
-        db.session.delete(user)
-        db.session.commit()
-        flash('User Deleted')
-    return render_template('/user/delete.html', title='Delete User', form=form)
+def delete(email):
+    user = User.query.filter_by(email=email).first_or_404()
+    db.session.delete(user)
+    db.session.commit()
+    flash('User Deleted')
+    return render_template('/user/delete.html', title='Delete User')

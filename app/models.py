@@ -8,8 +8,8 @@ from sqlalchemy.orm import relationship
 
 
 @login.user_loader
-def load_user(id):
-    ''' Used by Flask-Login to login user
+def load_user(emails):
+    '''Used by Flask-Login to login user
 
     Args: 
         primary key of User
@@ -17,7 +17,7 @@ def load_user(id):
     Returns: 
         User with primary key = to Args
     '''
-    return User.query.get(int(id))
+    return User.query.get(email)
 
 # Association Tables/Objects --------------------------------------------------
 class SyllabusInstructorAssociation(db.Model):
@@ -362,6 +362,29 @@ class Syllabus(db.Model, Timestamp):
     Students_with_disabilities = Column(String(500))
     University_cheating_policy = Column(String(500))
     withdrawl_date = Column(String(100), nullable=True)
+
+    def SetPDF(self):
+        '''Generates a PDF document and sets self.pdf to it
+        
+        This function should be the final function called before comitting 
+        to the DB. All other variables should be set when this function is called. 
+        
+        Args: 
+            none. 
+        
+        Returns: 
+            a success of failure message
+        '''
+
+        # Convert Model Data to HTML
+        syllabusHTML = 'TODO' # = convertToHTML()
+
+        # Convert HTML to PDF
+        syllabusPDF = 'TODO' # = pdfKitFunction(syllabusHTML)
+
+        self.pdf = syllabusPDF
+        
+        return 'failure'
 
 
     def __repr__(self):
