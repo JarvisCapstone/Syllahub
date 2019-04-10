@@ -30,7 +30,7 @@ def read(id):
     if form.validate_on_submit():
         instructor = Instructor.query.filter_by(id = int(form.id.data)).one()
         flash("Instructor read!")
-    return render_template('/instructor/read.html', title="Instructor read!", form=form)
+    return render_template('/instructor/read.html', title="Instructor read!", form=form, instructor=instructor)
 
 
 
