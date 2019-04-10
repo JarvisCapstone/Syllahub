@@ -3,7 +3,7 @@
 {% block title %}Index{% endblock %}
 
 {% block app_content %}
-    <h1>{{ user.username }}</h1>
+    <h1>{{ user.email }}</h1>
     <p>ToDo. add user info here. <br>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quis quod, quibusdam natus! Vero sapiente voluptatum, ducimus. Molestias, nam, libero! Id tenetur aliquid minus, dignissimos delectus fuga repellat consectetur praesentium magni.</p>
     <a class="btn btn-primary" href="{{ url_for('auth.logout') }}">Logout</a>
 {% endblock %}

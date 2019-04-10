@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship
 
 
 @login.user_loader
-def load_user(id):
+def load_user(email):
     '''Used by Flask-Login to login user
 
     Args: 
@@ -17,7 +17,8 @@ def load_user(id):
     Returns: 
         User with primary key = to Args
     '''
-    return User.query.get(int(id))
+    print("load user with email=", email)
+    return User.query.get(email)
 
 # Association Tables/Objects --------------------------------------------------
 class SyllabusInstructorAssociation(db.Model):
@@ -193,6 +194,7 @@ class Course(db.Model, Timestamp):
     '''
 
     # Primary Keys
+    # Number CS0001
     number = Column(Integer, primary_key=True)
     version = Column(Integer, primary_key=True) # TODO: autoincrement
     
@@ -215,7 +217,7 @@ class Course(db.Model, Timestamp):
     is_diversity = Column(Boolean)
     is_elr = Column(Boolean)
     is_wi = Column(Boolean)
-    name = Column(String(50))
+    name = Column(String(50)) #CS3
     prerequisites = Column(String(256))
     room = Column(String(50))
 
@@ -261,7 +263,7 @@ class Instructor(db.Model, Timestamp):
     # Non Key Columns
     email = Column(String(120), index=True, unique=True)
     name = Column(String(64), index=True)
-    phone = Column(Integer)
+    phone = Column(Integer) # TODO change this to string
     perfered_office_hours = Column(String(256))
     
 
@@ -283,8 +285,13 @@ class Syllabus(db.Model, Timestamp):
     '''
 
     # Primary Keys
+    # CRN course_registration_number used as a primary key in school db
+    # does not appear on syllabus
+
+
     course_number = Column(Integer, primary_key=True)
     course_version = Column(Integer, primary_key=True)
+    
     section = Column(Integer, primary_key=True)
     semester = Column(Enum('spring', 'summer', 'fall'), primary_key=True)
     version = Column(Integer, primary_key=True)
@@ -346,11 +353,19 @@ class Syllabus(db.Model, Timestamp):
 
         back_populates="syllabus")   
 
+    # Defaults
+    # TODO set default policy information to variables here. 
+    currentCheatingPolicy = "University policy 3-01.8 deals with the problem of academic dishonesty, cheating, and plagiarism.  None of these will be tolerated in this class.  The sanctions provided in this policy will be used to deal with any violations.  If you have any questions, please read the policy at http://www.kent.edu/policyreg/administrative-policy-regarding-student-cheating-and-plagiarism and/or ask."
+    currentAttendancePolicy = "Regular attendance in class is expected of all students at all levels at the university. While classes are conducted on the premise that regular attendance is expected, the university recognizes certain activities, events, and circumstances as legitimate reasons for absence from class. This policy provides for accommodations in accordance with federal and state laws prohibiting discrimination, including, but not limited to, Section 504 of the Rehabilitation Act of 1973, 29 U.S.C.§794, and its implementing regulation, 34 C.F.R. Part 104; Title II of the Americans with Disabilities Act of 1990, 42 U.S.C. §12131 et seq., and its implementing regulations, 28 C.F.R. Part 35; as well as university policy 5-16. More information can be found at https://www.kent.edu/policyreg/administrative-policy-regarding-class-attendance-and-class-absence"
+    currentSASText = "University policy 3-01.3 requires that students with disabilities be provided reasonable accommodations to ensure their equal access to course content.  If you have a documented disability and require accommodations, please contact the instructor at the beginning of the semester to make arrangements for necessary classroom adjustments.  Please note, you must   first verify your eligibility for these through Student Accessibility Services (contact 330-672-3391 or visit www.kent.edu/sas for more information on registration procedures)."
     # Non Key Columns
+
+
     attendance_policy = Column(String(500), nullable=True)
     calender = Column(LargeBinary, nullable=True)
-    cheating_policy = Column(String(500), nullable=True)
-    extra_policies = Column(String(500), nullable=True)
+    # crn = Column(Integer, index)
+    cheating_policy = Column(String(500), nullable=True) # TODO change name to optional cheating policy, maybe remove
+    extra_policies = Column(String(500), nullable=True) # TODO change to 1000
     grading_policy = Column(String(500), nullable=True)
     meeting_dates = Column(String(100), nullable=True)
     meeting_time = Column(String(100), nullable=True)
@@ -359,8 +374,8 @@ class Syllabus(db.Model, Timestamp):
     required_materials = Column(String(256), nullable=True)
     schedule = Column(LargeBinary, nullable=True)
     state = Column(Enum('approved', 'draft'), default='draft')
-    Students_with_disabilities = Column(String(500))
-    University_cheating_policy = Column(String(500))
+    Students_with_disabilities = Column(String(500)) #TODO change to sastext
+    University_cheating_policy = Column(String(500)) # TODO set default to  default=currentCheatingPollicy
     withdrawl_date = Column(String(100), nullable=True)
 
     def SetPDF(self):
@@ -412,7 +427,8 @@ class User(UserMixin, db.Model, Timestamp):
     '''
     # TODO: make email primary key
     # TODO: remove id and username from db 
-
+    def get_id(self):
+           return (self.email)
     # Primary Keys
     #id = Column(Integer, primary_key=True) 
     email = Column(String(120), primary_key=True)

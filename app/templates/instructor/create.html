@@ -3,5 +3,20 @@
 {% block title %}Index{% endblock %}
 
 {% block app_content %}
-    <h1>Stub instructor create</h1>
+    <h1>Instructor Creation</h1>
+    {%from "_formhelpers.html" import render_field %}
+
+    <form method="post" action="">
+        {{ form.hidden_tag() }}
+
+        {{render_field(form.name)}}
+
+        {{render_field(form.phone)}}<br>
+        
+        {{render_field(form.email)}}<br>
+        
+        {{render_field(form.hours)}}<br>
+        <button type="submit">Submit</button>
+    </form>
 {% endblock %}
+
