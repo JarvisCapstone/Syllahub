@@ -3,5 +3,23 @@
 {% block title %}Index{% endblock %}
 
 {% block app_content %}
-    <h1>Stub instructor read</h1>
+
+
+<h1>Instructor Result</h1>
+{% from "_formhelpers.html" import render_field %}
+
+<form method=post>
+    {{ form.hidden_tag() }}
+    {{render_field(form.id, "Enter ID")}}
+    <button class="btn btn-primary" type="submit">Read Instructor</button>
+</form>
+
+<ul class="list-group">
+    {% for instructor in instructors %}
+    <li class="list-group-item">
+        <p>ID: {{instructor.id}} </p>
+        </a>
+    </li>
+    {% endfor %}
+</ul>
 {% endblock %}

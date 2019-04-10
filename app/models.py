@@ -17,7 +17,6 @@ def load_user(email):
     Returns: 
         User with primary key = to Args
     '''
-    print("###### email=", email)
     return User.query.get(email)
 
 # Association Tables/Objects --------------------------------------------------
