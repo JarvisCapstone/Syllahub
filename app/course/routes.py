@@ -32,15 +32,17 @@ def create():
 
         db.session.add(course)
         db.session.commit()
+        # TODO: Handle case, what if course already exists. crash cleanly
         flash("Course Created!")
     return render_template('course/create.html', title="Create Course", 
                            form=form)
 
 @bp.route('/read/<number>/<version>', methods=['GET'])
 def read(number, version):
-    course = Course.query.filter_by(number=number, version=version).first_or_404()
-    return render_template('/course/read.html', course=course, number=number, 
-                           version=version)
+    course = Course.query.filter_by(number=number, version=version) \
+                         .first_or_404()
+    return render_template('/course/read.html', course=course, 
+                           number=number, version=version)
 
 @bp.route('/search/<number>/<sortBy>', methods=['GET'])
 def search(number, sortBy):
@@ -56,7 +58,8 @@ def search(number, sortBy):
 @login_required
 def update(number, version):
     # TODO authenticate user
-    course = Course.query.filter_by(number=number, version=version).first_or_404()
+    course = Course.query.filter_by(number=number, version=version) \
+                         .first_or_404()
     form = updateCourseForm()
     # if this is a validated post request
     if form.validate_on_submit():
