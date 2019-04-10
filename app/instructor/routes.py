@@ -31,7 +31,7 @@ def read(id):
         instructor = Instructor.query.filter_by(id=int(form.id.data)).one()
         flash("Instructor read!")
         print(instructor)
-    return render_template('/instructor/read.html', form=form, instructor=instructor)
+    return render_template('/instructor/read.html', form=form)
 
 
 @bp.route('/update/<id>', methods=['GET', 'POST'])
