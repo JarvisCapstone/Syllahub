@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship
 
 
 @login.user_loader
-def load_user(id):
+def load_user(email):
     '''Used by Flask-Login to login user
 
     Args: 
@@ -17,7 +17,8 @@ def load_user(id):
     Returns: 
         User with primary key = to Args
     '''
-    return User.query.get(int(id))
+    print("###### email=", email)
+    return User.query.get(email)
 
 # Association Tables/Objects --------------------------------------------------
 class SyllabusInstructorAssociation(db.Model):
@@ -193,6 +194,7 @@ class Course(db.Model, Timestamp):
     '''
 
     # Primary Keys
+    # Number CS0001
     number = Column(Integer, primary_key=True)
     version = Column(Integer, primary_key=True) # TODO: autoincrement
     
@@ -215,7 +217,7 @@ class Course(db.Model, Timestamp):
     is_diversity = Column(Boolean)
     is_elr = Column(Boolean)
     is_wi = Column(Boolean)
-    name = Column(String(50))
+    name = Column(String(50)) #CS3
     prerequisites = Column(String(256))
     room = Column(String(50))
 
@@ -283,8 +285,13 @@ class Syllabus(db.Model, Timestamp):
     '''
 
     # Primary Keys
+    # CRN course_registration_number used as a primary key in school db
+    # does not appear on syllabus
+
+
     course_number = Column(Integer, primary_key=True)
     course_version = Column(Integer, primary_key=True)
+    
     section = Column(Integer, primary_key=True)
     semester = Column(Enum('spring', 'summer', 'fall'), primary_key=True)
     version = Column(Integer, primary_key=True)
@@ -349,6 +356,7 @@ class Syllabus(db.Model, Timestamp):
     # Non Key Columns
     attendance_policy = Column(String(500), nullable=True)
     calender = Column(LargeBinary, nullable=True)
+    # crn = Column(Integer, index)
     cheating_policy = Column(String(500), nullable=True)
     extra_policies = Column(String(500), nullable=True)
     grading_policy = Column(String(500), nullable=True)
