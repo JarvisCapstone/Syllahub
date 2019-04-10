@@ -18,5 +18,8 @@ class readInstructorForm(FlaskForm):
     id = IntegerField('Id', validators=[DataRequired])
 
 class updateInstructorForm(FlaskForm):
-    id = IntegerField('Id,', validators=[DataRequired])
-name = StringField('Instructor')    
+    id = IntegerField('Id,', validators=[DataRequired()])
+    name = StringField('Instructor')
+    phone = StringField('Phone Number')
+    email = StringField('Email', validators=[DataRequired()])
+    hours = StringField('Office Hours')  

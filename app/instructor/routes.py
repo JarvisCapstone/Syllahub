@@ -1,9 +1,9 @@
 from app.instructor import bp
 from app.models import Instructor
-from flask import render_template, jsonify, flash, redirect, url_for
+from flask import render_template, jsonify, flash, redirect, url_for, request
 from flask_login import current_user, login_required
 from app import db
-from app.instructor.forms import createInstructorForm, deleteInstructorForm, readInstructorForm
+from app.instructor.forms import createInstructorForm, deleteInstructorForm, readInstructorForm, updateInstructorForm
 
 @bp.route('/index', methods=['GET', 'POST'])
 def index():
@@ -36,7 +36,18 @@ def read(id):
 
 @bp.route('/update/<id>', methods=['GET', 'POST'])
 def update(id):
-    return render_template('/instructor/update.html')
+    form = updateInstructorForm()
+    if form.validate_on_submit():
+        instructor = Instructor.query.filter_by(id = int(form.id.data)).one()
+        instructor.id = form.id.data
+        instructor.name = form.name.data
+        instructor.phone = form.phone.data
+        instructor.email = form.email.data
+        instructor.hours = form.hours.data
+
+        db.session.commit()
+
+    return render_template('/instructor/update.html', form=form)
 
 
 @bp.route('/delete/<id>', methods=['GET', 'POST'])

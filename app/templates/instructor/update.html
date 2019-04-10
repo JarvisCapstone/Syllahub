@@ -1,7 +1,20 @@
 {% extends "base.html" %}
 
-{% block title %}Index{% endblock %}
+{% block title %}Update{% endblock %}
 
 {% block app_content %}
-    <h1>Stub instructor show</h1>
+<h1>Instructor Update</h1>
+
+{% from "_formhelpers.html" import render_field %}
+
+<form method=POST>
+    {{ form.hidden_tag() }}
+    {{ render_field(form.id, "Enter ID") }}
+    {{ render_field(form.name, "Enter Name") }}
+    {{ render_field(form.phone, "Enter Phone Number") }}
+    {{ render_field(form.email, "Enter Email") }}
+    {{ render_field(form.hours, "Enter Office hours") }}
+
+    <button class="btn btn-primary", type="submit">Update Instructor</button>
+</form>
 {% endblock %}
