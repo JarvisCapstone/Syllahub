@@ -366,55 +366,36 @@ def createRandCloCourseAssociation():
     temp_course.clos.append(temp_clo)
     db.session.commit()
 
-def test():
+
+def printRandInstructorSyllabi():
+    i = Instructor.query.filter_by(id=18).first()
+    print(i.syllabiList)
+    print(i.all_syllabus_associations)
+    #s = Instructor.query.filter_by(id=18).first()
+    #print(s.syllabiList)
+
+def printRandSyllabusInstructors():
     temp_syllabus = Syllabus.query.order_by(func.rand()).first()
-    temp_instructor = Instructor.query.order_by(func.rand()).first()
-    temp_job = SyllabusInstructorAssociation(temp_syllabus, temp_instructor, job_on_syllabus='teacher')
-    #temp_instructor.my_syllabi.append(temp_syllabus)
-    print(temp_job)
-    #print(temp_instructor.my_syllabi)
+    print(temp_syllabus.instructorList)
+    print(temp_syllabus.all_instructor_associations)
+    #s = Instructor.query.filter_by(id=18).first()
+    #print(s.syllabiList)
 
 def createRandInstructorSyllabusAssociation():
-    # TODO: fix this
     temp_syllabus = Syllabus.query.order_by(func.rand()).first()
     temp_instructor = Instructor.query.order_by(func.rand()).first()
-    print(temp_syllabus)
-    print(temp_instructor)
-    temp_job = SyllabusInstructorAssociation()
-    temp_job.job_on_syllabus = 'grader'
-    print(temp_job)
-    print('before append')
-
-    #temp_job.instructor = temp_instructor
-    temp_syllabus.instructors.append(temp_job)
-    #temp_instructor.syllabi.append(temp_job)
-    print(temp_syllabus)
-    print(temp_syllabus.instructors)
-    #print(temp_job)
-    #print(temp_job)
-    print('===1')
-
-    #temp_syllabus.instructors.append(temp_job)
-    print(temp_syllabus.instructors)
-
-    '''
-    temp_instructor.syllabi.append(temp_job)
-    print(temp_syllabus)
-    print(temp_instructor)
-    print(temp_job)
-    print('-------5')
-    
-    temp_syllabus.instructors.append(temp_job)
-    print(temp_syllabus)
-    print(temp_instructor)
-    print(temp_job)
-    '''
-
-    print('-------6')
-    #db.session.commit()
+    temp_job = SyllabusInstructorAssociation(job_on_syllabus='teacher')
+    temp_job.instructor = temp_instructor;
+    temp_job.syllabus = temp_syllabus;
+    db.session.add(temp_job)
+    db.session.commit()
 
 
 def generateData(num=None):
+    '''seed db with junk data
+    Warning: does not check for primary keys. 
+    may randomly create existing data and crash
+    '''
     if not num: 
         num = 3
     else:
@@ -427,5 +408,6 @@ def generateData(num=None):
         addFakeCloToDB()
         addFakeSyllabusToDB()
         createRandCloCourseAssociation()
+        createRandInstructorSyllabusAssociation()
 
     print("added", num, "fake data entries to each table in db")

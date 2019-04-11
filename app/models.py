@@ -20,6 +20,40 @@ def load_user(id):
     '''
     return User.query.get(int(id))
 
+class Association(db.Model):
+    parent_id = Column(Integer, ForeignKey('parent.id'), primary_key=True)
+    child_id = Column(Integer, ForeignKey('child.id'), primary_key=True)
+    extra_data = Column(String(50))
+    child = relationship("Child")
+    def __repr__(self):
+        return "<Association \n" \
+            "\tparent_id={} \n" \
+            "\tchild_id={} \n" \
+            "\textra_data={} \n" \
+            "\tchild={}> \n" \
+            .format(self.parent_id, 
+                    self.child_id,
+                    self.extra_data,
+                    self.child)
+
+class Parent(db.Model):
+    id = Column(Integer, primary_key=True)
+    children = relationship("Association")
+    def __repr__(self):
+        return "<Parent \n" \
+            "\tid={} \n" \
+            "\tchildren={}> \n" \
+            .format(self.id, self.children)
+
+class Child(db.Model):
+    id = Column(Integer, primary_key=True)
+    def __repr__(self):
+        return "<Child \n" \
+            "\tid={}> \n" \
+            .format(self.id)
+
+
+
 # Association Tables/Objects --------------------------------------------------
 class SyllabusInstructorAssociation(db.Model):
     ''' Association object relating Instructor and Syllabus
@@ -29,11 +63,6 @@ class SyllabusInstructorAssociation(db.Model):
 
     TODO: consider making this not a model but share Base
     '''
-    def __init__(self, keyword=None, user=None, special_key=None):
-        self.user = user
-        self.keyword = keyword
-        self.special_key = special_key
-
 
     __tablename__ = 'syllabus_instructor'
     
@@ -79,7 +108,7 @@ class SyllabusInstructorAssociation(db.Model):
         remote_side="Instructor.id",
         foreign_keys="SyllabusInstructorAssociation.instructor_id",
 
-        backref=backref("instructor_syllabi"))
+        backref=backref("instructorSyllabusAssociationList"))
         #back_populates="syllabi")
 
     syllabus =  relationship(
@@ -121,7 +150,8 @@ class SyllabusInstructorAssociation(db.Model):
                 "SyllabusInstructorAssociation.syllabus_course_version,"
             "]",
 
-        back_populates="instructors")
+        backref=backref("syllabusInstructorAssociationList"))
+        #back_populates="syllabusInstructorAssociationList")
 
     # Non Key Columns
     job_on_syllabus = Column(String(120))
@@ -138,16 +168,22 @@ class SyllabusInstructorAssociation(db.Model):
             "\tsyllabus_section={} \n" \
             "\tsyllabus_semester={} \n" \
             "\tsyllabus_version={} \n" \
-            "\tsyllabus_year={}\n" \
-            "\tinstructor_id={} \n>" \
+            "\tsyllabus_year={} \n" \
+            "\tinstructor_id={} \n" \
+            "\tinstructor={} \n" \
+            "\tsyllabus={} \n" \
+            "\tjob_on_syllabus={} \n>" \
             .format(self.syllabus_course_number, 
                     self.syllabus_course_version, 
                     self.syllabus_section, self.syllabus_semester, 
                     self.syllabus_version, self.syllabus_year,
-                    self.instructor_id)
+                    self.instructor_id, 
+                    self.instructor,
+                    self.syllabus,
+                    self.job_on_syllabus)
 
 
-# SqlAlchemy requires a table define the many to many relationship between 
+# SqlAlchemy requires a table to define the many to many relationship between 
 # course and clo
 course_clo_table = db.Table(
     'course_clo', # Table Name
@@ -257,8 +293,10 @@ class Instructor(db.Model, Timestamp):
     # Primary Key
     id = Column(Integer, primary_key=True)
     
-    # Association Proxy
-    my_syllabi = association_proxy('instructor_syllabi', 'syllabus')
+    # Association Proxies
+    # Associates Instructor.instructorSyllabusAssociationList relationship with the
+    # SyllabusInstructorAssociation.syllabus relationship
+    syllabusList = association_proxy('instructorSyllabusAssociationList', 'syllabus')
 
     # Relationships
     user = relationship("User", uselist=False, back_populates="instructor")
@@ -307,6 +345,10 @@ class Syllabus(db.Model, Timestamp):
     ForeignKeyConstraint(['course_number', 'course_version'], 
                          ['course.number', 'course.version'])
 
+    # Association Proxies
+    instructorList = association_proxy('syllabusInstructorAssociationList', 'instructor')
+
+
     # Relationships  
     course = relationship(
         "Course", 
@@ -318,7 +360,8 @@ class Syllabus(db.Model, Timestamp):
         
         back_populates="syllabi")   
     
-    instructors = relationship(
+    '''
+    syllabusInstructorAssociationList = relationship(
         # use strings in relationships to avoid reference errors
         
         "SyllabusInstructorAssociation", # mapped class representing target of relationship
@@ -358,6 +401,7 @@ class Syllabus(db.Model, Timestamp):
             "]",
 
         back_populates="syllabus")   
+    '''
 
     # Non Key Columns
     attendance_policy = Column(String(500), nullable=True)
@@ -376,6 +420,14 @@ class Syllabus(db.Model, Timestamp):
     University_cheating_policy = Column(String(500))
     withdrawl_date = Column(String(100), nullable=True)
 
+    def addInstructor(self, instructor, job):
+    '''TODO
+    '''
+    new_job = SyllabusInstructorAssociation(job_on_syllabus=job)
+    new_job.instructor = instructor;
+    new_job.syllabus = self;
+    db.session.add(new_job)
+    db.session.commit()
 
     def __repr__(self):
         '''returns a printable representation of the object. 
