@@ -4,7 +4,7 @@
 
 {% block app_content %}
     <h1>Instructor Index</h1>
-    <b><u>Instructors </u></b> <br>
+
     <ul class="list-group">
 
         {% for instructor in instructors %}
@@ -15,7 +15,7 @@
             Email: {{instructor.email}} <br>
             Phone: {{instructor.phone}} <br>
             Hours: {{instructor.perfered_office_hours}} <br>
-            </a>
+        
         </li>
         {% endfor %} 
     </ul>
