@@ -17,7 +17,6 @@ def load_user(email):
     Returns: 
         User with primary key = to Args
     '''
-    print("load user with email=", email)
     return User.query.get(email)
 
 # Association Tables/Objects --------------------------------------------------
@@ -209,6 +208,8 @@ class Course(db.Model, Timestamp):
         foreign_keys="[Syllabus.course_number, Syllabus.course_version]",
         remote_side="[Syllabus.course_number, Syllabus.course_version]",
         back_populates="course")   
+
+    # TODO: determine onDelete functionality, cascase, ...
 
     # Non Key Columns
     building = Column(String(70))
@@ -425,10 +426,6 @@ class User(UserMixin, db.Model, Timestamp):
     Relationship with Instructor
         one to one
     '''
-    # TODO: make email primary key
-    # TODO: remove id and username from db 
-    def get_id(self):
-           return (self.email)
     # Primary Keys
     #id = Column(Integer, primary_key=True) 
     email = Column(String(120), primary_key=True)
@@ -445,6 +442,10 @@ class User(UserMixin, db.Model, Timestamp):
                         server_default=text("instructor"))
     #username = Column(String(64),  nullable=False, index=True, unique=True)
     
+    def get_id(self):
+        '''Used for Flask-Login to get the primary key of User
+        '''
+        return (self.email)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
