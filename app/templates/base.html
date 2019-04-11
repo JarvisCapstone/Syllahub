@@ -10,9 +10,9 @@
         {% endblock %}
     </head>
     <body>
+        {% include '_navbar.html' %}
         <div class="container">
             
-            {% include '_navbar.html' %}
             
                 {% with messages = get_flashed_messages() %}
                     {% if messages %}
