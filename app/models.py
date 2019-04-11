@@ -20,39 +20,6 @@ def load_user(id):
     '''
     return User.query.get(int(id))
 
-class Association(db.Model):
-    parent_id = Column(Integer, ForeignKey('parent.id'), primary_key=True)
-    child_id = Column(Integer, ForeignKey('child.id'), primary_key=True)
-    extra_data = Column(String(50))
-    child = relationship("Child")
-    def __repr__(self):
-        return "<Association \n" \
-            "\tparent_id={} \n" \
-            "\tchild_id={} \n" \
-            "\textra_data={} \n" \
-            "\tchild={}> \n" \
-            .format(self.parent_id, 
-                    self.child_id,
-                    self.extra_data,
-                    self.child)
-
-class Parent(db.Model):
-    id = Column(Integer, primary_key=True)
-    children = relationship("Association")
-    def __repr__(self):
-        return "<Parent \n" \
-            "\tid={} \n" \
-            "\tchildren={}> \n" \
-            .format(self.id, self.children)
-
-class Child(db.Model):
-    id = Column(Integer, primary_key=True)
-    def __repr__(self):
-        return "<Child \n" \
-            "\tid={}> \n" \
-            .format(self.id)
-
-
 
 # Association Tables/Objects --------------------------------------------------
 class SyllabusInstructorAssociation(db.Model):
