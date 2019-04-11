@@ -44,6 +44,7 @@ def read(number, version):
     return render_template('/course/read.html', course=course, 
                            number=number, version=version)
 
+
 @bp.route('/search/<number>/<sortBy>', methods=['GET'])
 def search(number, sortBy):
     courses = Course.query.filter_by(number=number).all()
@@ -105,7 +106,7 @@ def update(number, version):
     # TODO consider changing this to an error message
     return render_template('/course/update.html', form=form)
 
-@bp.route('/delete/<number>/<version>', methods=['GET', 'POST'])
+@bp.route('/delete/<number>/<version>', methods=['POST'])
 @login_required
 def delete(number,version):
     # TODO authenticate user
