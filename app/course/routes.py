@@ -1,11 +1,13 @@
 from app.course import bp
 from flask import render_template, flash, jsonify, request, redirect, url_for
 from flask_login import current_user, login_required
+from app.auth.routes import admin_required
 from app.models import Course
-from app.course.forms import createCourseForm, updateCourseForm
+from app.course.forms import CreateCourseForm, UpdateCourseForm, DeleteCourseForm
 from app import db
 from sqlalchemy import update
 
+@bp.route('/', methods=['GET'])
 @bp.route('/index', methods=['GET'])
 def index():
     courses = Course.query.all()
@@ -15,7 +17,7 @@ def index():
 @login_required
 def create():
     # TODO authenticate user
-    form = createCourseForm()
+    form = CreateCourseForm()
     if form.validate_on_submit():
         course = Course(number = int(form.courseNumber.data), 
                         version = int(form.courseVersion.data), 
@@ -37,7 +39,7 @@ def create():
     return render_template('course/create.html', title="Create Course", 
                            form=form)
 
-@bp.route('/read/<number>/<version>', methods=['GET'])
+@bp.route('/read/<int:number>/<int:version>', methods=['GET'])
 def read(number, version):
     course = Course.query.filter_by(number=number, version=version) \
                          .first_or_404()
@@ -55,13 +57,14 @@ def search(number, sortBy):
     return render_template('/course/search.html', courses=courses)
 
 
-@bp.route('/update/<number>/<version>', methods=['GET', 'POST'])
+@bp.route('/update/<int:number>/<int:version>', methods=['GET', 'POST'])
 @login_required
 def update(number, version):
     # TODO authenticate user
     course = Course.query.filter_by(number=number, version=version) \
                          .first_or_404()
-    form = updateCourseForm()
+    form = UpdateCourseForm()
+    deleteForm = DeleteCourseForm(courseNumber=number, courseVersion=version)
     # if this is a validated post request
     if form.validate_on_submit():
         # update course in database
@@ -87,6 +90,18 @@ def update(number, version):
         # the result of their update
         return redirect(url_for('course.read', number=number, version=version))
 
+    elif deleteForm.validate_on_submit():
+        #return 'delete validated'
+        #course = Course.query.filter_by(number=number, version=version) \
+        #                     .first_or_404()
+        #db.session.delete(course)
+        #db.session.commit()
+        # TODO Fix course cascade on delete relationship
+        flash('Nick needs to fix cascade on delete for all model '
+              'relationships. Please try again later')
+        #flash('Course Deleted')
+        return redirect(url_for('course.update', number=number, version=version))
+
     # if this is a get request then the user should recieve a form to use for
     # a future post request
     elif request.method == 'GET':
@@ -101,17 +116,26 @@ def update(number, version):
         form.isDiversity.data = course.is_diversity
         form.isELR.data = course.is_elr
         form.isWI.data = course.is_wi
-        return render_template('/course/update.html', form=form)
+        return render_template('/course/update.html', form=form, deleteForm=deleteForm) 
     # if not validated and not a post request, send the standards
     # TODO consider changing this to an error message
-    return render_template('/course/update.html', form=form)
+    return render_template('/course/update.html', form=form, deleteForm=deleteForm) 
 
-@bp.route('/delete/<number>/<version>', methods=['POST'])
+
+@bp.route('/delete/<int:number>/<int:version>', methods=['GET','POST'])
 @login_required
 def delete(number,version):
     # TODO authenticate user
-    course = Course.query.filter_by(number=number, version=version).first_or_404()
-    db.session.delete(course)
-    db.session.commit()
-    flash('Course Deleted')
-    return redirect(url_for('home.index'))
+    deleteForm = DeleteCourseForm(courseNumber=number, courseVersion=version)
+    if deleteForm.validate_on_submit():
+        #return 'delete validated'
+        #course = Course.query.filter_by(number=number, version=version) \
+        #                     .first_or_404()
+        #db.session.delete(course)
+        #db.session.commit()
+        # TODO Fix course cascade on delete relationship
+        flash('Nick needs to fix cascade on delete for all model '
+              'relationships. Please try again later')
+        #flash('Course Deleted')
+        return redirect(url_for('course.index'))
+    return render_template('/course/delete.html', form=deleteForm)

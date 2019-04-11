@@ -1,9 +1,9 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, HiddenField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from app.models import Course
 
-class createCourseForm(FlaskForm):
+class CreateCourseForm(FlaskForm):
     courseName = StringField('Course Name', validators=[DataRequired()])
     courseNumber = StringField('Course Number', validators=[DataRequired()])
     courseVersion = StringField('Course Version', validators=[DataRequired()])
@@ -18,7 +18,7 @@ class createCourseForm(FlaskForm):
 
     # TODO Add Type Validators
 
-class updateCourseForm(FlaskForm):
+class UpdateCourseForm(FlaskForm):
     courseName = StringField('Course Name', validators=[DataRequired()])
     courseNumber = StringField('Course Number', validators=[DataRequired()])
     courseVersion = StringField('Course Version', validators=[DataRequired()])
@@ -30,5 +30,10 @@ class updateCourseForm(FlaskForm):
     isWI = BooleanField('Satisfies writing intensive requirement?')
     isELR = BooleanField('Satisfies experimental learning requirement?')
     isDiversity = BooleanField('Satisfies diversity requirement?')
+
+class DeleteCourseForm(FlaskForm):
+    courseVersion = HiddenField(validators=[DataRequired()])
+    courseNumber = HiddenField(validators=[DataRequired()])
+    submit = SubmitField('Delete Course')
 
     # TODO Add Type Validators
