@@ -267,7 +267,7 @@ class Course(db.Model, Timestamp):
 
 
     def __repr__(self):
-        '''returns a printable representation of the object. 
+        '''Returns a printable representation of the object. 
 
         Determines the result of when class is called in Print()
         '''
@@ -300,14 +300,7 @@ class Instructor(db.Model, Timestamp):
 
     # Relationships
     user = relationship("User", uselist=False, back_populates="instructor")
-    '''
-    syllabi = relationship(
-        "SyllabusInstructorAssociation",
-        primaryjoin="Instructor.id == SyllabusInstructorAssociation.instructor_id ",
-        foreign_keys="SyllabusInstructorAssociation.instructor_id",
-        remote_side="SyllabusInstructorAssociation.instructor_id",
-        back_populates="instructor")
-    '''
+
 
     # Non Key Columns
     email = Column(String(120), index=True, unique=True)
@@ -360,48 +353,6 @@ class Syllabus(db.Model, Timestamp):
         
         back_populates="syllabi")   
     
-    '''
-    syllabusInstructorAssociationList = relationship(
-        # use strings in relationships to avoid reference errors
-        
-        "SyllabusInstructorAssociation", # mapped class representing target of relationship
-        
-        primaryjoin=
-            "and_(SyllabusInstructorAssociation.syllabus_section"
-                      " == Syllabus.section, "
-                 "SyllabusInstructorAssociation.syllabus_semester"
-                      " == Syllabus.semester, "
-                 "SyllabusInstructorAssociation.syllabus_year"
-                      " == Syllabus.year, "
-                 "SyllabusInstructorAssociation.syllabus_version"
-                      " == Syllabus.version, "
-                 "SyllabusInstructorAssociation.syllabus_course_number"
-                      " == Syllabus.course_number, "
-                 "SyllabusInstructorAssociation.syllabus_course_version"
-                      " == Syllabus.course_version)",
-
-        remote_side=
-            "["
-                "SyllabusInstructorAssociation.syllabus_section,"
-                "SyllabusInstructorAssociation.syllabus_semester,"
-                "SyllabusInstructorAssociation.syllabus_year,"
-                "SyllabusInstructorAssociation.syllabus_version,"
-                "SyllabusInstructorAssociation.syllabus_course_number,"
-                "SyllabusInstructorAssociation.syllabus_course_version,"
-            "]",
-
-        foreign_keys= 
-            "["
-                "SyllabusInstructorAssociation.syllabus_section,"
-                "SyllabusInstructorAssociation.syllabus_semester,"
-                "SyllabusInstructorAssociation.syllabus_year,"
-                "SyllabusInstructorAssociation.syllabus_version,"
-                "SyllabusInstructorAssociation.syllabus_course_number,"
-                "SyllabusInstructorAssociation.syllabus_course_version,"
-            "]",
-
-        back_populates="syllabus")   
-    '''
 
     # Non Key Columns
     attendance_policy = Column(String(500), nullable=True)
@@ -421,13 +372,14 @@ class Syllabus(db.Model, Timestamp):
     withdrawl_date = Column(String(100), nullable=True)
 
     def addInstructor(self, instructor, job):
-    '''TODO
-    '''
-    new_job = SyllabusInstructorAssociation(job_on_syllabus=job)
-    new_job.instructor = instructor;
-    new_job.syllabus = self;
-    db.session.add(new_job)
-    db.session.commit()
+        '''Add an association between syllabus and instructor
+        TODO: Test if this works flawlessly. Has not been tested
+        '''
+        new_job = SyllabusInstructorAssociation(job_on_syllabus=job)
+        new_job.instructor = instructor;
+        new_job.syllabus = self;
+        db.session.add(new_job)
+        db.session.commit()
 
     def __repr__(self):
         '''returns a printable representation of the object. 
@@ -456,7 +408,6 @@ class User(UserMixin, db.Model, Timestamp):
     # TODO: remove id and username from db 
 
     # Primary Keys
-    #id = Column(Integer, primary_key=True) 
     email = Column(String(120), primary_key=True)
 
     # Foreign Keys
@@ -469,7 +420,6 @@ class User(UserMixin, db.Model, Timestamp):
     password_hash = Column(String(128), nullable=False)
     permission = Column(Enum('admin', 'instructor'), nullable=False, 
                         server_default=text("instructor"))
-    #username = Column(String(64),  nullable=False, index=True, unique=True)
     
 
     def set_password(self, password):
@@ -477,6 +427,9 @@ class User(UserMixin, db.Model, Timestamp):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def isAdmin(self):
+        return self.permission == 'admin'
 
     def __repr__(self):
         '''returns a printable representation of the object. 
