@@ -1,3 +1,4 @@
+from functools import wraps
 from flask import render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
@@ -15,19 +16,16 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-        print("validated on submit")
         user = User.query.filter_by(email=form.email.data).first()
         if user is None or not user.check_password(form.password.data):
             flash('Invalid email or password')
             return redirect(url_for('auth.login'))
-        print('##### login user called')
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('home.index')
 
         return redirect(next_page)
-    print("not validated")
     return render_template('auth/login.html', title='Login', form=form)
 
 @bp.route('/logout')
@@ -62,3 +60,17 @@ def register():
 def my_profile():
     return "my_profile"
     #return redirect(url_for('auth.index'))
+
+
+
+def admin_required(func):
+    '''Decorator used to see if current user has administrator status
+    '''
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        if current_user.permission != 'admin':
+            flash("This action requires administrator privlages")
+            return redirect(url_for('auth.login'))
+        return func(*args, **kwargs)
+
+    return decorated_function
