@@ -6,6 +6,7 @@
     <h1>Update Course</h1>
     {% from "_formhelpers.html" import render_field%}
 
+
     <form action="" class="my-3" method="post">
         {{ form.hidden_tag() }}
 
@@ -22,5 +23,8 @@
         {{ render_field(form.isDiversity) }}
         <button class="btn btn-primary" type="submit">Update</button>
     </form>
+    <hr>
+    {% include 'course/_delete.html' %}
+    <hr>
 
 {% endblock %}

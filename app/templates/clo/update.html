@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Index{% endblock %}
+{% block title %}Update Clo{% endblock %}
 
 {% block app_content %}
     <h1>Stub clo update</h1>
@@ -8,9 +8,8 @@
 
     <form class="my-3" method=post>
         {{ form.hidden_tag() }}
-        {{ render_field(form.cloID, "Enter Clo ID")}}
-        {{ render_field(form.cloGeneral, "Enter General Description") }}
-        {{ render_field(form.cloSpecific, "Enter Specific Description") }}
-        <button class="btn btn-primary" type="submit">Create Clo</button>
+        {{ render_field(form.cloGeneral) }}
+        {{ render_field(form.cloSpecific) }}
+        <button class="btn btn-primary" type="submit">Update Clo</button>
     </form>
 {% endblock %}
