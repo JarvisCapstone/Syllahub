@@ -9,14 +9,12 @@
     <form method="post" action="">
         {{ form.hidden_tag() }}
 
-        {{render_field(form.name)}}
-
-        {{render_field(form.phone)}}<br>
+        {{render_field(form.name, "Enter Name")}}
+        {{render_field(form.phone, "Enter Phone Number")}}<br>
+        {{render_field(form.email, "Enter Email")}}<br>
+        {{render_field(form.hours, "Enter Office Hours")}}<br>
         
-        {{render_field(form.email)}}<br>
-        
-        {{render_field(form.hours)}}<br>
-        <button type="submit">Submit</button>
+        <button class="btn btn-secondary" type="submit">Submit</button>
     </form>
 {% endblock %}
 

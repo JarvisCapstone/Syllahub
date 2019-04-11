@@ -5,13 +5,13 @@ from flask_login import current_user, login_required
 from app import db
 from app.instructor.forms import createInstructorForm, deleteInstructorForm, updateInstructorForm
 
+
 @bp.route('/index', methods=['GET', 'POST'])
 def index():
     instructors = Instructor.query.all()
     print(instructors)
 
     return render_template('instructor/index.html', instructors=instructors)
-
 
 
 @bp.route('/create', methods=['GET', 'POST'])
@@ -43,6 +43,7 @@ def update(id):
         instructor.hours = form.hours.data
 
         db.session.commit()
+        
         flash("Instructor Updated!")
         return redirect(url_for('instructor.read', id=instructor.id))
 
