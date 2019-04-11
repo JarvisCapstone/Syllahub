@@ -76,7 +76,6 @@ class SyllabusInstructorAssociation(db.Model):
         foreign_keys="SyllabusInstructorAssociation.instructor_id",
 
         backref=backref("instructorSyllabusAssociationList"))
-        #back_populates="syllabi")
 
     syllabus =  relationship(
         # use strings in relationships to avoid reference errors
@@ -118,11 +117,24 @@ class SyllabusInstructorAssociation(db.Model):
             "]",
 
         backref=backref("syllabusInstructorAssociationList"))
-        #back_populates="syllabusInstructorAssociationList")
 
     # Non Key Columns
     job_on_syllabus = Column(String(120))
 
+    def create(syllabus, instructor, job):
+        '''Add an association between syllabus and instructor
+        TODO: Test if this works flawlessly. Has not been tested
+
+        Args: 
+            syllabus: Syllabus - 
+            instructor: Instructor - 
+            job: String - 
+        '''
+        new_job = SyllabusInstructorAssociation(job_on_syllabus=job)
+        new_job.instructor = instructor;
+        new_job.syllabus = syllabus;
+        db.session.add(new_job)
+        db.session.commit()
 
     def __repr__(self):
         '''returns a printable representation of the object. 
@@ -261,8 +273,6 @@ class Instructor(db.Model, Timestamp):
     id = Column(Integer, primary_key=True)
     
     # Association Proxies
-    # Associates Instructor.instructorSyllabusAssociationList relationship with the
-    # SyllabusInstructorAssociation.syllabus relationship
     syllabusList = association_proxy('instructorSyllabusAssociationList', 'syllabus')
 
     # Relationships
@@ -275,6 +285,16 @@ class Instructor(db.Model, Timestamp):
     phone = Column(Integer)
     perfered_office_hours = Column(String(256))
     
+    def addToSyllabus(self, syllabus, job):
+        '''Add an association between syllabus and instructor
+        TODO: Test if this works flawlessly. Has not been tested
+
+        Args: 
+            syllabus: Syllabus - 
+            job: String - 
+        '''
+        syllabus.addInstructor(self,job)
+        SyllabusInstructorAssociation.create(syllabus, self, job)
 
     def __repr__(self):
         '''returns a printable representation of the object. 
@@ -341,12 +361,12 @@ class Syllabus(db.Model, Timestamp):
     def addInstructor(self, instructor, job):
         '''Add an association between syllabus and instructor
         TODO: Test if this works flawlessly. Has not been tested
+
+        Args: 
+            instructor: Instructor - 
+            job: String - 
         '''
-        new_job = SyllabusInstructorAssociation(job_on_syllabus=job)
-        new_job.instructor = instructor;
-        new_job.syllabus = self;
-        db.session.add(new_job)
-        db.session.commit()
+        SyllabusInstructorAssociation.create(self, instructor, job)
 
     def __repr__(self):
         '''returns a printable representation of the object. 
