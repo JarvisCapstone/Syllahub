@@ -368,27 +368,22 @@ def createRandCloCourseAssociation():
 
 
 def printRandInstructorSyllabi():
-    i = Instructor.query.filter_by(id=18).first()
+    i = Instructor.query.order_by(func.rand()).first()
     print(i.syllabiList)
     print(i.all_syllabus_associations)
-    #s = Instructor.query.filter_by(id=18).first()
-    #print(s.syllabiList)
+
 
 def printRandSyllabusInstructors():
     temp_syllabus = Syllabus.query.order_by(func.rand()).first()
     print(temp_syllabus.instructorList)
     print(temp_syllabus.all_instructor_associations)
-    #s = Instructor.query.filter_by(id=18).first()
-    #print(s.syllabiList)
+
 
 def createRandInstructorSyllabusAssociation():
     temp_syllabus = Syllabus.query.order_by(func.rand()).first()
     temp_instructor = Instructor.query.order_by(func.rand()).first()
-    temp_job = SyllabusInstructorAssociation(job_on_syllabus='teacher')
-    temp_job.instructor = temp_instructor;
-    temp_job.syllabus = temp_syllabus;
-    db.session.add(temp_job)
-    db.session.commit()
+
+    SyllabusInstructorAssociation.create(temp_syllabus, temp_instructor, 'grader')
 
 
 def generateData(num=None):
