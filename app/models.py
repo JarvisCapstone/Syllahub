@@ -43,7 +43,9 @@ class SyllabusInstructorAssociation(db.Model):
     syllabus_year = Column(Integer, primary_key=True)
 
     # Primary and Foreign Key for Instructor    
-    instructor_id = Column(Integer, ForeignKey('instructor.id'), 
+    instructor_id = Column(Integer, 
+                           ForeignKey('instructor.id', onupdate="CASCADE", 
+                                      ondelete="CASCADE"), 
                            primary_key=True)
 
     # Foreign Keys for Syllabus    
@@ -64,7 +66,9 @@ class SyllabusInstructorAssociation(db.Model):
             'syllabus.version',
             'syllabus.course_number',
             'syllabus.course_version',
-        ])
+        ],
+        onupdate="CASCADE", 
+        ondelete="CASCADE")
 
     # Relationships
     instructor = relationship(
@@ -172,13 +176,16 @@ course_clo_table = db.Table(
     Column('course_version', Integer, primary_key=True),
     
     # Primary and Foreign Key for Clo
-    Column('clo_id', Integer, ForeignKey('clo.id'), primary_key=True),
+    Column('clo_id', Integer, 
+           ForeignKey('clo.id', onupdate="CASCADE", ondelete="CASCADE"), 
+           primary_key=True),
     
     # Foreign Keys for Course
     ForeignKeyConstraint(['course_number', 'course_version'], 
-                         ['course.number', 'course.version']))
+                         ['course.number', 'course.version'],
+                         onupdate="CASCADE", ondelete="CASCADE"))
 
-# Models ----------------------------------------------------------------------
+# Models ---------------------------------------------------------------------
 class Clo(db.Model, Timestamp):
     '''CLO model
 
@@ -331,7 +338,8 @@ class Syllabus(db.Model, Timestamp):
     
     # Foreign Keys
     ForeignKeyConstraint(['course_number', 'course_version'], 
-                         ['course.number', 'course.version'])
+                         ['course.number', 'course.version'], 
+                         onupdate="CASCADE", ondelete="CASCADE")
 
     # Association Proxies
     instructorList = association_proxy('syllabusInstructorAssociationList', 'instructor')
@@ -434,8 +442,12 @@ class User(UserMixin, db.Model, Timestamp):
     email = Column(String(120), primary_key=True)
 
     # Foreign Keys
-    instructor_id = Column(Integer, ForeignKey('instructor.id'), nullable=True)
-    
+    instructor_id = Column(Integer, 
+                           ForeignKey('instructor.id', 
+                                      onupdate="CASCADE", 
+                                      ondelete="SET NULL"),
+                           nullable=True)
+
     # Relationships    
     instructor = relationship("Instructor", back_populates="user")
 
