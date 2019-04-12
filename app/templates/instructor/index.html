@@ -3,5 +3,21 @@
 {% block title %}Index{% endblock %}
 
 {% block app_content %}
-    <h1>Stub instructor index</h1>
+    <h1>Instructor Index</h1>
+
+    <ul class="list-group">
+
+        {% for instructor in instructors %}
+        <li class="list-group-item">
+
+            ID: {{instructor.id}} <br>
+            Name: {{instructor.name}} <br>
+            Email: {{instructor.email}} <br>
+            Phone: {{instructor.phone}} <br>
+            Hours: {{instructor.perfered_office_hours}} <br>
+        
+        </li>
+        {% endfor %} 
+    </ul>
+
 {% endblock %}

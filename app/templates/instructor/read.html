@@ -3,5 +3,21 @@
 {% block title %}Index{% endblock %}
 
 {% block app_content %}
-    <h1>Stub instructor read</h1>
+
+
+<h1>Instructor Result</h1>
+{% from "_formhelpers.html" import render_field %}
+
+<ul class="list-group">
+    <li class="list-group-item">
+
+        <p>ID: {{ instructor.id}} </p>
+        <p>Name: {{ instructor.name }}</p>
+        <p>Email: {{ instructor.email }}</p>
+        <p>Phone Number: {{ instructor.phone }}</p>
+        <p>Office Hours: {{ instructor.perfered_office_hours }}</p>
+    
+    </li>
+</ul>
+
 {% endblock %}

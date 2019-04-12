@@ -4,12 +4,5 @@
 
 {% block app_content %}
     <h1>Delete User</h1>
-    {% from "_formhelpers.html" import render_field%}
-
-    <form action="" class="my-3" method="post">
-        {{ form.hidden_tag() }}
-        {{ render_field(form.email, "Enter Email")}}
-        <button class="btn btn-primary" type="submit">Delete User</button>
-    </form>
 
 {% endblock %}

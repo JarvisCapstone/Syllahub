@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Update Clo{% endblock %}
+
+{% block app_content %}
+    <h1>Stub clo update</h1>
+    {% from "_formhelpers.html" import render_field%}
+
+    <form class="my-3" method=post>
+        {{ form.hidden_tag() }}
+        {{ render_field(form.cloGeneral) }}
+        {{ render_field(form.cloSpecific) }}
+        <button class="btn btn-primary" type="submit">Update Clo</button>
+    </form>
+{% endblock %}

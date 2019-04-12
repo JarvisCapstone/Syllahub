@@ -3,5 +3,13 @@
 {% block title %}Index{% endblock %}
 
 {% block app_content %}
-    <h1>Stub syllabus read</h1>
+<h1>Result</h1>
+<ul class="list-group"> 
+    <li class="list-group-item">
+        <h3> Syllabus for {{ syllabus.course_number }} </h3>
+        <p>Section: {{ syllabus.section }}</p>
+        <p>Semester: {{ syllabus.semester }}</p>
+        <p>Year: {{ syllabus.year }}</p>
+        <p>Section {{ syllabus.section }}</p>
+    </li>
 {% endblock %}

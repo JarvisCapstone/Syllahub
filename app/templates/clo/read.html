@@ -3,5 +3,14 @@
 {% block title %}Index{% endblock %}
 
 {% block app_content %}
-    <h1>Stub clo read</h1>
+<h1>Results for {{ clo.id }}</h1>
+<ul class="list-group">
+    <li class="list-group-item">
+        <h3> {{ clo.id }} </h3>
+        <h3> General Description: </h3>
+            <p> {{ clo.general }}</p>
+        <h3> Specific Description: </h3>
+            <p> {{ clo.specific }} </p>
+    </li>
+    
 {% endblock %}
