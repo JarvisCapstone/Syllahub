@@ -91,16 +91,12 @@ def update(number, version):
         return redirect(url_for('course.read', number=number, version=version))
 
     elif deleteForm.validate_on_submit():
-        #return 'delete validated'
-        #course = Course.query.filter_by(number=number, version=version) \
-        #                     .first_or_404()
-        #db.session.delete(course)
-        #db.session.commit()
-        # TODO Fix course cascade on delete relationship
-        flash('Nick needs to fix cascade on delete for all model '
-              'relationships. Please try again later')
-        #flash('Course Deleted')
-        return redirect(url_for('course.update', number=number, version=version))
+        course = Course.query.filter_by(number=number, version=version) \
+                             .first_or_404()
+        db.session.delete(course)
+        db.session.commit()
+        flash('Course Deleted')
+        return redirect(url_for('course.index'))
 
     # if this is a get request then the user should recieve a form to use for
     # a future post request
@@ -116,10 +112,12 @@ def update(number, version):
         form.isDiversity.data = course.is_diversity
         form.isELR.data = course.is_elr
         form.isWI.data = course.is_wi
-        return render_template('/course/update.html', form=form, deleteForm=deleteForm) 
+        return render_template('/course/update.html', form=form, 
+                               deleteForm=deleteForm) 
     # if not validated and not a post request, send the standards
     # TODO consider changing this to an error message
-    return render_template('/course/update.html', form=form, deleteForm=deleteForm) 
+    return render_template('/course/update.html', form=form, 
+                           deleteForm=deleteForm) 
 
 
 @bp.route('/delete/<int:number>/<int:version>', methods=['GET','POST'])
@@ -128,14 +126,10 @@ def delete(number,version):
     # TODO authenticate user
     deleteForm = DeleteCourseForm(courseNumber=number, courseVersion=version)
     if deleteForm.validate_on_submit():
-        #return 'delete validated'
-        #course = Course.query.filter_by(number=number, version=version) \
-        #                     .first_or_404()
-        #db.session.delete(course)
-        #db.session.commit()
-        # TODO Fix course cascade on delete relationship
-        flash('Nick needs to fix cascade on delete for all model '
-              'relationships. Please try again later')
-        #flash('Course Deleted')
+        course = Course.query.filter_by(number=number, version=version) \
+                             .first_or_404()
+        db.session.delete(course)
+        db.session.commit()
+        flash('Course Deleted')
         return redirect(url_for('course.index'))
     return render_template('/course/delete.html', form=deleteForm)
