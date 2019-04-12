@@ -7,7 +7,8 @@ from app.syllabus.forms import createSyllabusForm, updateSyllabusForm
 from app import db
 from sqlalchemy import update
 
-@bp.route('/index', methods=['GET'])
+@bp.route('/')
+@bp.route('/index')
 def index():
     syllabi = Syllabus.query.all()
     return render_template('syllabus/index.html', syllabi=syllabi)
