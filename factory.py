@@ -2,7 +2,6 @@
 
 call commands like these from the flask shell
 >>>TODO
-
 '''
 from app import db
 from app.models import *
@@ -38,12 +37,11 @@ class Factory(metaclass=ABCMeta):
         return temp
 
     def addToDB(self, num=None):
-        num = int(num) or 1
+        num = num or 1
         u = self.create()
         db.session.add(u)
         db.session.commit()
         return "Success"
-
 
 
 class UserFactory(Factory):
@@ -83,6 +81,7 @@ class InstructorFactory(Factory):
         return Instructor()
 
     def setData(self, temp, data): 
+        p = fake.simple_profile()
         if 'name' in data:
             temp.name=data.name
         else:
@@ -105,7 +104,6 @@ class InstructorFactory(Factory):
             temp.perfered_office_hours='whenever'
 
         return temp
-
 
 
 class CourseFactory(Factory):
@@ -173,22 +171,27 @@ class CourseFactory(Factory):
 
         return temp
 
+
 class CloFactory(Factory):
     def __init__(self):
-        Factory.__init__(self, Clo)
+        Factory.__init__(self)
 
     
     def getModel(self):
         return Clo()
 
-    def create2(general=None, specific=None):
-        u = Clo()
+    def setData(self, temp, data): 
+        if 'general' in data:
+            temp.general=data.general
+        else:
+            temp.general=fake.paragraph(nb_sentences=2)
 
-        u.general = general or fake.paragraph(nb_sentences=2)
-        u.specific = specific or fake.paragraph(nb_sentences=2)
+        if 'specific' in data:
+            temp.specific=data.specific
+        else:
+            temp.specific=fake.paragraph(nb_sentences=2)
 
-        return u
-
+        return temp
 
 
 class SyllabusFactory(Factory):
@@ -198,60 +201,143 @@ class SyllabusFactory(Factory):
     def getModel(self):
         return Syllabus()
 
-    def create2(section=None, semester=None, year=None, version=None, 
-                           course_number=None, course_version=None, state=None, 
-                           pdf=None, calender=None, schedule=None, 
-                           required_materials=None, optional_materials=None, 
-                           withdrawl_date=None, grading_policy=None, 
-                           attendance_policy=None, cheating_policy=None, 
-                           extra_policies=None, meeting_time=None, 
-                           meeting_dates=None, University_cheating_policy=None, 
-                           Students_with_disabilities=None):
+    def setData(self, temp, data): 
         #must reference a course. get a random course
+
         course = Course.query.order_by(func.rand()).first()
 
         u = Syllabus()
-        u.section = section or fake.random_int(min=0, max=50)
-        u.semester = semester or 'spring'
-        u.year = year or 2018
-        u.version = version or fake.random_int(min=1, max=9)
-        u.course_number = course_number or course.number
-        u.course_version = course_version or course.version
-        u.state = state or 'draft'
-
-        if pdf:
-            u.pdf = pdf
-
-        if calender:
-            u.calender = calender
-
-        if schedule:
-            u.schedule = schedule
-
-        u.required_materials = required_materials or fake.paragraph(nb_sentences=2)
-        u.optional_materials = optional_materials or fake.paragraph(nb_sentences=2)
-        u.withdrawl_date = withdrawl_date or fake.paragraph(nb_sentences=1)
-        u.grading_policy = grading_policy or fake.paragraph(nb_sentences=3)
-        u.attendance_policy = attendance_policy or fake.paragraph(nb_sentences=3)
-        u.cheating_policy = cheating_policy or fake.paragraph(nb_sentences=3)
-        u.extra_policies = extra_policies or fake.paragraph(nb_sentences=3)
-        u.meeting_time = meeting_time or fake.paragraph(nb_sentences=1)
-        u.meeting_dates = meeting_dates or fake.paragraph(nb_sentences=1)
-        u.University_cheating_policy = University_cheating_policy or fake.paragraph(nb_sentences=3)
-        u.Students_with_disabilities = Students_with_disabilities or fake.paragraph(nb_sentences=3)
-
-        return u
+        if 'section' in data:
+            temp.section = data.section
+        else: 
+            temp.section = fake.random_int(min=0, max=50)
 
 
+        if 'semester' in data:
+            temp.semester = data.semester
+        else: 
+            temp.semester = 'spring'
 
-def create2RandCloCourseAssociation():
+
+        if 'year' in data:
+            temp.year = data.year
+        else: 
+            temp.year = 2018
+
+
+        if 'version' in data:
+            temp.version = data.version
+        else: 
+            temp.version = fake.random_int(min=1, max=9)
+
+
+        if 'course_number' in data:
+            temp.course_number = data.course_number
+        else: 
+            temp.course_number = course.number
+
+
+        if 'course_version' in data:
+            temp.course_version = data.course_version
+        else: 
+            temp.course_version = course.version
+
+
+        if 'state' in data:
+            temp.state = data.state
+        else: 
+            temp.state = 'draft'
+
+
+        if 'pdf' in data:
+            temp.pdf = data.pdf
+
+
+        if 'calender' in data:
+            temp.calender = data.calender
+
+
+        if 'schedule' in data:
+            temp.schedule = data.schedule
+
+
+        if 'required_materials' in data:
+            temp.required_materials = data.required_materials
+        else: 
+            temp.required_materials = fake.paragraph(nb_sentences=2)
+
+
+        if 'optional_materials' in data:
+            temp.optional_materials = data.optional_materials
+        else: 
+            temp.optional_materials = fake.paragraph(nb_sentences=2)
+
+
+        if 'withdrawl_date' in data:
+            temp.withdrawl_date = data.withdrawl_date
+        else: 
+            temp.withdrawl_date = fake.paragraph(nb_sentences=1)
+
+
+        if 'grading_policy' in data:
+            temp.grading_policy = data.grading_policy
+        else: 
+            temp.grading_policy = fake.paragraph(nb_sentences=3)
+
+
+        if 'attendance_policy' in data:
+            temp.attendance_policy = data.attendance_policy
+        else: 
+            temp.attendance_policy = fake.paragraph(nb_sentences=3)
+
+
+        if 'cheating_policy' in data:
+            temp.cheating_policy = data.cheating_policy
+        else: 
+            temp.cheating_policy = fake.paragraph(nb_sentences=3)
+
+
+        if 'extra_policies' in data:
+            temp.extra_policies = data.extra_policies
+        else: 
+            temp.extra_policies = fake.paragraph(nb_sentences=3)
+
+
+        if 'meeting_time' in data:
+            temp.meeting_time = data.meeting_time
+        else: 
+            temp.meeting_time = fake.paragraph(nb_sentences=1)
+
+
+        if 'meeting_dates' in data:
+            temp.meeting_dates = data.meeting_dates
+        else: 
+            temp.meeting_dates = fake.paragraph(nb_sentences=1)
+
+
+        if 'University_cheating_policy' in data:
+            temp.University_cheating_policy = data.University_cheating_policy
+        else: 
+            temp.University_cheating_policy = fake.paragraph(nb_sentences=3)
+
+
+        if 'Students_with_disabilities' in data:
+            temp.Students_with_disabilities = data.Students_with_disabilities
+        else: 
+            temp.Students_with_disabilities = fake.paragraph(nb_sentences=3)
+
+        return temp
+
+
+
+def createRandCloCourseAssociation():
     temp_course = Course.query.order_by(func.rand()).first()
     temp_clo = Clo.query.order_by(func.rand()).first()
     temp_course.clos.append(temp_clo)
     db.session.commit()
 
 
-def create2RandInstructorSyllabusAssociation():
+def createRandInstructorSyllabusAssociation():
     temp_syllabus = Syllabus.query.order_by(func.rand()).first()
     temp_instructor = Instructor.query.order_by(func.rand()).first()
     SyllabusInstructorAssociation.create2(temp_syllabus, temp_instructor, 'grader')
@@ -268,20 +354,13 @@ def generateData(num=None):
         num = int(num)
 
     factories = []
-    u = UserFactory()
-    factories.append(u)
+    factories.append(UserFactory())
+    factories.append(InstructorFactory())
+    factories.append(CourseFactory())
+    factories.append(CloFactory())
+    factories.append(SyllabusFactory())
     print(factories)
     for factory in factories:
-        x = factory.create()
-        print("generated x=", x)
-    '''
-    for x in range(num):
-        addFakeCourseToDB()
-        addFakeInstructorToDB()
-        addFakeUserToDB()
-        addFakeCloToDB()
-        addFakeSyllabusToDB()
-        create2RandCloCourseAssociation()
-        create2RandInstructorSyllabusAssociation()
-    '''
+        factory.addToDB(num)
+
     print("added", num, "fake data entries to each table in db")
