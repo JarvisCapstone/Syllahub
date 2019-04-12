@@ -37,11 +37,9 @@ def logout():
 
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
-    print("db in register", db)
     if current_user.is_authenticated:
         return redirect(url_for('home.index'))
     form = RegistrationForm()
-    print("before validate on submit")
     if form.validate_on_submit():
         print("validated")
         user = User(email=form.email.data)
