@@ -1,7 +1,4 @@
 '''Creates fake models and adds them to the database. 
-
-call commands like these from the flask shell
->>>TODO
 '''
 from app import db
 from app.models import *
@@ -13,15 +10,17 @@ import random
 from abc import ABCMeta, abstractmethod
 from typing import List, Set, Dict, Tuple, Optional
 
-fake = Faker() 
-fake.add_provider(profile)
-fake.add_provider(phone_number)
-fake.add_provider(lorem)
-fake.add_provider(misc)
-fake.add_provider(address)
-
 
 class Factory(metaclass=ABCMeta):
+    def __init__(self):
+        self.fake.add_provider(profile)
+        self.fake.add_provider(phone_number)
+        self.fake.add_provider(lorem)
+        self.fake.add_provider(misc)
+        self.fake.add_provider(address)
+
+    fake = Faker()
+
     @abstractmethod
     def getModel(self): 
         pass
@@ -52,7 +51,7 @@ class UserFactory(Factory):
         return User()
 
     def setData(self, temp, data): 
-        p = fake.simple_profile()
+        p = self.fake.simple_profile()
         if 'email' in data:
             temp.email = data.email
         else:
@@ -81,7 +80,7 @@ class InstructorFactory(Factory):
         return Instructor()
 
     def setData(self, temp, data): 
-        p = fake.simple_profile()
+        p = self.fake.simple_profile()
         if 'name' in data:
             temp.name=data.name
         else:
@@ -117,57 +116,57 @@ class CourseFactory(Factory):
         if 'number' in data:
             temp.number=data.number
         else:
-            temp.number=fake.random_int(min=10000, max=99999)
+            temp.number=self.fake.random_int(min=10000, max=99999)
         
         if 'version' in data:
             temp.version=data.version
         else:
-            temp.version=fake.random_int(min=1, max=9)
+            temp.version=self.fake.random_int(min=1, max=9)
 
         if 'name' in data:
             temp.name=data.name
         else:
-            temp.name=fake.sentence(nb_words=3)
+            temp.name=self.fake.sentence(nb_words=3)
 
         if 'description' in data:
             temp.description=data.description
         else:
-            temp.description=fake.paragraph(nb_sentences=2)
+            temp.description=self.fake.paragraph(nb_sentences=2)
 
         if 'prerequisites' in data:
             temp.prerequisites=data.prerequisites
         else:
-            temp.prerequisites=fake.sentence(nb_words=1)
+            temp.prerequisites=self.fake.sentence(nb_words=1)
 
         if 'building' in data:
             temp.building=data.building
         else:
-            temp.building=fake.street_address()
+            temp.building=self.fake.street_address()
 
         if 'room' in data:
             temp.room=data.room
         else:
-            temp.room=fake.random_int(min=0, max=999)
+            temp.room=self.fake.random_int(min=0, max=999)
 
         if 'is_core' in data:
             temp.is_core=data.is_core
         else:
-            temp.is_core=fake.boolean(chance_of_getting_true=20)
+            temp.is_core=self.fake.boolean(chance_of_getting_true=20)
 
         if 'is_wi' in data:
             temp.is_wi=data.is_wi
         else:
-            temp.is_wi=fake.boolean(chance_of_getting_true=20)
+            temp.is_wi=self.fake.boolean(chance_of_getting_true=20)
 
         if 'is_elr' in data:
             temp.is_elr=data.is_elr
         else:
-            temp.is_elr=fake.boolean(chance_of_getting_true=20)
+            temp.is_elr=self.fake.boolean(chance_of_getting_true=20)
 
         if 'is_diversity' in data:
             temp.is_diversity=data.is_diversity
         else:
-            temp.is_diversity=fake.boolean(chance_of_getting_true=20)
+            temp.is_diversity=self.fake.boolean(chance_of_getting_true=20)
 
         return temp
 
@@ -184,12 +183,12 @@ class CloFactory(Factory):
         if 'general' in data:
             temp.general=data.general
         else:
-            temp.general=fake.paragraph(nb_sentences=2)
+            temp.general=self.fake.paragraph(nb_sentences=2)
 
         if 'specific' in data:
             temp.specific=data.specific
         else:
-            temp.specific=fake.paragraph(nb_sentences=2)
+            temp.specific=self.fake.paragraph(nb_sentences=2)
 
         return temp
 
@@ -210,7 +209,7 @@ class SyllabusFactory(Factory):
         if 'section' in data:
             temp.section = data.section
         else: 
-            temp.section = fake.random_int(min=0, max=50)
+            temp.section = self.fake.random_int(min=0, max=50)
 
 
         if 'semester' in data:
@@ -228,7 +227,7 @@ class SyllabusFactory(Factory):
         if 'version' in data:
             temp.version = data.version
         else: 
-            temp.version = fake.random_int(min=1, max=9)
+            temp.version = self.fake.random_int(min=1, max=9)
 
 
         if 'course_number' in data:
@@ -264,67 +263,67 @@ class SyllabusFactory(Factory):
         if 'required_materials' in data:
             temp.required_materials = data.required_materials
         else: 
-            temp.required_materials = fake.paragraph(nb_sentences=2)
+            temp.required_materials = self.fake.paragraph(nb_sentences=2)
 
 
         if 'optional_materials' in data:
             temp.optional_materials = data.optional_materials
         else: 
-            temp.optional_materials = fake.paragraph(nb_sentences=2)
+            temp.optional_materials = self.fake.paragraph(nb_sentences=2)
 
 
         if 'withdrawl_date' in data:
             temp.withdrawl_date = data.withdrawl_date
         else: 
-            temp.withdrawl_date = fake.paragraph(nb_sentences=1)
+            temp.withdrawl_date = self.fake.paragraph(nb_sentences=1)
 
 
         if 'grading_policy' in data:
             temp.grading_policy = data.grading_policy
         else: 
-            temp.grading_policy = fake.paragraph(nb_sentences=3)
+            temp.grading_policy = self.fake.paragraph(nb_sentences=3)
 
 
         if 'attendance_policy' in data:
             temp.attendance_policy = data.attendance_policy
         else: 
-            temp.attendance_policy = fake.paragraph(nb_sentences=3)
+            temp.attendance_policy = self.fake.paragraph(nb_sentences=3)
 
 
         if 'cheating_policy' in data:
             temp.cheating_policy = data.cheating_policy
         else: 
-            temp.cheating_policy = fake.paragraph(nb_sentences=3)
+            temp.cheating_policy = self.fake.paragraph(nb_sentences=3)
 
 
         if 'extra_policies' in data:
             temp.extra_policies = data.extra_policies
         else: 
-            temp.extra_policies = fake.paragraph(nb_sentences=3)
+            temp.extra_policies = self.fake.paragraph(nb_sentences=3)
 
 
         if 'meeting_time' in data:
             temp.meeting_time = data.meeting_time
         else: 
-            temp.meeting_time = fake.paragraph(nb_sentences=1)
+            temp.meeting_time = self.fake.paragraph(nb_sentences=1)
 
 
         if 'meeting_dates' in data:
             temp.meeting_dates = data.meeting_dates
         else: 
-            temp.meeting_dates = fake.paragraph(nb_sentences=1)
+            temp.meeting_dates = self.fake.paragraph(nb_sentences=1)
 
 
         if 'University_cheating_policy' in data:
             temp.University_cheating_policy = data.University_cheating_policy
         else: 
-            temp.University_cheating_policy = fake.paragraph(nb_sentences=3)
+            temp.University_cheating_policy = self.fake.paragraph(nb_sentences=3)
 
 
         if 'Students_with_disabilities' in data:
             temp.Students_with_disabilities = data.Students_with_disabilities
         else: 
-            temp.Students_with_disabilities = fake.paragraph(nb_sentences=3)
+            temp.Students_with_disabilities = self.fake.paragraph(nb_sentences=3)
 
         return temp
 
