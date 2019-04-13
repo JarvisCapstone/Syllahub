@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block app_content %}
+    <h1>Admin Profile</h1>
+    <a type = "button" class= "btn" href="{{ url_for('instructor.create') }}" >Create Instructor</a>
+    <a type = "button" class= "btn" href="{{ url_for('course.create') }}" >Create Course</a>
+    <a type = "button" class= "btn" href="{{ url_for('auth.assignInstruct') }}" >Assign Instructor to Course</a>
+{% endblock %}
