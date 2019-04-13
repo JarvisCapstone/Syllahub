@@ -6,7 +6,7 @@ from werkzeug.urls import url_parse
 from app import db
 from app.auth import bp
 from app.auth.forms import LoginForm, RegistrationForm, assignInstructorToCourse
-from app.models import User, SyllabusInstructorAssociation
+from app.models import User, SyllabusInstructorAssociation, Syllabus
 
 
 @bp.route('/login', methods=['GET', 'POST'])
@@ -57,7 +57,8 @@ def register():
 @login_required
 def my_profile():
     if current_user.permission == 'admin':
-        return render_template('auth/admin_profile.html')
+        draftSyllabi = Syllabus.query.filter_by(state='draft').all()
+        return render_template('auth/admin_profile.html',draftSyllabi=draftSyllabi)
     else:
         return render_template('auth/instructor_profile.html')
     #return redirect(url_for('auth.index'))
