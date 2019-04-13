@@ -1,14 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Index{% endblock %}
+{% block title %}Delete Clo{% endblock %}
 
 {% block app_content %}
-    <h1>Stub clo delete</h1>
-    {% from "_formhelpers.html" import render_field%}
+    <br>
+    {% include 'clo/_delete.html' %}
 
-    <form class="my-3" method=post>
-        {{ form.hidden_tag() }}
-        {{ render_field(form.cloID, "Enter Clo ID") }}
-        <button class="btn btn-primary" type="submit">Delete Clo</button>
-    </form>
 {% endblock %}
