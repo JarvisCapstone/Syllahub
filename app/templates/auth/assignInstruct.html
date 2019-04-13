@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Assign Instructor{% endblock %}
+
+{% block app_content %}
+    <h1>Stub name</h1>
+    {% from "_formhelpers.html" import render_field%}
+    <form action="" class="my-3" method="post">
+        {{ form.hidden_tag() }}
+
+        {{ render_field(form.courseNumber) }}
+        {{ render_field(form.courseSection) }}
+        {{ render_field(form.semester) }}
+        {{ render_field(form.year) }}
+        {{ render_field(form.syllabusVersion) }}
+        {{ render_field(form.courseVersion) }}
+        {{ render_field(form.instructorID) }}
+        <button class="btn btn-primary" type="submit">Assign Course</button>
+    </form>
+{% endblock %}
