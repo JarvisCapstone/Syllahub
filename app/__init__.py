@@ -51,6 +51,10 @@ def create_app(config_class=Config):
     from app.syllabus import bp as syllabus_bp
     app.register_blueprint(syllabus_bp, url_prefix='/syllabus')
 
+
+    from app.factory import bp as factory_bp
+    app.register_blueprint(factory_bp, url_prefix='/factory')
+
     return app 
 
 from app import models

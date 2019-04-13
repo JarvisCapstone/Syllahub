@@ -5,7 +5,7 @@ from app.auth.routes import admin_required
 from app.models import Course
 from app.course.forms import CreateCourseForm, UpdateCourseForm, DeleteCourseForm
 from app import db
-from sqlalchemy import update
+from sqlalchemy import update # TODO, why is this here?
 
 @bp.route('/', methods=['GET'])
 @bp.route('/index', methods=['GET'])
