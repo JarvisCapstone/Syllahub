@@ -56,7 +56,10 @@ def register():
 @bp.route('/my_profile')
 @login_required
 def my_profile():
-    return "my_profile"
+    if current_user.permission == 'admin':
+        return render_template('auth/admin_profile.html')
+    else:
+        return render_template('auth/instructor_profile.html')
     #return redirect(url_for('auth.index'))
 
 
