@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Index{% endblock %}
+
+{% block app_content %}
+    <h1>Syllahub Factory</h1>
+    <p>this is only available to admins. If you are not an admin, you should not be here.</p>
+    
+    <h3>Seed From Webpage</h3>
+    <p>Add any new data from https://www.kent.edu/cs/course-schedule</p>
+    {% from "_formhelpers.html" import render_field%}
+
+    <form action="{{ url_for('factory.seed') }}" class="my-3" method="post">
+        {{ sForm.hidden_tag() }}
+        {{ sForm.submit(class_="btn btn-primary") }}
+    </form>
+
+    <hr>
+    <h3>Generate random data</h3>
+    <p>This is for development and testing. </p>
+    {% from "_formhelpers.html" import render_field%}
+
+    <form action="{{ url_for('factory.generate') }}" class="my-3" method="post">
+        {{ gForm.hidden_tag() }}
+        {{ render_field(gForm.count) }}
+        {{ gForm.submit(class_="btn btn-primary") }}
+    </form>
+    <hr>
+
+
+{% endblock %}

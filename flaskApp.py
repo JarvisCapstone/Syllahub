@@ -1,6 +1,6 @@
 from app import create_app, db
 from app.models import *
-import factory
+from app.factory import factory
 
 app = create_app()
 

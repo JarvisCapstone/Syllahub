@@ -32,13 +32,8 @@ class Retriever():
             'Instructor': lambda x: x.tolist(),
             'Loc': lambda x: x.tolist(),
             'Time': lambda x: x.tolist(),
-            }
+        }
         group = self.tableDataFrame.groupby('CRN').aggregate(aggregation_functions)
-
-        #print(group)
-        #for index, row in group.iterrows():
-        #    #print(row)
-        #    print(row)
         return group
 
     def run(self):
@@ -46,7 +41,7 @@ class Retriever():
         grouped = self.group()
         #print(type(grouped))
         for index, row in grouped.iterrows():
-            #print(row)
+            print(index)
             #row is a series type
             x = row.to_dict()
             print(x)
