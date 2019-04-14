@@ -5,4 +5,10 @@
 {% block app_content %}
     <h1>Welcome to Syllahub</h1>
     <p>Someone please write a site description here.</p>
+    <hr>
+    <h1>Crunch Time!</h1>
+    <p>Message on <a href="https://jarviscapstone.slack.com/messages/CFEMWECDP/team/UFMFTT7K4/">Slack</a> when you need help. </p>
+    <hr>
+    <p>So I made the factory into a blueprint. I used it as an example of my new @auth_required decorator. To access it, your account logged in must have its permission set to admin. Change this manually in phpmyadmin. Then check out the <a href="{{ url_for('factory.index') }}">Factory</a></p>
+
 {% endblock %}

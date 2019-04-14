@@ -3,35 +3,43 @@ from flask_login import current_user, login_required
 from app.models import User
 from app.factory import bp
 from app.factory.forms import GenerateForm, SeedFromWebForm
-
+from app.factory.factory import UserFactory, InstructorFactory, CourseFactory, CloFactory, SyllabusFactory
+from app.auth.routes import admin_required
 
 @bp.route('/', methods=['GET', 'POST'])
-@login_required
+@admin_required
 def index():
-    #TODO. make this auth required
     gForm = GenerateForm()
     sForm = SeedFromWebForm()
     return render_template('factory/index.html', gForm=gForm, sForm=sForm)
 
 
 @bp.route('/generate', methods=['POST'])
-@login_required
+@admin_required
 def generate():
     gForm = GenerateForm()
-    sForm = SeedFromWebForm()
     if gForm.validate_on_submit():
-        flash('validated g form')
-    return render_template('factory/index.html', gForm=gForm, sForm=sForm)
+        count = int(gForm.count.data)
+        factories = []
+        factories.append(UserFactory())
+        factories.append(InstructorFactory())
+        factories.append(CourseFactory())
+        factories.append(CloFactory())
+        factories.append(SyllabusFactory())
+        print(factories)
+        for factory in factories:
+            factory.addToDB(count)
+        message= "added {} fake data entries to each table in db".format(count)
+        flash(message)
+    return redirect(url_for('factory.index'))
 
 
 @bp.route('/seed', methods=['POST'])
-@login_required
+@admin_required
 def seed():
-    gForm = GenerateForm()
     sForm = SeedFromWebForm()
     if sForm.validate_on_submit():
-        flash('validated s form')
-    return render_template('factory/index.html', gForm=gForm, sForm=sForm)
-
-    
+        flash('Seed Form Validated')
+        # TODO
+    return redirect(url_for('factory.index'))
 

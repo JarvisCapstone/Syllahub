@@ -31,3 +31,6 @@ class assignInstructorToCourse(FlaskForm):
     syllabusVersion = StringField('Syllabus Version', validators=[DataRequired()])
     courseVersion = StringField('Course Version', validators=[DataRequired()])
     instructorID = StringField('Instructor ID', validators=[DataRequired()])
+
+class RequestReloginForm(FlaskForm):
+    logout = SubmitField('Logout')

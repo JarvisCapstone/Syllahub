@@ -1,18 +1,25 @@
 from functools import wraps
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, session
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
 
 from app import db
 from app.auth import bp
-from app.auth.forms import LoginForm, RegistrationForm, assignInstructorToCourse
-from app.models import User, SyllabusInstructorAssociation, Syllabus, Course
+
+from app.auth.forms import LoginForm, RegistrationForm, assignInstructorToCourse, RequestReloginForm
+from app.models import User, SyllabusInstructorAssociation
+
+
+def redirect_url(default='home.index'):
+    return request.args.get('next') or \
+           request.referrer or \
+           url_for(default)
 
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('home.index'))
     form = LoginForm()
 
     if form.validate_on_submit():
@@ -27,6 +34,7 @@ def login():
 
         return redirect(next_page)
     return render_template('auth/login.html', title='Login', form=form)
+
 
 @bp.route('/logout')
 @login_required
@@ -96,15 +104,38 @@ def myCourses():
         courses.append(Course.query.filter_by(number=pair[0], version=pair[1]).first())
     return render_template('auth/my_courses.html', courses=courses)
 
+@bp.route('/requestRelogin', methods=['GET','POST'])
+@login_required
+def requestRelogin():
+    next=request.args.get('next')
+    form = RequestReloginForm()
+    if form.validate_on_submit():
+        logout_user()
+        return redirect(url_for('auth.login', next=next))
+    return render_template('auth/requestRelogin.html', form=form)
+
 
 def admin_required(func):
-    '''Decorator used to see if current user has administrator status
+    '''Restricts access to routes if the user is not logged in with admin privlages
+    If you decorate a view with this, it will ensure that the current user is
+    logged in and has a permission = 'admin'
+    
+    Example useage:
+        @app.route('/post')
+        @admin_required
+        def post():
+            pass
+
+    import with:
+        from app.auth.routes import admin_required
+
     '''
     @wraps(func)
+    @login_required
     def decorated_function(*args, **kwargs):
         if current_user.permission != 'admin':
-            flash("This action requires administrator privlages")
-            return redirect(url_for('auth.login'))
+            flash("This page requires administrator privlages to access")
+            return redirect(url_for('auth.requestRelogin', 
+                            next=url_for(request.endpoint)))
         return func(*args, **kwargs)
-
     return decorated_function
