@@ -3,7 +3,7 @@ from wtforms import IntegerField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 
 class GenerateForm(FlaskForm):
-    count = IntegerField('How many fake users do you want?')
+    count = IntegerField('How many fake things do you want?')
     generateSubmit = SubmitField('Generate')
 
 
