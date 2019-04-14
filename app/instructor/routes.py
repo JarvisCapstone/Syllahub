@@ -1,5 +1,5 @@
 from app.instructor import bp
-from app.models import Instructor
+from app.models import Instructor, User
 from flask import render_template, jsonify, flash, redirect, url_for, request
 from flask_login import current_user, login_required
 from app import db
@@ -18,7 +18,8 @@ def index():
 def create():
     form = createInstructorForm()
     if form.validate_on_submit():
-        instructor = Instructor(name=form.name.data, phone=form.phone.data, email=form.email.data, perfered_office_hours=form.hours.data)
+        instructor = Instructor(name=form.name.data, phone=form.phone.data, 
+                                email=form.email.data, perfered_office_hours=form.hours.data)
         db.session.add(instructor)
         db.session.commit()
         return redirect(url_for('instructor.read', id=instructor.id))
