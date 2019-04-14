@@ -71,6 +71,23 @@ class UserFactory(Factory):
 
         return temp
 
+    def generateAdmin(self):
+        '''Adds admin@syllahub.com to db if it isn't already there
+        '''
+        admin = User.query.filter_by(email='admin@syllahub.com').first()
+        if admin is None:
+            admin = User(email='admin@syllahub.com')
+            admin.set_password('admin')
+            db.session.add(admin)
+            db.session.commit()
+            return 'Generated admin@syllahub.com'
+        elif not admin.permission =='admin':
+            admin.permission='admin'
+            db.session.commit()
+            return 'Set admin@syllahub.com to an admin'
+        else:
+            return 'admin@syllahub.com is already an admin in the database'
+    
 
 class InstructorFactory(Factory):
     def __init__(self):

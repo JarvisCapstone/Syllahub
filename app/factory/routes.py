@@ -1,8 +1,8 @@
-from flask import render_template, flash, redirect, url_for
+from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_required
 from app.models import User
 from app.factory import bp
-from app.factory.forms import GenerateForm, SeedFromWebForm
+from app.factory.forms import GenerateForm, SeedFromWebForm, GenerateAdminForm
 from app.factory.factory import UserFactory, InstructorFactory, CourseFactory, CloFactory, SyllabusFactory
 from app.auth.routes import admin_required
 
@@ -11,14 +11,9 @@ from app.auth.routes import admin_required
 def index():
     gForm = GenerateForm()
     sForm = SeedFromWebForm()
-    return render_template('factory/index.html', gForm=gForm, sForm=sForm)
-
-
-@bp.route('/generate', methods=['POST'])
-@admin_required
-def generate():
-    gForm = GenerateForm()
-    if gForm.validate_on_submit():
+    adminForm = GenerateAdminForm()
+    if gForm.generateSubmit.data and gForm.validate():
+        print('gForm')
         count = int(gForm.count.data)
         factories = []
         factories.append(UserFactory())
@@ -31,15 +26,13 @@ def generate():
             factory.addToDB(count)
         message= "added {} fake data entries to each table in db".format(count)
         flash(message)
-    return redirect(url_for('factory.index'))
-
-
-@bp.route('/seed', methods=['POST'])
-@admin_required
-def seed():
-    sForm = SeedFromWebForm()
-    if sForm.validate_on_submit():
-        flash('Seed Form Validated')
+    elif sForm.seedSubmit.data and sForm.validate():
+        print('sForm')
+        flash('Seed Form Validated. TODO')
         # TODO
-    return redirect(url_for('factory.index'))
-
+    elif adminForm.adminSubmit.data and adminForm.validate():
+        print('adminForm')
+        f = UserFactory()
+        message = f.generateAdmin()
+        flash(message)
+    return render_template('factory/index.html', gForm=gForm, sForm=sForm, adminForm=adminForm)
