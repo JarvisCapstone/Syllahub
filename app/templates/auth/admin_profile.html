@@ -7,4 +7,14 @@
     <a type = "button" class= "btn" href="{{ url_for('instructor.create') }}" >Create Instructor</a>
     <a type = "button" class= "btn" href="{{ url_for('course.create') }}" >Create Course</a>
     <a type = "button" class= "btn" href="{{ url_for('auth.assignInstruct') }}" >Assign Instructor to Course</a>
+    <h2>Draft Syllabi</h2>
+<div class="list-group">
+    {% for syllabi in draftSyllabi %}
+    <a href="{{ url_for('syllabus.read', CNumber=syllabi.course_number, CVersion=syllabi.course_version, 
+        sec=syllabi.section, semester=syllabi.semester, version=syllabi.version, year=syllabi.year) }}" 
+       class="list-group-item list-group-item-action">
+        <p>Syllabus for {{ syllabi.course_number }} is waiting approval.</p>
+    </a>
+    {% endfor %}
+</div>
 {% endblock %}

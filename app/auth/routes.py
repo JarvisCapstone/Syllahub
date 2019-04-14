@@ -5,6 +5,7 @@ from werkzeug.urls import url_parse
 
 from app import db
 from app.auth import bp
+
 from app.auth.forms import LoginForm, RegistrationForm, assignInstructorToCourse, RequestReloginForm
 from app.models import User, SyllabusInstructorAssociation
 
@@ -64,7 +65,8 @@ def register():
 @login_required
 def my_profile():
     if current_user.permission == 'admin':
-        return render_template('auth/admin_profile.html')
+        draftSyllabi = Syllabus.query.filter_by(state='draft').all()
+        return render_template('auth/admin_profile.html', draftSyllabi=draftSyllabi)
     else:
         return render_template('auth/instructor_profile.html')
     #return redirect(url_for('auth.index'))
@@ -87,6 +89,20 @@ def assignInstruct():
         return redirect(url_for('auth.my_profile'))
     return render_template('auth/assignInstruct.html', form=form)
 
+@bp.route('/myCourses', methods=['GET', 'POST'])
+@login_required
+def myCourses():
+    print (current_user.email)
+    user = User.query.filter_by(email=current_user.email).first()
+    associations = SyllabusInstructorAssociation.query.filter_by(instructor_id=user.instructor_id).all()
+    courseNumsAndVersions = list()
+    courses = list()
+    for association in associations:
+        courseNumsAndVersions.append((association.syllabus_course_number,
+                                    association.syllabus_course_version))
+    for pair in courseNumsAndVersions:
+        courses.append(Course.query.filter_by(number=pair[0], version=pair[1]).first())
+    return render_template('auth/my_courses.html', courses=courses)
 
 @bp.route('/requestRelogin', methods=['GET','POST'])
 @login_required
