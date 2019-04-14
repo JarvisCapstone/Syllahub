@@ -3,7 +3,7 @@ from flask_login import current_user, login_required
 from app.models import User
 from app.factory import bp
 from app.factory.forms import GenerateForm, SeedFromWebForm
-from app.factory.factory import Factory
+from app.factory.factory import UserFactory, InstructorFactory, CourseFactory, CloFactory, SyllabusFactory
 from app.auth.routes import admin_required
 
 @bp.route('/', methods=['GET', 'POST'])
@@ -19,7 +19,18 @@ def index():
 def generate():
     gForm = GenerateForm()
     if gForm.validate_on_submit():
-        flash('Generate Form Validated')
+        count = int(gForm.count.data)
+        factories = []
+        factories.append(UserFactory())
+        factories.append(InstructorFactory())
+        factories.append(CourseFactory())
+        factories.append(CloFactory())
+        factories.append(SyllabusFactory())
+        print(factories)
+        for factory in factories:
+            factory.addToDB(count)
+        message= "added {} fake data entries to each table in db".format(count)
+        flash(message)
     return redirect(url_for('factory.index'))
 
 
@@ -29,7 +40,6 @@ def seed():
     sForm = SeedFromWebForm()
     if sForm.validate_on_submit():
         flash('Seed Form Validated')
+        # TODO
     return redirect(url_for('factory.index'))
-
-    
 
