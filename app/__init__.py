@@ -54,8 +54,8 @@ def create_app(config_class=Config):
     from app.factory import bp as factory_bp
     app.register_blueprint(factory_bp, url_prefix='/factory')
 
-    #from app.errors import bp as errors_bp
-    #app.register_blueprint(errors_bp, url_prefix='/errors')
+    from app.errors import bp as errors_bp
+    app.register_blueprint(errors_bp, url_prefix='/errors')
 
     return app 
 
