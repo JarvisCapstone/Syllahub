@@ -15,11 +15,12 @@ class syllabusGenerator():
 
         pdf.set_font_size(10)
 
-        #TODO, once we find out relationships
         for instructor in syllabus.instructorList
             pdf.cell(0, 10, instructor.name, ln=1, align='C')
+
         pdf.ln(5)
         pdf.cell(0, 10, syllabus.semester + ' ' + str(syllabus.year) + ' Semester', ln=1, align='C')
+
         #TODO, make section number a string in database, add check
         # for section to determine campus
         pdf.cell(0, 10, 'Kent Campus, Section: ' + str(syllabus.section), ln=1, align='C')

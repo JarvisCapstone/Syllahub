@@ -4,6 +4,7 @@ from app.models import User
 from app.factory import bp
 from app.factory.forms import GenerateForm, SeedFromWebForm, GenerateAdminForm
 from app.factory.factory import UserFactory, InstructorFactory, CourseFactory, CloFactory, SyllabusFactory
+from app.factory.webparse import Retriever
 from app.auth.routes import admin_required
 
 @bp.route('/', methods=['GET', 'POST'])
@@ -26,10 +27,14 @@ def index():
             factory.addToDB(count)
         message= "added {} fake data entries to each table in db".format(count)
         flash(message)
+
     elif sForm.seedSubmit.data and sForm.validate():
         print('sForm')
         flash('Seed Form Validated. TODO')
+        r = Retriever()
+        r.run()
         # TODO
+
     elif adminForm.adminSubmit.data and adminForm.validate():
         print('adminForm')
         f = UserFactory()

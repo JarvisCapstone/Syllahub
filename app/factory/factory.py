@@ -187,6 +187,55 @@ class CourseFactory(Factory):
 
         return temp
 
+    def createOrGet(number, version=None, name=None):
+        '''Given a number [and version], get or create course with that pk
+        '''
+        course = None
+        if version == 'any':
+            existingCourseList = Course.query.filter_by(number=number).all()
+            #print('existingCourseList', existingCourseList)
+            if len(existingCourseList) == 0:
+                newCourse = Course()
+                newCourse.number = number
+                newCourse.version = 1 #TODO, remove once autoincrement is changed
+                db.session.add(newCourse)
+                db.session.commit()
+                course = newCourse
+                print('new course added')
+            else:
+                # search course list for most recent version
+                # TODO
+                print('course already exists')
+                course = existingCourseList[0] # TODO, fix this
+            #print(course)
+
+        else:
+            course = Course.query.filter_by(number=number, version=version).first()
+        print('course=', course)
+        return course
+
+    def updateIfDifferent(course, name=None):
+        '''TODO add more fields other than name
+        '''
+        # For each item, check if the existing course needs updating. 
+        # if so, update and save to db
+        changed = False
+        if name:
+            if not course.name == name:
+                course.name = name
+                changed = True
+
+        if changed:
+            db.session.commit()
+                #print('name=', newCourse.name)
+        # TODO, figure out how we will do time and loc information
+        #locationList = r.Loc
+        #BuildingStr = ""
+        #timeStr = 
+        #for location in locationList
+        #    locationStr += location
+
+
 
 class CloFactory(Factory):
     def __init__(self):
@@ -344,7 +393,71 @@ class SyllabusFactory(Factory):
 
         return temp
 
+    def createOrGet(course_number, course_version, section, semester, year, 
+                    version=None):
+        '''Provided the pk, get a syllabus if it exists, or create one if not
+        '''
+        syllabus = None
+        if version == 'any':
+            existingSyllabusList = Syllabus.query.filter_by(
+                course_number=course_number,
+                course_version=course_version,
+                section=section,
+                semester=semester,
+                year=year).all()
+            #print("existingSyllabusList=", existingSyllabusList)
 
+            if len(existingSyllabusList) == 0:
+                newSyllabus = Syllabus()
+                newSyllabus.course_number = course_number
+                newSyllabus.course_version = course_version
+                newSyllabus.version = 1 #TODO, remove once autoincrement is changed
+                newSyllabus.section = section
+                newSyllabus.semester = semester
+                newSyllabus.year = year
+               
+                db.session.add(newSyllabus)
+                db.session.commit()
+                syllabus = newSyllabus
+                print('new syllabus added')
+            else:
+                # search course list for most recent version
+                # TODO
+                # For each item, check if the existing course needs updating. 
+                # if so, update and save to db
+                print('syllabus already exists')
+                syllabus = existingSyllabusList[0] # TODO, fix this
+
+        else:
+            syllabus = Syllabus.query.filter_by(course_number=course.number,
+                                                course_version=course.version,
+                                                section=section,
+                                                semester=semester,
+                                                year=year).first()
+        print('syllabus=', syllabus)
+        return syllabus
+
+
+    def updateIfDifferent(syllabus, meeting_time=None):
+        '''TODO add more fields other than name
+        '''
+        # For each item, check if the existing course needs updating. 
+        # if so, update and save to db
+        changed = False
+        if meeting_time:
+            if not course.meeting_time == meeting_time:
+                course.meeting_time = meeting_time
+                changed = True
+
+        if changed:
+            db.session.commit()
+                #print('name=', newCourse.name)
+        # TODO, figure out how we will do time and loc information
+        #locationList = r.Loc
+        #BuildingStr = ""
+        #timeStr = 
+        #for location in locationList
+        #    locationStr += location
 
 def createRandCloCourseAssociation():
     temp_course = Course.query.order_by(func.rand()).first()

@@ -1,6 +1,9 @@
 #import requests
 import pandas as pd
 import pprint
+from app.models import Course, Syllabus
+from app.factory.factory import InstructorFactory, CourseFactory, SyllabusFactory
+from app import db
 
 class Retriever():
     '''Read cs courses from a table on their website
@@ -39,14 +42,52 @@ class Retriever():
     def run(self):
         self.getTable()
         grouped = self.group()
+        #r = grouped.iloc[0]
+        #print(r)
+        #print('------------------------------------------------------')
+
         #print(type(grouped))
         for index, row in grouped.iterrows():
-            print(index)
-            #row is a series type
-            x = row.to_dict()
-            print(x)
-            #TODO convert this into models of courses and syllabi and add them to the DB
+            #    print(index)
+            #    #row is a series type
+            #x = row.to_dict()
+            #See if Course already exists in db. 
+            # Primary key is course.number
+            # data from web is a string of the format "CS #####" where # are the numbers we want
 
+            numberString = row.Crse[-5:] # selects only the 5 rightmost charicters 
+            course_number = int(numberString)
+            course = CourseFactory.createOrGet(number=course_number,
+                                               version='any')
 
-a = Retriever()
-a.run()
+            CourseFactory.updateIfDifferent(course, name=row.Title)
+            # Create Syllabus if it doesn't already exits
+            # syllabus primary key 
+            #     course_number = Column(Integer, primary_key=True)
+            #     course_version = Column(Integer, primary_key=True)
+            
+            #     section = Column(Integer, primary_key=True) # TODO change to string(3)
+            #     semester = Column(Enum('spring', 'summer', 'fall'), primary_key=True)
+            #     version = Column(Integer, primary_key=True)
+            #     year = Column(Integer, primary_key=True)
+            section = row.Sec
+            yearAndSemester = row.Semester # has both info Ex: "2019 Spring"
+            yearString = yearAndSemester[:4] # get left 4 chars
+            year = int(yearString)
+            semester = yearAndSemester[5:] # get chars after char 5
+            #print('name=', newCourse.name)
+            # TODO, figure out how we will do time and loc information
+            #locationList = r.Loc
+            #BuildingStr = ""
+            #timeStr = 
+            #for location in locationList
+            #    locationStr += location
+            syllabus = SyllabusFactory.createOrGet(course_number=course.number,
+                                                   course_version=course.version,
+                                                   section=section,
+                                                   semester=semester,
+                                                   year=year,
+                                                   version='any')
+
+            #SyllabusFactory.updateIfDifferent(syllabus, meeting_time) TODO. once time format is setup
+

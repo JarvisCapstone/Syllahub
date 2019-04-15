@@ -241,18 +241,16 @@ class Course(db.Model, Timestamp):
         back_populates="course")   
     
 
-    # TODO: determine onDelete functionality, cascase, ...
-
     # Non Key Columns
-    building = Column(String(70))
+    building = Column(String(70)) # TODO, remove (move to syllabus)
     description = Column(String(256))
     is_core = Column(Boolean)
     is_diversity = Column(Boolean)
     is_elr = Column(Boolean)
     is_wi = Column(Boolean)
-    name = Column(String(50)) #CS3
+    name = Column(String(50)) #EX: CS3
     prerequisites = Column(String(256))
-    room = Column(String(50))
+    room = Column(String(50)) # TODO, remove (move to syllabus)
 
 
     def __repr__(self):
@@ -326,14 +324,12 @@ class Syllabus(db.Model, Timestamp):
     # Primary Keys
     # CRN course_registration_number used as a primary key in school db
     # does not appear on syllabus
-
-
     course_number = Column(Integer, primary_key=True)
     course_version = Column(Integer, primary_key=True)
     
-    section = Column(Integer, primary_key=True)
+    section = Column(Integer, primary_key=True) # TODO change to string(3)
     semester = Column(Enum('spring', 'summer', 'fall'), primary_key=True)
-    version = Column(Integer, primary_key=True)
+    version = Column(Integer, primary_key=True) # TODO set to autoincrement
     year = Column(Integer, primary_key=True)
     
     # Foreign Keys
@@ -374,13 +370,19 @@ class Syllabus(db.Model, Timestamp):
     meeting_dates = Column(String(100), nullable=True)
     meeting_time = Column(String(100), nullable=True)
     optional_materials = Column(String(256), nullable=True)
-    pdf = Column(LargeBinary, nullable=True)
+    pdf = Column(LargeBinary, nullable=True) # TODO set to longblob?
     required_materials = Column(String(256), nullable=True)
     schedule = Column(LargeBinary, nullable=True)
     state = Column(Enum('approved', 'draft'), default='draft')
     Students_with_disabilities = Column(String(500)) #TODO change to sastext
     University_cheating_policy = Column(String(500)) # TODO set default to  default=currentCheatingPollicy
     withdrawl_date = Column(String(100), nullable=True)
+
+
+    # TODO add building = Column(String(70)) 
+    # TODO add room = Column(String(50))
+
+
 
     def addInstructor(self, instructor, job):
         '''Add an association between syllabus and instructor
@@ -391,6 +393,7 @@ class Syllabus(db.Model, Timestamp):
             job: String - 
         '''
         SyllabusInstructorAssociation.create(self, instructor, job)
+
     def SetPDF(self):
         '''Generates a PDF document and sets self.pdf to it
         
