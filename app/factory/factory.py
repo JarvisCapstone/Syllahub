@@ -1,8 +1,11 @@
 '''Creates fake models and adds them to the database. 
 '''
+import pprint
 from app import db
 from app.models import *
 from sqlalchemy.sql.expression import func
+from flask import flash
+from flask_login import current_user
 
 from faker import Faker
 from faker.providers import profile, phone_number, lorem, address, misc
@@ -28,6 +31,10 @@ class Factory(metaclass=ABCMeta):
     @abstractmethod
     def setData(self, temp, data): 
         pass
+    
+    @abstractmethod
+    def deleteAll(showFlashMessage=True): 
+        pass
 
     def create(self, data=None):
         temp = self.getModel()
@@ -37,8 +44,9 @@ class Factory(metaclass=ABCMeta):
 
     def addToDB(self, num=None):
         num = num or 1
-        u = self.create()
-        db.session.add(u)
+        for i in range(num):
+            u = self.create()
+            db.session.add(u)
         db.session.commit()
         return "Success"
 
@@ -87,7 +95,16 @@ class UserFactory(Factory):
             return 'Set admin@syllahub.com to an admin'
         else:
             return 'admin@syllahub.com is already an admin in the database'
-    
+
+    def deleteAll(showFlashMessage=True):
+        '''Deletes all users except the Currently logged in user. 
+        '''
+        num = db.session.query(User).filter(User.email != current_user.email) \
+                  .delete(synchronize_session=False)
+        db.session.commit()
+        if showFlashMessage:
+            flash("Deleted {} Users".format(num))
+
 
 class InstructorFactory(Factory):
     def __init__(self):
@@ -120,6 +137,12 @@ class InstructorFactory(Factory):
             temp.perfered_office_hours='whenever'
 
         return temp
+
+    def deleteAll(showFlashMessage=True):
+        num = db.session.query(Instructor).delete()
+        db.session.commit()
+        if showFlashMessage:
+            flash("Deleted {} Instructors".format(num))
 
 
 class CourseFactory(Factory):
@@ -201,17 +224,17 @@ class CourseFactory(Factory):
                 db.session.add(newCourse)
                 db.session.commit()
                 course = newCourse
-                print('new course added')
+                #print('new course added')
             else:
                 # search course list for most recent version
                 # TODO
-                print('course already exists')
+                #print('course already exists')
                 course = existingCourseList[0] # TODO, fix this
             #print(course)
 
         else:
             course = Course.query.filter_by(number=number, version=version).first()
-        print('course=', course)
+        #print('course=', course)
         return course
 
     def updateIfDifferent(course, name=None):
@@ -235,6 +258,11 @@ class CourseFactory(Factory):
         #for location in locationList
         #    locationStr += location
 
+    def deleteAll(showFlashMessage=True):
+        num = db.session.query(Course).delete()
+        db.session.commit()
+        if showFlashMessage:
+            flash("Deleted {} Courses ".format(num))
 
 
 class CloFactory(Factory):
@@ -257,6 +285,12 @@ class CloFactory(Factory):
             temp.specific=self.fake.paragraph(nb_sentences=2)
 
         return temp
+
+    def deleteAll(showFlashMessage=True):
+        num = db.session.query(Clo).delete()
+        db.session.commit()
+        if showFlashMessage:
+            flash("Deleted {} CLO's".format(num))
 
 
 class SyllabusFactory(Factory):
@@ -393,8 +427,7 @@ class SyllabusFactory(Factory):
 
         return temp
 
-    def createOrGet(course_number, course_version, section, semester, year, 
-                    version=None):
+    def createOrGet(course_number, course_version, section, semester, year, version=None):
         '''Provided the pk, get a syllabus if it exists, or create one if not
         '''
         syllabus = None
@@ -419,13 +452,13 @@ class SyllabusFactory(Factory):
                 db.session.add(newSyllabus)
                 db.session.commit()
                 syllabus = newSyllabus
-                print('new syllabus added')
+                #print('new syllabus added')
             else:
                 # search course list for most recent version
                 # TODO
                 # For each item, check if the existing course needs updating. 
                 # if so, update and save to db
-                print('syllabus already exists')
+                #print('syllabus already exists')
                 syllabus = existingSyllabusList[0] # TODO, fix this
 
         else:
@@ -434,7 +467,7 @@ class SyllabusFactory(Factory):
                                                 section=section,
                                                 semester=semester,
                                                 year=year).first()
-        print('syllabus=', syllabus)
+        #print('syllabus=', syllabus)
         return syllabus
 
 
@@ -458,6 +491,14 @@ class SyllabusFactory(Factory):
         #timeStr = 
         #for location in locationList
         #    locationStr += location
+
+    def deleteAll(showFlashMessage=True):
+        #num = Syllabus.query().delete()
+        num = db.session.query(Syllabus).delete()
+        db.session.commit()
+        if showFlashMessage:
+            flash("Deleted {} Syllabi".format(num))
+
 
 def createRandCloCourseAssociation():
     temp_course = Course.query.order_by(func.rand()).first()
@@ -488,8 +529,8 @@ def generateData(num=None):
     factories.append(CourseFactory())
     factories.append(CloFactory())
     factories.append(SyllabusFactory())
-    print(factories)
+    #print(factories)
     for factory in factories:
         factory.addToDB(num)
 
-    print("added", num, "fake data entries to each table in db")
+    flash("added", num, "fake data entries to each table in db")
