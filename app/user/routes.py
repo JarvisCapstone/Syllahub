@@ -5,7 +5,7 @@ from app.models import User
 from app import db
 from app.user.forms import DeleteUserForm
 
-@bp.route('/user/<emial>', methods=['GET', 'POST'])
+@bp.route('/user/<email>', methods=['GET', 'POST'])
 @login_required
 def user(email):
     user = User.query.filter_by(email=email).first_or_404()

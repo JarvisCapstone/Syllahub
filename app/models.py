@@ -4,7 +4,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from sqlalchemy_utils import Timestamp
 from sqlalchemy import and_, Boolean, Column, Enum, ForeignKey, ForeignKeyConstraint, Integer, LargeBinary, MetaData, String, text
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
+from sqlalchemy.ext.associationproxy import association_proxy
 
 
 @login.user_loader
@@ -18,6 +19,7 @@ def load_user(email):
         User with primary key = to Args
     '''
     return User.query.get(email)
+
 
 # Association Tables/Objects --------------------------------------------------
 class SyllabusInstructorAssociation(db.Model):
@@ -41,7 +43,9 @@ class SyllabusInstructorAssociation(db.Model):
     syllabus_year = Column(Integer, primary_key=True)
 
     # Primary and Foreign Key for Instructor    
-    instructor_id = Column(Integer, ForeignKey('instructor.id'), 
+    instructor_id = Column(Integer, 
+                           ForeignKey('instructor.id', onupdate="CASCADE", 
+                                      ondelete="CASCADE"), 
                            primary_key=True)
 
     # Foreign Keys for Syllabus    
@@ -62,7 +66,9 @@ class SyllabusInstructorAssociation(db.Model):
             'syllabus.version',
             'syllabus.course_number',
             'syllabus.course_version',
-        ])
+        ],
+        onupdate="CASCADE", 
+        ondelete="CASCADE")
 
     # Relationships
     instructor = relationship(
@@ -73,7 +79,7 @@ class SyllabusInstructorAssociation(db.Model):
         remote_side="Instructor.id",
         foreign_keys="SyllabusInstructorAssociation.instructor_id",
 
-        back_populates="syllabi")
+        backref=backref("instructorSyllabusAssociationList"))
 
     syllabus =  relationship(
         # use strings in relationships to avoid reference errors
@@ -114,32 +120,53 @@ class SyllabusInstructorAssociation(db.Model):
                 "SyllabusInstructorAssociation.syllabus_course_version,"
             "]",
 
-        back_populates="instructors")
+        backref=backref("syllabusInstructorAssociationList"))
 
     # Non Key Columns
     job_on_syllabus = Column(String(120))
 
+    def create(syllabus, instructor, job):
+        '''Add an association between syllabus and instructor
+        TODO: Test if this works flawlessly. Has not been tested
+
+        Args: 
+            syllabus: Syllabus - 
+            instructor: Instructor - 
+            job: String - 
+        '''
+        new_job = SyllabusInstructorAssociation(job_on_syllabus=job)
+        new_job.instructor = instructor;
+        new_job.syllabus = syllabus;
+        db.session.add(new_job)
+        db.session.commit()
 
     def __repr__(self):
         '''returns a printable representation of the object. 
 
         Determines the result of when class is called in Print()
         '''
-        return "<SyllabusInstructorAssociation " \
-            "\tcourse_number={} \n" \
-            "\tcourse_version={} \n" \
-            "\tsection={} \n" \
-            "\tsemester={} \n" \
-            "\tversion={} \n" \
-            "\tyear={}\n" \
-            "\tinstructor_id={} \n>" \
-            .format(self.course_number, self.course_version, 
-                    self.section, self.semester, 
-                    self.version, self.year,
-                    self.instructor_id)
+        return "<SyllabusInstructorAssociation \n" \
+            "\tsyllabus_course_number={} \n" \
+            "\tsyllabus_course_version={} \n" \
+            "\tsyllabus_section={} \n" \
+            "\tsyllabus_semester={} \n" \
+            "\tsyllabus_version={} \n" \
+            "\tsyllabus_year={} \n" \
+            "\tinstructor_id={} \n" \
+            "\tinstructor={} \n" \
+            "\tsyllabus={} \n" \
+            "\tjob_on_syllabus={} \n>" \
+            .format(self.syllabus_course_number, 
+                    self.syllabus_course_version, 
+                    self.syllabus_section, self.syllabus_semester, 
+                    self.syllabus_version, self.syllabus_year,
+                    self.instructor_id, 
+                    self.instructor,
+                    self.syllabus,
+                    self.job_on_syllabus)
 
 
-# SqlAlchemy requires a table define the many to many relationship between 
+# SqlAlchemy requires a table to define the many to many relationship between 
 # course and clo
 course_clo_table = db.Table(
     'course_clo', # Table Name
@@ -149,13 +176,16 @@ course_clo_table = db.Table(
     Column('course_version', Integer, primary_key=True),
     
     # Primary and Foreign Key for Clo
-    Column('clo_id', Integer, ForeignKey('clo.id'), primary_key=True),
+    Column('clo_id', Integer, 
+           ForeignKey('clo.id', onupdate="CASCADE", ondelete="CASCADE"), 
+           primary_key=True),
     
     # Foreign Keys for Course
     ForeignKeyConstraint(['course_number', 'course_version'], 
-                         ['course.number', 'course.version']))
+                         ['course.number', 'course.version'],
+                         onupdate="CASCADE", ondelete="CASCADE"))
 
-# Models ----------------------------------------------------------------------
+# Models ---------------------------------------------------------------------
 class Clo(db.Model, Timestamp):
     '''CLO model
 
@@ -201,6 +231,7 @@ class Course(db.Model, Timestamp):
     clos = relationship('Clo', secondary=course_clo_table,
                         back_populates='courses')
     
+    
     syllabi = relationship(
         "Syllabus", 
         primaryjoin="and_(Course.number == Syllabus.course_number, "
@@ -208,23 +239,22 @@ class Course(db.Model, Timestamp):
         foreign_keys="[Syllabus.course_number, Syllabus.course_version]",
         remote_side="[Syllabus.course_number, Syllabus.course_version]",
         back_populates="course")   
-
-    # TODO: determine onDelete functionality, cascase, ...
+    
 
     # Non Key Columns
-    building = Column(String(70))
+    building = Column(String(70)) # TODO, remove (move to syllabus)
     description = Column(String(256))
     is_core = Column(Boolean)
     is_diversity = Column(Boolean)
     is_elr = Column(Boolean)
     is_wi = Column(Boolean)
-    name = Column(String(50)) #CS3
+    name = Column(String(50)) #EX: CS3
     prerequisites = Column(String(256))
-    room = Column(String(50))
+    room = Column(String(50)) # TODO, remove (move to syllabus)
 
 
     def __repr__(self):
-        '''returns a printable representation of the object. 
+        '''Returns a printable representation of the object. 
 
         Determines the result of when class is called in Print()
         '''
@@ -250,15 +280,11 @@ class Instructor(db.Model, Timestamp):
     # Primary Key
     id = Column(Integer, primary_key=True)
     
+    # Association Proxies
+    syllabusList = association_proxy('instructorSyllabusAssociationList', 'syllabus')
+
     # Relationships
     user = relationship("User", uselist=False, back_populates="instructor")
-    
-    syllabi = relationship(
-        "SyllabusInstructorAssociation",
-        primaryjoin="Instructor.id == SyllabusInstructorAssociation.instructor_id ",
-        foreign_keys="SyllabusInstructorAssociation.instructor_id",
-        remote_side="SyllabusInstructorAssociation.instructor_id",
-        back_populates="instructor")
 
 
     # Non Key Columns
@@ -267,6 +293,16 @@ class Instructor(db.Model, Timestamp):
     phone = Column(Integer) # TODO change this to string
     perfered_office_hours = Column(String(256))
     
+    def addToSyllabus(self, syllabus, job):
+        '''Add an association between syllabus and instructor
+        TODO: Test if this works flawlessly. Has not been tested
+
+        Args: 
+            syllabus: Syllabus - 
+            job: String - 
+        '''
+        syllabus.addInstructor(self,job)
+        SyllabusInstructorAssociation.create(syllabus, self, job)
 
     def __repr__(self):
         '''returns a printable representation of the object. 
@@ -288,19 +324,22 @@ class Syllabus(db.Model, Timestamp):
     # Primary Keys
     # CRN course_registration_number used as a primary key in school db
     # does not appear on syllabus
-
-
     course_number = Column(Integer, primary_key=True)
     course_version = Column(Integer, primary_key=True)
     
-    section = Column(Integer, primary_key=True)
+    section = Column(Integer, primary_key=True) # TODO change to string(3)
     semester = Column(Enum('spring', 'summer', 'fall'), primary_key=True)
-    version = Column(Integer, primary_key=True)
+    version = Column(Integer, primary_key=True) # TODO set to autoincrement
     year = Column(Integer, primary_key=True)
     
     # Foreign Keys
     ForeignKeyConstraint(['course_number', 'course_version'], 
-                         ['course.number', 'course.version'])
+                         ['course.number', 'course.version'], 
+                         onupdate="CASCADE", ondelete="CASCADE")
+
+    # Association Proxies
+    instructorList = association_proxy('syllabusInstructorAssociationList', 'instructor')
+
 
     # Relationships  
     course = relationship(
@@ -313,46 +352,6 @@ class Syllabus(db.Model, Timestamp):
         
         back_populates="syllabi")   
     
-    instructors = relationship(
-        # use strings in relationships to avoid reference errors
-        
-        "SyllabusInstructorAssociation", # mapped class representing target of relationship
-        
-        primaryjoin=
-            "and_(SyllabusInstructorAssociation.syllabus_section"
-                      " == Syllabus.section, "
-                 "SyllabusInstructorAssociation.syllabus_semester"
-                      " == Syllabus.semester, "
-                 "SyllabusInstructorAssociation.syllabus_year"
-                      " == Syllabus.year, "
-                 "SyllabusInstructorAssociation.syllabus_version"
-                      " == Syllabus.version, "
-                 "SyllabusInstructorAssociation.syllabus_course_number"
-                      " == Syllabus.course_number, "
-                 "SyllabusInstructorAssociation.syllabus_course_version"
-                      " == Syllabus.course_version)",
-
-        remote_side=
-            "["
-                "SyllabusInstructorAssociation.syllabus_section,"
-                "SyllabusInstructorAssociation.syllabus_semester,"
-                "SyllabusInstructorAssociation.syllabus_year,"
-                "SyllabusInstructorAssociation.syllabus_version,"
-                "SyllabusInstructorAssociation.syllabus_course_number,"
-                "SyllabusInstructorAssociation.syllabus_course_version,"
-            "]",
-
-        foreign_keys= 
-            "["
-                "SyllabusInstructorAssociation.syllabus_section,"
-                "SyllabusInstructorAssociation.syllabus_semester,"
-                "SyllabusInstructorAssociation.syllabus_year,"
-                "SyllabusInstructorAssociation.syllabus_version,"
-                "SyllabusInstructorAssociation.syllabus_course_number,"
-                "SyllabusInstructorAssociation.syllabus_course_version,"
-            "]",
-
-        back_populates="syllabus")   
 
     # Defaults
     # TODO set default policy information to variables here. 
@@ -371,13 +370,29 @@ class Syllabus(db.Model, Timestamp):
     meeting_dates = Column(String(100), nullable=True)
     meeting_time = Column(String(100), nullable=True)
     optional_materials = Column(String(256), nullable=True)
-    pdf = Column(LargeBinary, nullable=True)
+    pdf = Column(LargeBinary, nullable=True) # TODO set to longblob?
     required_materials = Column(String(256), nullable=True)
     schedule = Column(LargeBinary, nullable=True)
     state = Column(Enum('approved', 'draft'), default='draft')
     Students_with_disabilities = Column(String(500)) #TODO change to sastext
     University_cheating_policy = Column(String(500)) # TODO set default to  default=currentCheatingPollicy
     withdrawl_date = Column(String(100), nullable=True)
+
+
+    # TODO add building = Column(String(70)) 
+    # TODO add room = Column(String(50))
+
+
+
+    def addInstructor(self, instructor, job):
+        '''Add an association between syllabus and instructor
+        TODO: Test if this works flawlessly. Has not been tested
+
+        Args: 
+            instructor: Instructor - 
+            job: String - 
+        '''
+        SyllabusInstructorAssociation.create(self, instructor, job)
 
     def SetPDF(self):
         '''Generates a PDF document and sets self.pdf to it
@@ -408,7 +423,7 @@ class Syllabus(db.Model, Timestamp):
 
         Determines the result of when class is called in Print()
         '''
-        return "<Syllabus " \
+        return "<Syllabus \n" \
             "\tcourse_number={} \n" \
             "\tcourse_version={} \n" \
             "\tsection={} \n" \
@@ -427,12 +442,15 @@ class User(UserMixin, db.Model, Timestamp):
         one to one
     '''
     # Primary Keys
-    #id = Column(Integer, primary_key=True) 
     email = Column(String(120), primary_key=True)
 
     # Foreign Keys
-    instructor_id = Column(Integer, ForeignKey('instructor.id'), nullable=True)
-    
+    instructor_id = Column(Integer, 
+                           ForeignKey('instructor.id', 
+                                      onupdate="CASCADE", 
+                                      ondelete="SET NULL"),
+                           nullable=True)
+
     # Relationships    
     instructor = relationship("Instructor", back_populates="user")
 
@@ -440,7 +458,6 @@ class User(UserMixin, db.Model, Timestamp):
     password_hash = Column(String(128), nullable=False)
     permission = Column(Enum('admin', 'instructor'), nullable=False, 
                         server_default=text("instructor"))
-    #username = Column(String(64),  nullable=False, index=True, unique=True)
     
     def get_id(self):
         '''Used for Flask-Login to get the primary key of User
@@ -452,6 +469,9 @@ class User(UserMixin, db.Model, Timestamp):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def isAdmin(self):
+        return self.permission == 'admin'
 
     def __repr__(self):
         '''returns a printable representation of the object. 

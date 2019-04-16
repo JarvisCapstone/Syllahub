@@ -3,7 +3,8 @@ from flask import render_template
 from flask_login import current_user, login_required
 from app.models import User
 
-@bp.route('/', methods=['GET', 'POST'])
+@bp.route('/')
+@bp.route('/index')
 def index():
     return render_template('home/index.html')
 

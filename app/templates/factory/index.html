@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Index{% endblock %}
+
+{% block app_content %}
+    {% from "_formhelpers.html" import render_field%}
+    
+    <h1>Syllahub Factory</h1>
+    <p>This is only available to admins. If you are not an admin, you should not be here.</p>
+    
+    <div class="alert alert-danger" role="alert">
+      WARNING: This is a powerful and dangerous page. You can easily delete all of your data. Use At your own risk. 
+    </div>
+    <hr>
+    <h3>Seed From Webpage</h3>
+    <p>Add any new data from the <a href="https://www.kent.edu/cs/course-schedule">Kent CS course schedule</a></p>
+
+    <form action="" class="my-3" method="post">
+        {{ sForm.hidden_tag() }}
+        {{ sForm.seedSubmit(class_="btn btn-primary") }}
+    </form>
+
+    <hr>
+
+
+    <h3>Generate Admin</h3>
+    <p>Creates The user 'admin@syllahub.com'. password='admin'. permission='admin'</p>
+
+    <form action="" class="my-3" method="post">
+        {{ adminForm.hidden_tag() }}
+        {{ adminForm.adminSubmit(class_="btn btn-primary") }}
+    </form>
+
+    <hr>
+
+    <h3>Generate random data</h3>
+    <p>This is for development and testing. </p>
+    <form action="" class="my-3" method="post">
+        {{ gForm.hidden_tag() }}
+        {{ render_field(gForm.count) }}
+        {{ gForm.generateSubmit(class_="btn btn-primary") }}
+    </form>
+    <hr>
+
+    <h3>Drop All</h3>
+    <p>Drops everything from the database</p>
+
+    <form action="" class="my-3" method="post">
+        {{ deleteForm.hidden_tag() }}
+        {{ deleteForm.deleteUsersSubmit(class_="btn btn-warning") }}
+        {{ deleteForm.deleteInstructorsSubmit(class_="btn btn-warning") }}
+        {{ deleteForm.deleteCoursesSubmit(class_="btn btn-warning") }}
+        {{ deleteForm.deleteClosSubmit(class_="btn btn-warning") }}
+        {{ deleteForm.deleteSyllabiSubmit(class_="btn btn-warning") }}
+        {{ deleteForm.deleteAllSubmit(class_="btn btn-danger") }}
+    </form>
+
+
+
+{% endblock %}

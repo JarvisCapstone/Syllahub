@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Index{% endblock %}
+
+{% block app_content %}
+    <h1>Logout?</h1>
+    <p>To access this page, your account must have administrator status. Would you like to logout?</p>
+    <a class="btn btn-primary" href="{{ url_for('home.index') }}">Home</a>
+    <form action="" class="my-3" method="post">
+        {{ form.hidden_tag() }}
+        {{ form.logout(class_="btn btn-warning") }}
+    </form>
+
+{% endblock %}
