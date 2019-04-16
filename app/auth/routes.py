@@ -7,7 +7,7 @@ from app import db
 from app.auth import bp
 
 from app.auth.forms import LoginForm, RegistrationForm, assignInstructorToCourse, RequestReloginForm
-from app.models import User, SyllabusInstructorAssociation
+from app.models import User, SyllabusInstructorAssociation, Syllabus
 
 
 def redirect_url(default='home.index'):
