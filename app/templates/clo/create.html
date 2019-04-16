@@ -4,4 +4,13 @@
 
 {% block app_content %}
     <h1>Stub clo create</h1>
+    {% from "_formhelpers.html" import render_field%}
+
+    <form class="my-3" method=post>
+        {{ form.hidden_tag() }}
+        {{ render_field(form.cloGeneral, "Enter General Description") }}
+        {{ render_field(form.cloSpecific, "Enter Specific Description") }}
+        <button class="btn btn-primary" type="submit">Create Clo</button>
+    </form>
+
 {% endblock %}

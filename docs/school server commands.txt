@@ -1,0 +1,17 @@
+#Apache commands
+apachectl restart
+apachectl status
+
+
+#Apache error log location
+/var/log/httpd/error_log
+
+#Display last 5 lines of Apache Error Log
+tail -n 5 /var/log/httpd/error.log
+
+
+# activate virtual environment
+workon syllahub
+
+
+

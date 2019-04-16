@@ -3,5 +3,30 @@
 {% block title %}Index{% endblock %}
 
 {% block app_content %}
-    <h1>Stub course index</h1>
+<h1>All Courses</h1>
+<div class="list-group">
+    {% for course in courses %}
+    <a href="{{ url_for('course.update', number=course.number, version=course.version) }}" 
+       class="list-group-item list-group-item-action">
+        <h3> {{ course.name }} </h3>
+        <p>Number: {{ course.number }}</p>
+        <p>Version: {{ course.version }}</p>
+        <p>Description: {{ course.description }}</p>
+        <p>Building: {{ course.building }}</p>
+        <p>Room: {{ course.room }}</p>
+        {% if course.is_core %}
+            <p>Satisfies Kent Core</p>
+        {% endif %}
+        {% if course.is_diversity %}
+            <p>Satisfies Diversity</p>
+        {% endif %}
+        {% if course.is_elr %}
+            <p>Satisfies Experimental Learning</p>
+        {% endif %}
+        {% if course.is_wi %}
+            <p>Satisfies Writing Intensive</p>
+        {% endif %}
+    </a>
+    {% endfor %}
+</div>
 {% endblock %}

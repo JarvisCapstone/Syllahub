@@ -3,5 +3,18 @@
 {% block title %}Index{% endblock %}
 
 {% block app_content %}
-    <h1>Stub instructor delete</h1>
+    <h1>Delete An Instructor</h1><br>
+    {% from "_formhelpers.html" import render_field %}
+
+    {{form.hidden_tag()}}
+
+    <form method="post" action="">
+        {{ form.hidden_tag() }}
+
+        {{render_field(form.id, "Enter ID")}}
+       <br>
+        <button class="btn btn-danger", type="submit">Submit</button>
+        <br>
+    </form>
+    
 {% endblock %}

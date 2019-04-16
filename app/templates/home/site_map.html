@@ -7,9 +7,9 @@
     <h3>User</h3>
     <a href="{{ url_for('user.index') }}">User Index</a><br>
     <a href="{{ url_for('user.create') }}">User create</a><br>
-    <a href="{{ url_for('user.read', username='test') }}">User read</a><br>
-    <a href="{{ url_for('user.update', username='test') }}">User update</a><br>
-    <a href="{{ url_for('user.delete', username='test') }}">User delete</a><br>
+    <a href="{{ url_for('user.read', email='test') }}">User read</a><br>
+    <a href="{{ url_for('user.update', email='test') }}">User update</a><br>
+    <a href="{{ url_for('user.delete', email='test') }}">User delete</a><br>
 
     <h3>CLO</h3>
     <a href="{{ url_for('clo.index') }}">clo Index</a><br>
@@ -28,9 +28,9 @@
     <h3>Syllabus</h3>
     <a href="{{ url_for('syllabus.index') }}">syllabus Index</a><br>
     <a href="{{ url_for('syllabus.create') }}">syllabus create</a><br>
-    <a href="{{ url_for('syllabus.read', id='test') }}">syllabus read</a><br>
-    <a href="{{ url_for('syllabus.update', id='test') }}">syllabus update</a><br>
-    <a href="{{ url_for('syllabus.delete', id='test') }}">syllabus delete</a><br>
+    <a href="{{ url_for('syllabus.read', CNumber='test', CVersion='test', sec='test', semester='spring', version='test', year='2019') }}">syllabus read</a><br>
+    <a href="{{ url_for('syllabus.update', CNumber='test', CVersion='test', sec='test', semester='spring', version='test', year='2019') }}">syllabus update</a><br>
+    <a href="{{ url_for('syllabus.delete', CNumber='test', CVersion='test', sec='test', semester='spring', version='test', year='2019') }}">syllabus delete</a><br>
 
     <h3>auth</h3>
     <a href="{{ url_for('auth.login') }}">auth login</a><br>

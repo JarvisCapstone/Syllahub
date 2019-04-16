@@ -3,5 +3,26 @@
 {% block title %}Index{% endblock %}
 
 {% block app_content %}
-    <h1>Stub syllabus create</h1>
+    <h1>Create Syllabus</h1>
+    {% from "_formhelpers.html" import render_field%}
+
+    <form action="" class="my-3" method="post">
+        {{ form.hidden_tag() }}
+
+        {{ render_field(form.course_number) }}
+        {{ render_field(form.course_version) }}
+        {{ render_field(form.section) }}
+        {{ render_field(form.semester) }}
+        {{ render_field(form.version) }}
+        {{ render_field(form.year) }}
+        {{ render_field(form.SASText) }}
+        {{ render_field(form.cheatingPolicy) }}
+        {{ render_field(form.attendancePolicy) }}
+        {{ render_field(form.gradingPolicy) }}
+        {{ render_field(form.withdrawlDate) }}
+        {{ render_field(form.requiredMaterials) }}
+        {{ render_field(form.optionalMaterials) }}
+        {{ render_field(form.meetingTimes) }}
+        <button class="btn btn-primary" type="submit">Create Syllabus</button>
+    </form>
 {% endblock %}

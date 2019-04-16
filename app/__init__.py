@@ -3,6 +3,9 @@ from flask import Flask, current_app
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+# TODO: from flask_wtf.csrf import CSRFProtect
+
+# TODO: csrf = CSRFProtect()
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -14,11 +17,12 @@ login.login_message = 'Please log in to access this page.'
 def create_app(config_class=Config):
     app = Flask(__name__)
 
-    """ Default config is the variables in the Config class in config.py.
+    """Default config is the variables in the Config class in config.py.
     Use a different argument for testing"""
     app.config.from_object(config_class)
 
     app.app_context().push()
+    # TODO: csrf.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db)
     login.init_app(app)
@@ -46,6 +50,12 @@ def create_app(config_class=Config):
 
     from app.syllabus import bp as syllabus_bp
     app.register_blueprint(syllabus_bp, url_prefix='/syllabus')
+
+    from app.factory import bp as factory_bp
+    app.register_blueprint(factory_bp, url_prefix='/factory')
+
+    from app.errors import bp as errors_bp
+    app.register_blueprint(errors_bp, url_prefix='/errors')
 
     return app 
 

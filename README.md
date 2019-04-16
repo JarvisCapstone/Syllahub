@@ -79,13 +79,16 @@ downgrade migration with: <br>
 
 Create a migration with: <br>
 <code>(venv) $ flask db migrate -m "migration name"</code>
-
-
-
-
-
-
 <hr>
+
+
+
+<h3>HTTP RESTful Services</h3>
+<a href="https://www.restapitutorial.com/lessons/httpmethods.html">GET and Post tutorial</a>
+<p>We probably won't be using PUT, PATCH, and DELETE requests. But this is ideally how it should be done. This link also shows a good list of errors.</p>
+<hr>
+
+
 <h3>Related Flask Tutorials</h3>
 <p><a href="https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world">The Flask Mega Tutorial</a> is a good start if anything here confuses you.</p>
 <p><a href="http://exploreflask.com/en/latest/index.html">Explore Flask</a> is the best resourse for the design patterns we will be using. Check it out.</p>
