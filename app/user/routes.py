@@ -1,9 +1,9 @@
 from app.user import bp
-from flask import render_template, flash
+from flask import render_template, flash, redirect, url_for
 from flask_login import current_user, login_required
 from app.models import User
 from app import db
-from app.user.forms import DeleteUserForm
+from app.user.forms import DeleteUserForm, createUserForm
 
 @bp.route('/user/<email>', methods=['GET', 'POST'])
 @login_required
@@ -21,7 +21,15 @@ def index():
 
 @bp.route('/create', methods=['GET', 'POST'])
 def create():
-    return render_template('/user/create.html')
+    form = createUserForm()
+    if form.validate_on_submit():
+        user = User(username=form.username.data, password = form.password.data, 
+        email=form.email.data)
+
+        db.session.add(user)
+        db.session.commit()
+        return redirect(url_for('user.read', id=user.id))
+    return render_template('/user/create.html', title="Create User", form=form)
 
 
 

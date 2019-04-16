@@ -3,5 +3,16 @@
 {% block title %}Index{% endblock %}
 
 {% block app_content %}
-    <h1>Stub user create</h1>
+    <h1>User Creation</h1>
+    {%from "_formhelpers.html" import render_field %}
+
+    <form method="post" action="">
+        {{ form.hidden_tag() }}
+
+        {{render_field(form.username, "Enter Username")}}
+        {{render_field(form.password, "Enter Password")}}<br>
+        {{render_field(form.email, "Enter Email")}}<br>      
+        <button class="btn btn-secondary" type="submit">Submit</button>
+    </form>
 {% endblock %}
+
