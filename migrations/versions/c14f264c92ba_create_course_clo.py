@@ -1,4 +1,4 @@
-"""create fks course clo
+"""create course clo
 
 Revision ID: c14f264c92ba
 Revises: eb030f05bfa2
