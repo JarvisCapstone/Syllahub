@@ -58,6 +58,7 @@ def search():
         courses.sort(key=lambda x : x.version, reverse=False)
     elif (sortBy == 'new' or form.sortBy == None):
         courses.sort(key=lambda x : x.version, reverse=True)
+        
     return render_template('/course/search.html', courses=courses)
 
 
