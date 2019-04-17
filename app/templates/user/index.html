@@ -3,5 +3,18 @@
 {% block title %}Index{% endblock %}
 
 {% block app_content %}
-    <h1>Stub user index</h1>
+    <h1>User Index</h1>
+
+    <ul class="list-group">
+
+        {% for user in users %}
+        <li class="list-group-item">
+
+            ID: {{user.id}} <br>
+            Email: {{user.email}} <br>
+
+        </li>
+        {% endfor %} 
+    </ul>
+
 {% endblock %}

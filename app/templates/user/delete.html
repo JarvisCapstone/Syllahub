@@ -1,8 +1,20 @@
 {% extends "base.html" %}
 
-{% block title %}Delete{% endblock %}
+{% block title %}Index{% endblock %}
 
 {% block app_content %}
-    <h1>Delete User</h1>
+    <h1>Delete An Instructor</h1><br>
+    {% from "_formhelpers.html" import render_field %}
 
+    {{form.hidden_tag()}}
+
+    <form method="post" action="">
+        {{ form.hidden_tag() }}
+
+        {{render_field(form.email, "Enter Email")}}
+       <br>
+        <button class="btn btn-danger", type="submit">Submit</button>
+        <br>
+    </form>
+    
 {% endblock %}

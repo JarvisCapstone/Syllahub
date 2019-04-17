@@ -11,3 +11,8 @@ class DeleteUserForm(FlaskForm):
         user = User.query.filter_by(email=email.data).first()
         if user is None:
             raise ValidationError('Please use a different email address.')
+
+class createUserForm(FlaskForm):
+    password = StringField('Password:', validators=[DataRequired()])
+    email = StringField('Email:', validators=[DataRequired()])
+    submit = SubmitField('Submit')
