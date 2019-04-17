@@ -82,19 +82,20 @@ class UserFactory(Factory):
     def generateAdmin(self):
         '''Adds admin@syllahub.com to db if it isn't already there
         '''
-        admin = User.query.filter_by(email='admin@syllahub.com').first()
+        adminEmail='syllahub@gmail.com'
+        admin = User.query.filter_by(email=adminEmail).first()
         if admin is None:
-            admin = User(email='admin@syllahub.com')
+            admin = User(email=adminEmail)
             admin.set_password('admin')
             db.session.add(admin)
             db.session.commit()
-            return 'Generated admin@syllahub.com'
+            return 'Generated ' + adminEmail
         elif not admin.permission =='admin':
             admin.permission='admin'
             db.session.commit()
-            return 'Set admin@syllahub.com to an admin'
+            return 'Set ' + adminEmail + ' to an admin'
         else:
-            return 'admin@syllahub.com is already an admin in the database'
+            return adminEmail + ' is already an admin in the database'
 
     def deleteAll(showFlashMessage=True):
         '''Deletes all users except the Currently logged in user. 
@@ -472,14 +473,14 @@ class SyllabusFactory(Factory):
 
 
     def updateIfDifferent(syllabus, meeting_time=None):
-        '''TODO add more fields other than name
+        '''TODO add more fields other than meeting_time
         '''
-        # For each item, check if the existing course needs updating. 
+        # For each item, check if the existing syllabus needs updating. 
         # if so, update and save to db
         changed = False
         if meeting_time:
-            if not course.meeting_time == meeting_time:
-                course.meeting_time = meeting_time
+            if not syllabus.meeting_time == meeting_time:
+                syllabus.meeting_time = meeting_time
                 changed = True
 
         if changed:

@@ -4,10 +4,10 @@
 
 {% block app_content %}
     <h1>Admin Profile</h1>
-    <a type = "button" class= "btn" href="{{ url_for('instructor.create') }}" >Create Instructor</a>
-    <a type = "button" class= "btn" href="{{ url_for('course.create') }}" >Create Course</a>
-    <a type = "button" class= "btn" href="{{ url_for('syllabus.create') }}" >Create Syllabus</a>
-    <a type = "button" class= "btn" href="{{ url_for('auth.assignInstruct') }}" >Assign Instructor to Course</a>
+    <a class="btn btn-primary" href="{{ url_for('factory.index') }}">Factory</a>
+    <a class="btn btn-primary" href="{{ url_for('instructor.create') }}">Create Instructor</a>
+    <a class="btn btn-primary" href="{{ url_for('course.create') }}">Create Course</a>
+    <a class="btn btn-primary" href="{{ url_for('auth.assignInstruct') }}">Assign Instructor to Course</a>
     <h2>Draft Syllabi</h2>
 <div class="list-group">
     {% for syllabi in draftSyllabi %}

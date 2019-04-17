@@ -10,3 +10,8 @@ apachectl status
 tail -n 5 /var/log/httpd/error.log
 
 
+# activate virtual environment
+workon syllahub
+
+
+
