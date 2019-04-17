@@ -7,7 +7,7 @@ apachectl status
 /var/log/httpd/error_log
 
 #Display last 5 lines of Apache Error Log
-tail -n 5 /var/log/httpd/error.log
+tail -n 5 /var/log/httpd/error_log
 
 
 # activate virtual environment
