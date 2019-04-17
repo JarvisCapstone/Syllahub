@@ -35,7 +35,7 @@ def read(email):
 def update(email):
     return render_template('/user/update.html')
 
-
+    
 
 @bp.route('/delete/<email>', methods=['GET', 'POST'])
 @login_required

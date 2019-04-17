@@ -39,16 +39,20 @@ def create():
     return render_template('course/create.html', title="Create Course", 
                            form=form)
 
-@bp.route('/read/<int:number>/<int:version>', methods=['GET'])
+@bp.route('/read', methods=['GET'])
 def read(number, version):
+    number = request.args.get('number')
+    sortBy = request.args.get('sortBy')
     course = Course.query.filter_by(number=number, version=version) \
                          .first_or_404()
     return render_template('/course/read.html', course=course, 
                            number=number, version=version)
 
 
-@bp.route('/search/<number>/<sortBy>', methods=['GET'])
-def search(number, sortBy):
+@bp.route('/search', methods=['GET'])
+def search():
+    number = request.args.get('number')
+    sortBy = request.args.get('sortBy')
     courses = Course.query.filter_by(number=number).all()
     if (sortBy == 'old'):
         courses.sort(key=lambda x : x.version, reverse=False)
