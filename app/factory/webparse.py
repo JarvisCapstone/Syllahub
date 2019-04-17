@@ -1,4 +1,6 @@
 #import requests
+
+# https://www.kent.edu/cs/office-hours Table for office hours
 import pandas as pd
 import pprint
 from app.models import Course, Syllabus
@@ -42,11 +44,22 @@ class Retriever():
     def run(self):
         self.getTable()
         grouped = self.group()
-        #r = grouped.iloc[0]
-        #print(r)
-        #print('------------------------------------------------------')
+        r = grouped.iloc[0]
+        print(r)
+        print('------------------------------------------------------')
 
-        #print(type(grouped))
+        
+        # Create instructor
+        print(type(r.Instructor))
+        for instructor in r.Instructor:
+            print('type=', type(instructor))
+            # instructors in the list are usually strings or floats = to 'nan'. 
+            # If the input is a string, it is probably a correct instructor. 
+            if type(instructor) is str:
+                print('instructor=', instructor)
+                #print
+
+        '''
         for index, row in grouped.iterrows():
             #    print(index)
             #    #row is a series type
@@ -88,6 +101,6 @@ class Retriever():
                                                    semester=semester,
                                                    year=year,
                                                    version='any')
-
-            #SyllabusFactory.updateIfDifferent(syllabus, meeting_time) TODO. once time format is setup
-
+            meeting_time = 'ToDo'
+            SyllabusFactory.updateIfDifferent(syllabus, meeting_time) #TODO. once time format is setup
+        '''
