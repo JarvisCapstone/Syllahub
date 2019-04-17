@@ -15,7 +15,7 @@ def user(email):
 @bp.route('/index', methods=['GET', 'POST'])
 def index():
     users = User.query.all()
-    return render_template('user/index.html', users = users)
+    return render_template('user/index.html', users=users)
 
 
 
@@ -23,8 +23,7 @@ def index():
 def create():
     form = createUserForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, password = form.password.data, 
-        email=form.email.data)
+        user = User(email=form.email.data, password = form.password.data)
 
         db.session.add(user)
         db.session.commit()
@@ -48,8 +47,12 @@ def update(email):
 @bp.route('/delete/<email>', methods=['GET', 'POST'])
 @login_required
 def delete(email):
-    user = User.query.filter_by(email=email).first_or_404()
-    db.session.delete(user)
-    db.session.commit()
-    flash('User Deleted')
-    return render_template('/user/delete.html', title='Delete User')
+    form = DeleteUserForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first_or_404()
+        flash("Succesfully Deleted User")
+        db.session.delete(user)
+        db.session.commit()
+        return redirect(url_for('home.index'))
+
+    return render_template('/user/delete.html', form=form)

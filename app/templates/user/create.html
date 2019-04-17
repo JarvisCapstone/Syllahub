@@ -9,9 +9,9 @@
     <form method="post" action="">
         {{ form.hidden_tag() }}
 
-        {{render_field(form.username, "Enter Username")}}
-        {{render_field(form.password, "Enter Password")}}<br>
         {{render_field(form.email, "Enter Email")}}<br>      
+        {{render_field(form.set_password(password), "Enter Password")}}<br>
+
         <button class="btn btn-secondary" type="submit">Submit</button>
     </form>
 {% endblock %}

@@ -13,7 +13,6 @@ class DeleteUserForm(FlaskForm):
             raise ValidationError('Please use a different email address.')
 
 class createUserForm(FlaskForm):
-    username = StringField('Username:', validators=[DataRequired()])
     password = StringField('Password:', validators=[DataRequired()])
     email = StringField('Email:', validators=[DataRequired()])
     submit = SubmitField('Submit')
