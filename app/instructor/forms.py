@@ -15,8 +15,6 @@ class deleteInstructorForm(FlaskForm):
     submit = SubmitField('Submit')
 
 class updateInstructorForm(FlaskForm):
-    id = IntegerField('ID:', validators=[DataRequired()])
-    name = StringField('Instructor:')
+    name = StringField('Your Name:')
     phone = StringField('Phone Number:')
-    email = StringField('Email:', validators=[DataRequired()])
-    hours = StringField('Office Hours:')  
+    hours = StringField('Office Hours:')

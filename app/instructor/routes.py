@@ -36,11 +36,9 @@ def read(id):
 def update(id):
     form = updateInstructorForm()
     if form.validate_on_submit():
-        instructor = Instructor.query.filter_by(id = int(form.id.data)).one()
-        instructor.id = form.id.data
+        instructor = Instructor.query.filter_by(id = id).one()
         instructor.name = form.name.data
         instructor.phone = form.phone.data
-        instructor.email = form.email.data
         instructor.hours = form.hours.data
 
         db.session.commit()

@@ -7,7 +7,7 @@ from app import db
 from app.auth import bp
 
 from app.auth.forms import LoginForm, RegistrationForm, assignInstructorToCourse, RequestReloginForm
-from app.models import User, SyllabusInstructorAssociation, Syllabus
+from app.models import User, SyllabusInstructorAssociation, Syllabus, Instructor
 
 
 def redirect_url(default='home.index'):
@@ -49,14 +49,17 @@ def register():
         return redirect(url_for('home.index'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        print("validated")
-        user = User(email=form.email.data)
+        instructor = Instructor(email=form.email.data)
+        db.session.add(instructor)
+        db.session.commit()
+        newinstructor = Instructor.query.filter_by(email = form.email.data).first()
+        user = User(email=form.email.data, instructor_id = newinstructor.id)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
         login_user(user)
-        flash('Congratulations, you are now a registered user!')
-        return redirect(url_for('home.index'))
+        flash('Congratulations, you are now a registered user! Please provide some additional iformation')
+        return redirect(url_for('instructor.update', id=newinstructor.id))
     return render_template('auth/register.html', title='Register',
                            form=form)
 
