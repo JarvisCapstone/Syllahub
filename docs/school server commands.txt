@@ -13,5 +13,5 @@ tail -n 5 /var/log/httpd/error_log
 # activate virtual environment
 workon syllahub
 
-
-
+# enter mysql
+mqsyl -u root -p
