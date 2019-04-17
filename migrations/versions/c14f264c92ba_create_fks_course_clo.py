@@ -22,7 +22,7 @@ def upgrade():
         sa.Column('course_number',  sa.Integer(), nullable=False),
         sa.Column('course_version', sa.Integer(), nullable=False),
         sa.Column('clo_id',         sa.Integer(), nullable=False),
-        sa.PrimaryKeyConstraint('course_number', 'course_version', 'clo_id')
+        sa.PrimaryKeyConstraint('course_number', 'course_version', 'clo_id'),
         sa.ForeignKeyConstraint(['clo_id'], ['clo.id'], ),
         sa.ForeignKeyConstraint(['course_number', 'course_version'], 
                                 ['course.number', 'course.version'], ),
