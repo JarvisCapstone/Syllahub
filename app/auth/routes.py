@@ -6,8 +6,8 @@ from werkzeug.urls import url_parse
 from app import db
 from app.auth import bp
 
-from app.auth.forms import LoginForm, RegistrationForm, assignInstructorToCourse, RequestReloginForm
-from app.models import User, SyllabusInstructorAssociation, Syllabus, Instructor
+from app.auth.forms import LoginForm, RegistrationForm, assignInstructorToCourse, RequestReloginForm, assignCloToCourse
+from app.models import User, SyllabusInstructorAssociation, Syllabus, Instructor, course_clo_table
 
 
 def redirect_url(default='home.index'):
@@ -91,6 +91,23 @@ def assignInstruct():
         flash("Assignment Made!")
         return redirect(url_for('auth.my_profile'))
     return render_template('auth/assignInstruct.html', form=form)
+
+@bp.route('/assignClo', methods=['GET', 'POST'])
+@login_required
+def assignClo():
+    form = assignCloToCourse()
+    if form.validate_on_submit():
+       # relationship = course_clo_table(course_number = int(form.courseNumber.data),
+       #                                 course_version = int(form.courseVersion.data),
+       #                                 clo_id = int(form.cloID.data))
+        db.session.execute("INSERT INTO course_clo VALUES ("+ (form.courseNumber.data) +
+                         ", " + (form.courseVersion.data) + ", " + (form.cloID.data) + ");")
+        #db.session.add(relationship)
+        db.session.commit()
+        flash("Created relationship between CLO and Course!")
+        return redirect(url_for('auth.my_profile'))
+    return render_template('auth/assignClo.html', form=form)
+
 
 @bp.route('/myCourses', methods=['GET', 'POST'])
 @login_required
