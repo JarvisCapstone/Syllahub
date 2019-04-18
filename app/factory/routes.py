@@ -25,7 +25,7 @@ def index():
         factories.append(SyllabusFactory())
         #print(factories)
         for factory in factories:
-            factory.addToDB(count)
+            factory.createFakes(count)
         message= "added {} fake data entries to each table in db".format(count)
         flash(message)
 
@@ -39,7 +39,7 @@ def index():
     elif adminForm.adminSubmit.data and adminForm.validate():
         print('AdminForm validated')
         f = UserFactory()
-        message = f.generateAdmin()
+        message = f.createAdmin()
         flash(message)
     
     elif deleteForm.deleteUsersSubmit.data and deleteForm.validate():

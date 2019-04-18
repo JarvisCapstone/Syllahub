@@ -6,6 +6,7 @@ from sqlalchemy_utils import Timestamp
 from sqlalchemy import and_, Boolean, Column, Enum, ForeignKey, ForeignKeyConstraint, Integer, LargeBinary, MetaData, String, text
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.sql import select, func
 
 
 @login.user_loader
@@ -311,7 +312,12 @@ class Instructor(db.Model, Timestamp):
         '''
         return '<Instructor id={} name={}>'.format(self.id, self.name)
 
-
+def generateSyllabusVersion():
+    syllabiList=select(['syllabus.c.version'])
+    print(syllabiList)
+    default=select([func.max(1,func.max('syllabus.c.version'))]) # TODO set to autoincrement
+    print(default)
+    return 2
 
 class Syllabus(db.Model, Timestamp):
     '''Syllabus Model
@@ -324,12 +330,18 @@ class Syllabus(db.Model, Timestamp):
     # Primary Keys
     # CRN course_registration_number used as a primary key in school db
     # does not appear on syllabus
+
     course_number = Column(Integer, primary_key=True)
     course_version = Column(Integer, primary_key=True)
     
     section = Column(Integer, primary_key=True) # TODO change to string(3)
     semester = Column(Enum('spring', 'summer', 'fall'), primary_key=True)
-    version = Column(Integer, primary_key=True) # TODO set to autoincrement
+    version = Column(
+                  Integer, primary_key=True)#,default=generateSyllabusVersion()) # TODO set to autoincrement
+                  #default=select([func.max(1,func.max('syllabus.c.version'))])) # TODO set to autoincrement
+
+
+    #[func.max(1,func.max(version_table.c.old_versions))]
     year = Column(Integer, primary_key=True)
     
     # Foreign Keys
@@ -358,11 +370,11 @@ class Syllabus(db.Model, Timestamp):
     currentCheatingPolicy = "University policy 3-01.8 deals with the problem of academic dishonesty, cheating, and plagiarism.  None of these will be tolerated in this class.  The sanctions provided in this policy will be used to deal with any violations.  If you have any questions, please read the policy at http://www.kent.edu/policyreg/administrative-policy-regarding-student-cheating-and-plagiarism and/or ask."
     currentAttendancePolicy = "Regular attendance in class is expected of all students at all levels at the university. While classes are conducted on the premise that regular attendance is expected, the university recognizes certain activities, events, and circumstances as legitimate reasons for absence from class. This policy provides for accommodations in accordance with federal and state laws prohibiting discrimination, including, but not limited to, Section 504 of the Rehabilitation Act of 1973, 29 U.S.C.§794, and its implementing regulation, 34 C.F.R. Part 104; Title II of the Americans with Disabilities Act of 1990, 42 U.S.C. §12131 et seq., and its implementing regulations, 28 C.F.R. Part 35; as well as university policy 5-16. More information can be found at https://www.kent.edu/policyreg/administrative-policy-regarding-class-attendance-and-class-absence"
     currentSASText = "University policy 3-01.3 requires that students with disabilities be provided reasonable accommodations to ensure their equal access to course content.  If you have a documented disability and require accommodations, please contact the instructor at the beginning of the semester to make arrangements for necessary classroom adjustments.  Please note, you must   first verify your eligibility for these through Student Accessibility Services (contact 330-672-3391 or visit www.kent.edu/sas for more information on registration procedures)."
-    # TODO. currentRegistrationStatement = "The official registration deadline for this course can be found at https://www.kent.edu/registrar/calendars-deadlines. University policy requires all students to be officially registered in each class they are attending. Students who are not officially registered for a course by published deadlines should not be attending classes and will not receive credit or a grade for the course. Each student must confirm enrollment by checking his/her class schedule (using Student Tools in FlashLine) prior to the deadline indicated. Registration errors must be corrected prior to the deadline."
+    currentRegistrationStatement = "The official registration deadline for this course can be found at https://www.kent.edu/registrar/calendars-deadlines. University policy requires all students to be officially registered in each class they are attending. Students who are not officially registered for a course by published deadlines should not be attending classes and will not receive credit or a grade for the course. Each student must confirm enrollment by checking his/her class schedule (using Student Tools in FlashLine) prior to the deadline indicated. Registration errors must be corrected prior to the deadline."
+    
+
     # Non Key Columns
-
-
-    attendance_policy = Column(String(500), nullable=True)
+    attendance_policy = Column(String(500), nullable=True, default=currentAttendancePolicy)
     calender = Column(LargeBinary, nullable=True)
     # crn = Column(Integer, index)
     # TODO instroduction_statement(String(500), nullable=True)
@@ -377,15 +389,15 @@ class Syllabus(db.Model, Timestamp):
     # TODO registration_statement(String(600), default=currentRegistrationStatement)
     schedule = Column(LargeBinary, nullable=True)
     state = Column(Enum('approved', 'draft'), default='draft')
-    Students_with_disabilities = Column(String(500)) #TODO change to sastext
-    University_cheating_policy = Column(String(500)) # TODO set default to  default=currentCheatingPollicy
+    Students_with_disabilities = Column(String(500), default=currentSASText) #TODO change to sastext
+    University_cheating_policy = Column(String(500), 
+                                        default=currentCheatingPolicy) # TODO set default to  default=currentCheatingPollicy
     withdrawl_date = Column(String(100), nullable=True)
 
 
     # TODO add building = Column(String(70)) 
     # TODO add room = Column(String(50))
-
-
+    
 
     def addInstructor(self, instructor, job):
         '''Add an association between syllabus and instructor
@@ -396,6 +408,36 @@ class Syllabus(db.Model, Timestamp):
             job: String - 
         '''
         SyllabusInstructorAssociation.create(self, instructor, job)
+
+    def setVersion(self):
+        '''Sets the version number to one more than the previous
+        
+        select max(version)
+        from syllabus
+        where 'course_number = %'
+              'course_version = %'
+              'section = %'
+              'semester = %'
+              'year = %'
+ 
+        '''
+        conn = db.session.connection()
+        meta = db.metadata
+        syllabus = meta.tables['syllabus']
+
+        s = select([db.func.max(syllabus.c.version)]) \
+                .where(and_(syllabus.c.year == self.year,
+                            syllabus.c.section == self.section, 
+                            syllabus.c.course_version == self.course_version, 
+                            syllabus.c.semester == self.semester,
+                            syllabus.c.course_number == self.course_number))
+        result = conn.execute(s)
+        largestVersion = result.first().max_1
+        if largestVersion:
+            self.version = largestVersion + 1
+            print(self.version)
+        else:
+            self.version = 1
 
     def setPDF(self):
         '''Generates a PDF document and sets self.pdf to it
@@ -437,6 +479,13 @@ class Syllabus(db.Model, Timestamp):
                     self.section, self.semester, 
                     self.version, self.year)
 
+def generateSyllabusVersion():
+        x = Syllabus.query.filter_by(
+                course_number=self.course_number,
+                course_version=self.course_version,
+                section=self.section,
+                semester=self.semester,
+                year=self.year)
 
 
 class User(UserMixin, db.Model, Timestamp):
