@@ -454,8 +454,9 @@ def createRandCloCourseAssociation():
 
 def createRandInstructorSyllabusAssociation():
     temp_syllabus = Syllabus.query.order_by(func.rand()).first()
-    temp_instructor = Instructor.query.order_by(func.rand()).first()
-    SyllabusInstructorAssociation.create2(temp_syllabus, temp_instructor, 'grader')
+    #temp_instructor = Instructor.query.order_by(func.rand()).first()
+    temp_instructor = Instructor.query.filter_by(id=36).first()
+    SyllabusInstructorAssociation.create(temp_syllabus, temp_instructor, 'grader')
 
 
 def generateData(num=None):

@@ -3,14 +3,30 @@
 {% block title %}Index{% endblock %}
 
 {% block app_content %}
+{% if canCurrentUserEdit %}
+
+<div class="float-right">
+    <a class="btn btn-warning" 
+       href="{{ url_for('syllabus.update', 
+                        CNumber = syllabus.course.number, 
+                        CVersion = syllabus.course.version,
+                        sec = syllabus.section, 
+                        semester = syllabus.semester, 
+                        version = syllabus.version, 
+                        year = syllabus.year) }}" 
+       role="button">Update</a>
+
+</div>
+{% endif %}
+
 <h1>
-    CS{{ syllabus.course_number }}-
-    {{ syllabus.course_version }}: 
+    CS{{ syllabus.course_number }}-v{{ syllabus.course_version }}: 
     {{ syllabus.course.name }}
 </h1>
 <h6>{{ syllabus.semester }} {{ syllabus.year }}</h6>
 <p>Section: {{ syllabus.section }}</p>
-
+<p>Version: {{ syllabus.section }}</p>
+<h3>TODO add all fields here in a neat manner</h3>
 <p>State: {{ syllabus.state }}</p>
 <p>Cheating_policy: {{ syllabus.University_cheating_policy }}</p>
 <p>Attendance policy: {{ syllabus.attendancy_policy }}</p>

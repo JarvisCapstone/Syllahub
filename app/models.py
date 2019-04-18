@@ -312,12 +312,6 @@ class Instructor(db.Model, Timestamp):
         '''
         return '<Instructor id={} name={}>'.format(self.id, self.name)
 
-def generateSyllabusVersion():
-    syllabiList=select(['syllabus.c.version'])
-    print(syllabiList)
-    default=select([func.max(1,func.max('syllabus.c.version'))]) # TODO set to autoincrement
-    print(default)
-    return 2
 
 class Syllabus(db.Model, Timestamp):
     '''Syllabus Model

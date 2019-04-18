@@ -7,6 +7,7 @@ from app.syllabus.forms import createSyllabusForm, updateSyllabusForm
 from app import db
 from sqlalchemy import update
 from app.factory.factory import SyllabusFactory
+
 @bp.route('/')
 @bp.route('/index')
 def index():
@@ -53,8 +54,19 @@ def read(CNumber, CVersion, sec, semester, version, year):
                                         section=sec, semester=semester, 
                                         version=version, 
                                         year=year).first_or_404()
+    
+    canCurrentUserEdit = False
+    if current_user.permission == 'admin':
+        canCurrentUserEdit = True
+    i = current_user.instructor
+    if i:
+        for iSyllabus in i.syllabusList:
+            if iSyllabus == syllabus:
+                canCurrentUserEdit = True
+
     if syllabus is not None:
-        return render_template('/syllabus/read.html', syllabus=syllabus)
+        return render_template('/syllabus/read.html', syllabus=syllabus,
+                               canCurrentUserEdit=canCurrentUserEdit)
     else:
         flash('Syllabus Not Found')
         return redirect(url_for('home.index'))
