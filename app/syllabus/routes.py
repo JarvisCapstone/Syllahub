@@ -6,7 +6,7 @@ from app.models import Syllabus, Course
 from app.syllabus.forms import createSyllabusForm, updateSyllabusForm
 from app import db
 from sqlalchemy import update
-
+from app.factory.factory import SyllabusFactory
 @bp.route('/')
 @bp.route('/index')
 def index():
@@ -19,26 +19,24 @@ def create():
     # TODO, add comments
     form = createSyllabusForm()
     if form.validate_on_submit():
-        syllabus = Syllabus(course_number=form.course_number.data, 
-                            course_version=form.course_version.data,
-                            section=form.section.data, 
-                            version=form.version.data, 
-                            semester=form.semester.data,
-                            year=form.year.data, 
-                            Students_with_disabilities=form.SASText.data, 
-                            cheating_policy=form.cheatingPolicy.data,
-                            attendance_policy=form.attendancePolicy.data, 
-                            grading_policy=form.gradingPolicy.data,
-                            required_materials=form.requiredMaterials.data, 
-                            optional_materials=form.optionalMaterials.data,
-                            meeting_time=form.meetingTimes.data, 
-                            withdrawl_date=form.withdrawlDate.data)
-        if syllabus is not None:
-            db.session.add(syllabus)
-            db.session.commit()
-            flash("Syllabus Created!")
-        else:
-            flash("That course does not exist")
+        f = SyllabusFactory()
+        data = {}
+        data['course_number'] = form.course_number.data, 
+        data['course_version'] = form.course_version.data,
+        data['section'] = form.section.data, 
+        data['semester'] = form.semester.data,
+        data['year'] = form.year.data, 
+        data['Students_with_disabilities'] = form.SASText.data, 
+        data['cheating_policy'] = form.cheatingPolicy.data,
+        data['attendance_policy'] = form.attendancePolicy.data, 
+        data['grading_policy'] = form.gradingPolicy.data,
+        data['required_materials'] = form.requiredMaterials.data, 
+        data['optional_materials'] = form.optionalMaterials.data,
+        data['meeting_time'] = form.meetingTimes.data, 
+        data['withdrawl_date'] = form.withdrawlDate.data
+
+        f.create(data)
+
         # TODO redirect on successful create
     elif request.method == 'GET':
         form.cheatingPolicy.data = Syllabus.currentCheatingPolicy

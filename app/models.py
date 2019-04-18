@@ -424,7 +424,8 @@ class Syllabus(db.Model, Timestamp):
         conn = db.session.connection()
         meta = db.metadata
         syllabus = meta.tables['syllabus']
-
+        print(self.semester)
+        print(type(self.semester))
         s = select([db.func.max(syllabus.c.version)]) \
                 .where(and_(syllabus.c.year == self.year,
                             syllabus.c.section == self.section, 
