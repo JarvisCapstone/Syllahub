@@ -44,11 +44,11 @@ class Retriever():
     def run(self):
         self.getTable()
         grouped = self.group()
-        r = grouped.iloc[0]
-        print(r)
-        print('------------------------------------------------------')
+        #r = grouped.iloc[0]
+        #print(r)
+        #print('------------------------------------------------------')
 
-        
+        '''
         # Create instructor
         print(type(r.Instructor))
         for instructor in r.Instructor:
@@ -103,4 +103,4 @@ class Retriever():
                                                    version='any')
             meeting_time = 'ToDo'
             SyllabusFactory.updateIfDifferent(syllabus, meeting_time) #TODO. once time format is setup
-        '''
+        

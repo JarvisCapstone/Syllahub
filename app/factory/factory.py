@@ -51,10 +51,6 @@ class Factory(metaclass=ABCMeta):
         for i in range(num):
             data = self.getFakeData()
             self.create(data)
-            #print('temp=', temp)
-            #db.session.add(temp)
-        #db.session.commit()
-        #print('dtf')
         return "Success"
 
 
