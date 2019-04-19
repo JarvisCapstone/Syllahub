@@ -330,12 +330,8 @@ class Syllabus(db.Model, Timestamp):
     
     section = Column(Integer, primary_key=True) # TODO change to string(3)
     semester = Column(Enum('spring', 'summer', 'fall'), primary_key=True)
-    version = Column(
-                  Integer, primary_key=True)#,default=generateSyllabusVersion()) # TODO set to autoincrement
-                  #default=select([func.max(1,func.max('syllabus.c.version'))])) # TODO set to autoincrement
+    version = Column(Integer, primary_key=True)
 
-
-    #[func.max(1,func.max(version_table.c.old_versions))]
     year = Column(Integer, primary_key=True)
     
     # Foreign Keys
@@ -470,14 +466,6 @@ class Syllabus(db.Model, Timestamp):
             .format(self.course_number, self.course_version, 
                     self.section, self.semester, 
                     self.version, self.year)
-
-def generateSyllabusVersion():
-        x = Syllabus.query.filter_by(
-                course_number=self.course_number,
-                course_version=self.course_version,
-                section=self.section,
-                semester=self.semester,
-                year=self.year)
 
 
 class User(UserMixin, db.Model, Timestamp):
