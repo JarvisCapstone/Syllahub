@@ -34,4 +34,7 @@ class updateSyllabusForm(FlaskForm):
     optionalMaterials = StringField('Optional Materials')
     meetingTimes = StringField('Meeting Times', validators=[DataRequired()])
     
+class ApproveForm(FlaskForm):
+    approveSubmit = SubmitField('Approve')
+
 

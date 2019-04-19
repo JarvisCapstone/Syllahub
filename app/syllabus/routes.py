@@ -3,7 +3,7 @@ from app.syllabus import bp
 from flask import render_template, flash, jsonify, request, redirect, url_for
 from flask_login import current_user, login_required
 from app.models import Syllabus, Course
-from app.syllabus.forms import createSyllabusForm, updateSyllabusForm
+from app.syllabus.forms import ApproveForm, createSyllabusForm, updateSyllabusForm
 from app import db
 from sqlalchemy import update
 from app.factory.factory import SyllabusFactory
@@ -46,30 +46,50 @@ def create():
         form.year.data = datetime.date.today().strftime("%Y")
     return render_template('syllabus/create.html', form=form)
 
+
 @bp.route('/read/<CNumber>/<CVersion>/<sec>/<semester>/<version>/<year>', 
           methods=['GET', 'POST'])
 def read(CNumber, CVersion, sec, semester, version, year):
     syllabus = Syllabus.query.filter_by(course_number=CNumber, 
                                         course_version=CVersion, 
-                                        section=sec, semester=semester, 
+                                        section=sec, 
+                                        semester=semester, 
                                         version=version, 
                                         year=year).first_or_404()
-    
+    showApproveButton = False
+    approveForm = ApproveForm()
+    if approveForm.validate_on_submit():
+        syllabus.state = 'approved'
+        db.session.commit()
+
     canCurrentUserEdit = False
     if current_user.permission == 'admin':
         canCurrentUserEdit = True
+        if syllabus.state == 'draft':
+            showApproveButton = True
     i = current_user.instructor
     if i:
         for iSyllabus in i.syllabusList:
             if iSyllabus == syllabus:
                 canCurrentUserEdit = True
 
+
+
     if syllabus is not None:
-        return render_template('/syllabus/read.html', syllabus=syllabus,
-                               canCurrentUserEdit=canCurrentUserEdit)
+        if showApproveButton:
+            return render_template('/syllabus/read.html', 
+                                   syllabus=syllabus,
+                                   canCurrentUserEdit=canCurrentUserEdit,
+                                   showApproveButton=showApproveButton, 
+                                   approveForm=approveForm)
+        else:
+            return render_template('/syllabus/read.html', 
+                                   syllabus=syllabus,
+                                   canCurrentUserEdit=canCurrentUserEdit,
+                                   showApproveButton=showApproveButton)
     else:
         flash('Syllabus Not Found')
-        return redirect(url_for('home.index'))
+        return redirect(url_for('syllabus.index'))
 
 @bp.route('/update/<CNumber>/<CVersion>/<sec>/<semester>/<version>/<year>', 
           methods=['GET', 'POST'])
