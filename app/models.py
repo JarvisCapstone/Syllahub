@@ -261,6 +261,21 @@ class Course(db.Model, Timestamp):
         '''
         return '<Course number={} version={}>'.format(self.number, self.version)
 
+    def setVersion(self):
+        '''Sets the version number to one more than the previous
+        '''
+        conn = db.session.connection()
+        meta = db.metadata
+        course = meta.tables['course']
+        s = select([db.func.max(course.c.version)]) \
+                .where(and_(course.c.number == self.number))
+        result = conn.execute(s)
+        largestVersion = result.first().max_1
+        if largestVersion:
+            self.version = largestVersion + 1
+        else:
+            self.version = 1
+
 
 
 class Instructor(db.Model, Timestamp):
