@@ -86,7 +86,7 @@ class UserFactory(Factory):
         '''
         adminEmail='syllahub@gmail.com'
         
-        data = []
+        data = {}
         data['email'] = adminEmail
         data['password'] = 'admin'
         data['permission'] = 'admin'
