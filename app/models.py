@@ -463,7 +463,7 @@ class Syllabus(db.Model, Timestamp):
         pdf.ln(5)
         
         pdf.set_font_size(14)
-        for instructor in self.instructorList
+        for instructor in self.instructorList:
             pdf.cell(0, 10, instructor.name, ln=1, align='C')
         pdf.ln(5)
         pdf.set_font('')
@@ -514,7 +514,7 @@ class Syllabus(db.Model, Timestamp):
         pdf.cell(0,5, 'Course Learning Outcomes', ln=1)
         pdf.set_font_size(12)
         pdf.cell(0,5, 'By the end of this course, you should be able to:', ln=1)
-        for clo in self.course.clos
+        for clo in self.course.clos:
             pdf.multi_cell(0,5, clo.general)
         pdf.ln(5)
 
