@@ -15,7 +15,7 @@
     <a href="{{ url_for('syllabus.read', CNumber=syllabi.course_number, CVersion=syllabi.course_version, 
         sec=syllabi.section, semester=syllabi.semester, version=syllabi.version, year=syllabi.year) }}" 
        class="list-group-item list-group-item-action">
-        <p>Syllabus for {{ syllabi.course_number }} is waiting approval.</p>
+        <p>Syllabus for CS-{{ syllabi.course_number }} is waiting approval.</p>
     </a>
     {% endfor %}
 </div>
