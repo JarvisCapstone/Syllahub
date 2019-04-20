@@ -34,7 +34,7 @@
 
     <h3>Syllabus</h3>
     <a href="{{ url_for('syllabus.index') }}">syllabus Index</a><br>
-    <a href="{{ url_for('syllabus.create') }}">syllabus create</a><br>
+    <!-- syllabi are created when courses are --> <a href="{{ url_for('syllabus.create') }}">syllabus create</a><br>
     <a href="{{ url_for('syllabus.read', CNumber='test', CVersion='test', sec='test', semester='spring', version='test', year='2019') }}">syllabus read</a><br>
     <a href="{{ url_for('syllabus.update', CNumber='test', CVersion='test', sec='test', semester='spring', version='test', year='2019') }}">syllabus update</a><br>
     <a href="{{ url_for('syllabus.delete', CNumber='test', CVersion='test', sec='test', semester='spring', version='test', year='2019') }}">syllabus delete</a><br>

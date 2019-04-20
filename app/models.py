@@ -1,3 +1,4 @@
+from fpdf import FPDF
 from app import db, login
 from enum import Enum
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -456,9 +457,12 @@ class Syllabus(db.Model, Timestamp):
         '''
         pdf=FPDF()
 
+        course=Course.query.filter_by(number=self.course_number,
+                                    version=self.course_version).first()
+
         pdf.add_page()
         pdf.set_font('Arial', 'B', 16)
-        pdf.cell(0, 5, 'CS' + str(self.course_number) + ' ' + self.course.name, ln=1, align='C')
+        pdf.cell(0, 5, 'CS' + str(self.course_number) + ' ' + course.name, ln=1, align='C')
         pdf.cell(0, 5, 'Course Syllabus', ln=1, align='C')
         pdf.ln(5)
         
@@ -475,7 +479,7 @@ class Syllabus(db.Model, Timestamp):
         #TODO, revamp meeting_time once we get delimiter solved
         if (self.meeting_time != None):
             pdf.cell(0, 5, self.meeting_time + ', ' +
-            str(self.course.room) + ' ' + self.course.building , ln=1, align='C')
+            str(course.room) + ' ' + course.building , ln=1, align='C')
         else:
             pdf.cell(0, 10, 'This is an online course, there is no meeting times',
                     ln=1, align='C')
@@ -503,10 +507,10 @@ class Syllabus(db.Model, Timestamp):
         pdf.set_font_size(14)
         pdf.cell(0,5, 'Course Description from the University Catalog', ln=1)
         pdf.set_font_size(12)
-        pdf.multi_cell(0,5, 'CS'+str(self.course_number) + ' ' + self.course.name + ': ' +
-                self.course.description)    
-        if (self.course.prerequisites != None):
-            pdf.cell(0,5, 'Prerequisite: ' + self.course.prerequisites, ln=1)
+        pdf.multi_cell(0,5, 'CS'+str(self.course_number) + ' ' + course.name + ': ' +
+                course.description)    
+        if (course.prerequisites != None):
+            pdf.cell(0,5, 'Prerequisite: ' + course.prerequisites, ln=1)
             pdf.cell(0, 5, 'Students without the proper prerequisite(s) risk being deregistered from the class', ln=1)
         pdf.ln(5)
 
@@ -514,20 +518,20 @@ class Syllabus(db.Model, Timestamp):
         pdf.cell(0,5, 'Course Learning Outcomes', ln=1)
         pdf.set_font_size(12)
         pdf.cell(0,5, 'By the end of this course, you should be able to:', ln=1)
-        for clo in self.course.clos:
+        for clo in course.clos:
             pdf.multi_cell(0,5, clo.general)
         pdf.ln(5)
 
-        if(self.course.is_core):
+        if(course.is_core):
             pdf.ln(5)
             pdf.multi_cell(0, 5, 'This coourse may be used to satisfy a Kent Core requirement. The Kent Core as a whole is intended to broaden intellectual perspectives, foster ethical and humanitarian values, and prepare students for responsible citizenship and productive careers.')
-        if(self.course.is_diversity==1):
+        if(course.is_diversity==1):
             pdf.ln(5)
             pdf.multi_cell(0, 5, 'This course may be used to satisfy the University Diversity requirement. Diversity courses provide opportunities for students to learn about such matters as the history, culture, values and notable achievements of people other than those of their own national origin, ethnicity, religion, sexual orientaiton, age, gender, physical and mental ability, and social class. Diversity courses also provide opportunities to examine problems and issues that may arise from differences, and opportunities to learn how to deal constructively with them.')
-        if(self.course.is_wi==1):
+        if(course.is_wi==1):
             pdf.ln(5)
             pdf.multi_cell(0, 5, 'This course may be used to satisfy the Writing Intensive Course (WIC) requirement. The purpose of a writing-intensive course is to assist students in becoming effective writers within their major discipline. A WIC requires a substantial amount of writing, provides opportunities for guided revision, and focuses on writing forms and standards used in the professional life of the discipline.')
-        if(self.course.is_elr==1):
+        if(course.is_elr==1):
             pdf.ln(5)
             pdf.multi_cell(0, 5, 'This course may be used to fulfill the university\'s Experiential Learning Requirement (ELR) which provides students with the opportunity to initiate lifelong learning through the development and application of academic knowledge and skills in new or different settings. Experiential learning can occur through civic engagement, creative and artistic activities, practical experiences, research, and study abroad/away.')
         
@@ -545,11 +549,12 @@ class Syllabus(db.Model, Timestamp):
             pdf.set_font_size(12)
             pdf.cell(0,5, self.optional_materials, ln=1)
 
-        #TODO, enforce notnull dates / policies      
-        pdf.ln(5)        
-        pdf.set_font_size(14)
-        pdf.cell(0,5, 'Grading Policy', ln=1)
-        pdf.multi_cell(0,5, self.grading_policy)
+        #TODO, enforce notnull dates / policies
+        if (self.grading_policy != None):   
+            pdf.ln(5)        
+            pdf.set_font_size(14)
+            pdf.cell(0,5, 'Grading Policy', ln=1)
+            pdf.multi_cell(0,5, self.grading_policy)
 
         pdf.ln(5)
         pdf.set_font_size(14)
@@ -583,7 +588,7 @@ class Syllabus(db.Model, Timestamp):
         pdf.set_font_size(14)
         pdf.cell(0,5, 'Academic Integrity', ln=1)
         pdf.set_font_size(12)
-        pdf.multi_cell(0, 5, self.University_cheating_policy)
+        pdf.multi_cell(0, 5, self.cheating_policy)
         #pdf.cell(0,5, "Don't plagarize bad", ln=1)
 
         if (self.extra_policies != None):
@@ -602,8 +607,15 @@ class Syllabus(db.Model, Timestamp):
         # Convert HTML to PDF
         #syllabusPDF = 'TODO' # = pdfKitFunction(syllabusHTML)
 
-        self.pdf = pdf.output('S')
-        
+        #self.pdf = pdf.output(dest='S').encode('latin-1')
+        pdf.output('wolves.pdf', 'F')
+        file = open('wolves.pdf', 'rb').read()
+        self.pdf = file
+        #db.session.query(Syllabus) \
+            #.filter_by(self) \
+            #.update({"pdf": (file)})
+        #db.session.commit()
+
         if(self.pdf != None):
             return 'success'
         else:

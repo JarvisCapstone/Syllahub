@@ -22,7 +22,7 @@ class updateSyllabusForm(FlaskForm):
     course_number = StringField('Course Number',validators=[DataRequired()])
     course_version = StringField('Course Version',validators=[DataRequired()])
     section = StringField('Section',validators=[DataRequired()])
-    version = StringField('Syllabus Version',validators=[DataRequired()])
+    #version = StringField('Syllabus Version',validators=[DataRequired()])
     semester = SelectField(choices=[('spring','Spring'), ('fall','Fall'), ('summer','Summer')])
     year = StringField('Year', validators=[DataRequired()])
     SASText = TextAreaField('Student Accesability Info', validators=[DataRequired()])
