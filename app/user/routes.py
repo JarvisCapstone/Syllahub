@@ -34,7 +34,7 @@ def create():
 
 @bp.route('/read/<email>', methods=['GET', 'POST'])
 def read(email):
-    user = User.query.filter_by(email=email).first_or_404()
+    user = User.query.filter_by(email=email).first()
     return render_template('user/read.html', user=user)
 
 
