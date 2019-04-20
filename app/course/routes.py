@@ -36,7 +36,7 @@ def create():
         syllabus = Syllabus(course_number = form.courseNumber.data,
                             course_version = course.version,
                             semester = form.semester.data,
-                            year = form.semester.data,
+                            year = form.year.data,
                             section = form.section.data)
         syllabus.setVersion()
 
@@ -50,10 +50,18 @@ def create():
 
 @bp.route('/read/<number>/<version>', methods=['GET'])
 def read(number, version):
+    canCurrentUserEdit = False
+    if(not current_user.is_anonymous):
+        if current_user.permission == 'admin':
+            canCurrentUserEdit = True
+
     course = Course.query.filter_by(number=number, version=version) \
                          .first_or_404()
+    syllabus= Syllabus.query.filter_by(course_number = number, course_version=version).first()
     return render_template('/course/read.html', course=course, 
-                           number=number, version=version)
+                           number=number, version=version, 
+                           canCurrentUserEdit=canCurrentUserEdit,
+                           syllabus = syllabus)
 
 
 @bp.route('/search', methods=['GET'])

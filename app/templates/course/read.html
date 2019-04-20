@@ -1,14 +1,29 @@
 {% extends "base.html" %}
 
 {% block title %}Index{% endblock %}
-
 {% block app_content %}
-<h1>Results for version {{ version }} of {{ course.name }}</h1>
+{% if canCurrentUserEdit %}
+
+
+    <div class="float-right">
+        <a class="btn btn-warning float-right" 
+           href="{{ url_for('course.update', number=course.number, version=course.version) }}" 
+           role="button">Update</a>
+           {% endif %}
+
+    <a class="btn btn-success float-right" 
+       href="{{ url_for('syllabus.read', CNumber=course.number, 
+                CVersion=course.version, version=syllabus.version,
+                semester=syllabus.semester, year=syllabus.year, 
+                sec=syllabus.section) }}" 
+       role="button">View Syllabus</a>
+    </div>
+
+<h1>Result for version {{ version }} of {{ course.name }}</h1>
 <ul class="list-group">
     <li class="list-group-item">
         <h3> {{ course.name }} </h3>
         <p>Number: {{ course.number }}</p>
-        <p>Version: {{ course.version }}</p>
         <p>Description: {{ course.description }}</p>
         <p>Prerequisites: {{ course.prerequisites }}</p>
         <p>Building: {{ course.building }}</p>
