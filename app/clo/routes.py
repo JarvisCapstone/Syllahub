@@ -9,7 +9,6 @@ from app import db
 @bp.route('/index', methods=['GET', 'POST'])
 def index():
     clos = Clo.query.all()
-    print (clos)
     return render_template('clo/index.html', clos=clos)
 
 
@@ -73,7 +72,6 @@ def update(id):
 def delete(id):
     # TODO authenticate user
     deleteForm = DeleteCloForm(id=id)
-    print(deleteForm.errors)
     if deleteForm.validate_on_submit():
         clo = Clo.query.filter_by(id = id).first_or_404()
         flash('test')

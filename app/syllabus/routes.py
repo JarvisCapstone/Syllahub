@@ -3,9 +3,10 @@ from app.syllabus import bp
 from flask import render_template, flash, jsonify, request, redirect, url_for
 from flask_login import current_user, login_required
 from app.models import Syllabus, Course
-from app.syllabus.forms import createSyllabusForm, updateSyllabusForm
+from app.syllabus.forms import ApproveForm, createSyllabusForm, updateSyllabusForm
 from app import db
 from sqlalchemy import update
+from app.factory.factory import SyllabusFactory
 
 @bp.route('/')
 @bp.route('/index')
@@ -19,26 +20,24 @@ def create():
     # TODO, add comments
     form = createSyllabusForm()
     if form.validate_on_submit():
-        syllabus = Syllabus(course_number=form.course_number.data, 
-                            course_version=form.course_version.data,
-                            section=form.section.data, 
-                            version=form.version.data, 
-                            semester=form.semester.data,
-                            year=form.year.data, 
-                            Students_with_disabilities=form.SASText.data, 
-                            cheating_policy=form.cheatingPolicy.data,
-                            attendance_policy=form.attendancePolicy.data, 
-                            grading_policy=form.gradingPolicy.data,
-                            required_materials=form.requiredMaterials.data, 
-                            optional_materials=form.optionalMaterials.data,
-                            meeting_time=form.meetingTimes.data, 
-                            withdrawl_date=form.withdrawlDate.data)
-        if syllabus is not None:
-            db.session.add(syllabus)
-            db.session.commit()
-            flash("Syllabus Created!")
-        else:
-            flash("That course does not exist")
+        f = SyllabusFactory()
+        data = {}
+        data['course_number'] = form.course_number.data, 
+        data['course_version'] = form.course_version.data,
+        data['section'] = form.section.data, 
+        data['semester'] = form.semester.data,
+        data['year'] = form.year.data, 
+        data['Students_with_disabilities'] = form.SASText.data, 
+        data['cheating_policy'] = form.cheatingPolicy.data,
+        data['attendance_policy'] = form.attendancePolicy.data, 
+        data['grading_policy'] = form.gradingPolicy.data,
+        data['required_materials'] = form.requiredMaterials.data, 
+        data['optional_materials'] = form.optionalMaterials.data,
+        data['meeting_time'] = form.meetingTimes.data, 
+        data['withdrawl_date'] = form.withdrawlDate.data
+
+        f.create(data)
+
         # TODO redirect on successful create
     elif request.method == 'GET':
         form.cheatingPolicy.data = Syllabus.currentCheatingPolicy
@@ -47,19 +46,50 @@ def create():
         form.year.data = datetime.date.today().strftime("%Y")
     return render_template('syllabus/create.html', form=form)
 
+
 @bp.route('/read/<CNumber>/<CVersion>/<sec>/<semester>/<version>/<year>', 
           methods=['GET', 'POST'])
 def read(CNumber, CVersion, sec, semester, version, year):
     syllabus = Syllabus.query.filter_by(course_number=CNumber, 
                                         course_version=CVersion, 
-                                        section=sec, semester=semester, 
+                                        section=sec, 
+                                        semester=semester, 
                                         version=version, 
                                         year=year).first_or_404()
+    showApproveButton = False
+    approveForm = ApproveForm()
+    if approveForm.validate_on_submit():
+        syllabus.state = 'approved'
+        db.session.commit()
+
+    canCurrentUserEdit = False
+    if current_user.permission == 'admin':
+        canCurrentUserEdit = True
+        if syllabus.state == 'draft':
+            showApproveButton = True
+    i = current_user.instructor
+    if i:
+        for iSyllabus in i.syllabusList:
+            if iSyllabus == syllabus:
+                canCurrentUserEdit = True
+
+
+
     if syllabus is not None:
-        return render_template('/syllabus/read.html', syllabus=syllabus)
+        if showApproveButton:
+            return render_template('/syllabus/read.html', 
+                                   syllabus=syllabus,
+                                   canCurrentUserEdit=canCurrentUserEdit,
+                                   showApproveButton=showApproveButton, 
+                                   approveForm=approveForm)
+        else:
+            return render_template('/syllabus/read.html', 
+                                   syllabus=syllabus,
+                                   canCurrentUserEdit=canCurrentUserEdit,
+                                   showApproveButton=showApproveButton)
     else:
         flash('Syllabus Not Found')
-        return redirect(url_for('home.index'))
+        return redirect(url_for('syllabus.index'))
 
 @bp.route('/update/<CNumber>/<CVersion>/<sec>/<semester>/<version>/<year>', 
           methods=['GET', 'POST'])

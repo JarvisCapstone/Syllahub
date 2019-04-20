@@ -5,7 +5,9 @@ from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 class CreateCourseForm(FlaskForm):
     courseName = StringField('Course Name', validators=[DataRequired()])
     courseNumber = StringField('Course Number', validators=[DataRequired()])
-    courseVersion = StringField('Course Version', validators=[DataRequired()])
+    section = StringField('Section Number',validators=[DataRequired()])
+    semester = SelectField(choices=[('spring','Spring'), ('fall','Fall'), ('summer','Summer')])
+    year = StringField('Year', validators=[DataRequired()])
     courseDescription = StringField('Course Description')
     coursePrereqs = StringField('Course Prereques')
     courseBuilding = StringField('Building')
@@ -20,7 +22,9 @@ class CreateCourseForm(FlaskForm):
 class UpdateCourseForm(FlaskForm):
     courseName = StringField('Course Name', validators=[DataRequired()])
     courseNumber = StringField('Course Number', validators=[DataRequired()])
-    courseVersion = StringField('Course Version', validators=[DataRequired()])
+    section = StringField('Section Number',validators=[DataRequired()])
+    semester = SelectField(choices=[('spring','Spring'), ('fall','Fall'), ('summer','Summer')])
+    year = StringField('Year', validators=[DataRequired()])
     courseDescription = StringField('Course Description')
     coursePrereqs = StringField('Course Prereques')
     courseBuilding = StringField('Building')
