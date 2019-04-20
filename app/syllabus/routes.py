@@ -61,28 +61,17 @@ def read(CNumber, CVersion, sec, semester, version, year):
     if approveForm.validate_on_submit():
         syllabus.state = 'approved'
         db.session.commit()
-
-    canCurrentUserEdit = False
-<<<<<<< HEAD
-    if( not current_user.is_anonymous):
+    if(not current_user.is_anonymous):
+        canCurrentUserEdit = False
         if current_user.permission == 'admin':
             canCurrentUserEdit = True
+        if syllabus.state == 'draft':
+            showApproveButton = True
         i = current_user.instructor
         if i:
             for iSyllabus in i.syllabusList:
                 if iSyllabus == syllabus:
-                 canCurrentUserEdit = True
-=======
-    if current_user.permission == 'admin':
-        canCurrentUserEdit = True
-        if syllabus.state == 'draft':
-            showApproveButton = True
-    i = current_user.instructor
-    if i:
-        for iSyllabus in i.syllabusList:
-            if iSyllabus == syllabus:
-                canCurrentUserEdit = True
->>>>>>> 2dd2b7a0263327002cdc806b0a3335b3a6b4b3bb
+                    canCurrentUserEdit = True
 
 
 
