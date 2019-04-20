@@ -13,6 +13,11 @@ class DeleteUserForm(FlaskForm):
             raise ValidationError('Please use a different email address.')
 
 class createUserForm(FlaskForm):
-    password = StringField('Password:', validators=[DataRequired()])
+    password = PasswordField('Password:', validators=[DataRequired()])
     email = StringField('Email:', validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
+class updateUserForm(FlaskForm):
+    currentPassword = PasswordField('Current Password', validators=[DataRequired()])
+    newPassword = PasswordField('New Password', validators=[DataRequired()])
     submit = SubmitField('Submit')

@@ -1,7 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %}Index{% endblock %}
+{% block title %}Change Password{% endblock %}
 
 {% block app_content %}
-    <h1>Stub user show</h1>
+    <h1>Change Password</h1>
+    {%from "_formhelpers.html" import render_field %}
+
+    <form method="post" action="">
+        {{ form.hidden_tag() }}
+
+        {{render_field(form.currentPassword, "Enter Current Password")}}<br>      
+        {{render_field(form.newPassword, "Enter New Password")}}<br>
+
+        <button class="btn btn-secondary" type="submit">Submit</button>
+    </form>
 {% endblock %}
