@@ -56,13 +56,14 @@ def read(CNumber, CVersion, sec, semester, version, year):
                                         year=year).first_or_404()
     
     canCurrentUserEdit = False
-    if current_user.permission == 'admin':
-        canCurrentUserEdit = True
-    i = current_user.instructor
-    if i:
-        for iSyllabus in i.syllabusList:
-            if iSyllabus == syllabus:
-                canCurrentUserEdit = True
+    if( not current_user.is_anonymous):
+        if current_user.permission == 'admin':
+            canCurrentUserEdit = True
+        i = current_user.instructor
+        if i:
+            for iSyllabus in i.syllabusList:
+                if iSyllabus == syllabus:
+                 canCurrentUserEdit = True
 
     if syllabus is not None:
         return render_template('/syllabus/read.html', syllabus=syllabus,

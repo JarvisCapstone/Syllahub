@@ -101,7 +101,7 @@ def update(number, version):
                             course_version = course.version,
                             version = oldSyllabus.version,
                             semester = form.semester.data,
-                            year = form.semester.data,
+                            year = form.year.data,
                             section = form.section.data)
         syllabus.setVersion()
 
