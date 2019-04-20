@@ -31,23 +31,26 @@ class Factory(metaclass=ABCMeta):
     @abstractmethod
     def setData(self, temp, data): 
         pass
-    
+
     @abstractmethod
     def deleteAll(showFlashMessage=True): 
         pass
 
-    def create(self, data=None):
-        temp = self.getModel()
-        tempData = data or {}
-        temp = self.setData(temp, tempData)
-        return temp
+    @abstractmethod
+    def getFakeData(self): 
+        pass
 
-    def addToDB(self, num=None):
+    def create(self, data):
+        temp = self.getModel()
+        temp = self.setData(temp, data)
+        db.session.add(temp)
+        db.session.commit()
+
+    def createFakes(self, num=None):
         num = num or 1
         for i in range(num):
-            u = self.create()
-            db.session.add(u)
-        db.session.commit()
+            data = self.getFakeData()
+            self.create(data)
         return "Success"
 
 
@@ -58,37 +61,43 @@ class UserFactory(Factory):
     def getModel(self):
         return User()
 
-    def setData(self, temp, data): 
+    def getFakeData(self): 
+        data={}
         p = self.fake.simple_profile()
-        if 'email' in data:
-            temp.email = data.email
-        else:
-            temp.email = p['mail']
+        data['email'] = p['mail']
+        data['password'] = 'password'
+        #data.permission=
+        #data.instructor_id=data.instructor_id
 
-        if 'password' in data:
-            temp.set_password(data.password)
-        else:
-            #password is 'password by default'
-            temp.set_password('password')
+        return data
 
+    def setData(self, temp, data): 
+        temp.email = data['email']
+        temp.set_password(data['password'])
         if 'permission' in data:
-            temp.permission=data.permission
-        
+            temp.permission=data['permission']
         if 'instructor_id' in data:
-            temp.instructor_id=data.instructor_id
+            temp.instructor_id=data['instructor_id']
 
         return temp
 
-    def generateAdmin(self):
+    def createAdmin(self):
         '''Adds admin@syllahub.com to db if it isn't already there
         '''
         adminEmail='syllahub@gmail.com'
+        
+        data = {}
+        data['email'] = adminEmail
+        data['password'] = 'admin'
+        data['permission'] = 'admin'
+
         admin = User.query.filter_by(email=adminEmail).first()
         if admin is None:
-            admin = User(email=adminEmail)
-            admin.set_password('admin')
-            db.session.add(admin)
-            db.session.commit()
+            self.create(data)
+            #admin = User(email=adminEmail)
+            #admin.set_password('admin')
+            #db.session.add(admin)
+            #db.session.commit()
             return 'Generated ' + adminEmail
         elif not admin.permission =='admin':
             admin.permission='admin'
@@ -114,29 +123,25 @@ class InstructorFactory(Factory):
     def getModel(self):
         return Instructor()
 
-    def setData(self, temp, data): 
+    def getFakeData(self): 
+        data={}
         p = self.fake.simple_profile()
+        data['name'] = p['name']
+        data['phone'] = random.randint(1000000000,9999999999)   
+        data['email'] = p['mail']
+        data['perfered_office_hours'] = 'whenever'
+
+        return data
+
+    def setData(self, temp, data): 
         if 'name' in data:
-            temp.name=data.name
-        else:
-            temp.name=p['name']
-        
+            temp.name=data['name']
         if 'phone' in data:
-            temp.phone=data.phone
-        else:
-            temp.phone=random.randint(1000000000,9999999999)   
-
+            temp.phone=data['phone']
         if 'email' in data:
-            temp.email=data.email
-        else:
-            temp.email=p['mail']
-
-        
+            temp.email=data['email']
         if 'perfered_office_hours' in data:
-            temp.perfered_office_hours=data.perfered_office_hours
-        else:
-            temp.perfered_office_hours='whenever'
-
+            temp.perfered_office_hours=data['perfered_office_hours']
         return temp
 
     def deleteAll(showFlashMessage=True):
@@ -153,62 +158,45 @@ class CourseFactory(Factory):
     def getModel(self):
         return Course()
 
+    def getFakeData(self): 
+        data={}
+        data['number'] = self.fake.random_int(min=10000, max=99999)
+        data['version'] = self.fake.random_int(min=1, max=9)
+        data['name'] = self.fake.sentence(nb_words=3)
+        data['description'] = self.fake.paragraph(nb_sentences=2)
+        data['prerequisites'] = self.fake.sentence(nb_words=1)
+        data['building'] = self.fake.street_address()
+        data['room'] = self.fake.random_int(min=0, max=999)
+        data['is_core'] = self.fake.boolean(chance_of_getting_true=20)
+        data['is_wi'] = self.fake.boolean(chance_of_getting_true=20)
+        data['is_elr'] = self.fake.boolean(chance_of_getting_true=20)
+        data['is_diversity'] = self.fake.boolean(chance_of_getting_true=20)
+
+        return data
+
     def setData(self, temp, data): 
         if 'number' in data:
-            temp.number=data.number
-        else:
-            temp.number=self.fake.random_int(min=10000, max=99999)
-        
+            temp.number = data['number']
         if 'version' in data:
-            temp.version=data.version
-        else:
-            temp.version=self.fake.random_int(min=1, max=9)
-
+            temp.version = data['version']
         if 'name' in data:
-            temp.name=data.name
-        else:
-            temp.name=self.fake.sentence(nb_words=3)
-
+            temp.name = data['name']
         if 'description' in data:
-            temp.description=data.description
-        else:
-            temp.description=self.fake.paragraph(nb_sentences=2)
-
+            temp.description = data['description']
         if 'prerequisites' in data:
-            temp.prerequisites=data.prerequisites
-        else:
-            temp.prerequisites=self.fake.sentence(nb_words=1)
-
+            temp.prerequisites = data['prerequisites']
         if 'building' in data:
-            temp.building=data.building
-        else:
-            temp.building=self.fake.street_address()
-
+            temp.building = data['building']
         if 'room' in data:
-            temp.room=data.room
-        else:
-            temp.room=self.fake.random_int(min=0, max=999)
-
+            temp.room = data['room']
         if 'is_core' in data:
-            temp.is_core=data.is_core
-        else:
-            temp.is_core=self.fake.boolean(chance_of_getting_true=20)
-
+            temp.is_core = data['is_core']
         if 'is_wi' in data:
-            temp.is_wi=data.is_wi
-        else:
-            temp.is_wi=self.fake.boolean(chance_of_getting_true=20)
-
+            temp.is_wi = data['is_wi']
         if 'is_elr' in data:
-            temp.is_elr=data.is_elr
-        else:
-            temp.is_elr=self.fake.boolean(chance_of_getting_true=20)
-
+            temp.is_elr = data['is_elr']
         if 'is_diversity' in data:
-            temp.is_diversity=data.is_diversity
-        else:
-            temp.is_diversity=self.fake.boolean(chance_of_getting_true=20)
-
+            temp.is_diversity = data['is_diversity']
         return temp
 
     def createOrGet(number, version=None, name=None):
@@ -270,21 +258,23 @@ class CloFactory(Factory):
     def __init__(self):
         Factory.__init__(self)
 
-    
     def getModel(self):
         return Clo()
 
+    def getFakeData(self): 
+        data={}
+        data['general'] = self.fake.paragraph(nb_sentences=2)
+        data['specific'] = self.fake.paragraph(nb_sentences=2)
+
+        return data
+
     def setData(self, temp, data): 
         if 'general' in data:
-            temp.general=data.general
-        else:
-            temp.general=self.fake.paragraph(nb_sentences=2)
-
+            temp.general = data['general']
+        
         if 'specific' in data:
-            temp.specific=data.specific
-        else:
-            temp.specific=self.fake.paragraph(nb_sentences=2)
-
+            temp.specific = data['specific']
+        
         return temp
 
     def deleteAll(showFlashMessage=True):
@@ -301,130 +291,85 @@ class SyllabusFactory(Factory):
     def getModel(self):
         return Syllabus()
 
+    def getFakeData(self): 
+        data={}
+        course = Course.query.order_by(func.rand()).first()
+        #course = Course.query.filter_by(number=96260).first()
+        #print
+        if course is None:
+            raise Exception("There are no courses")
+    
+        data['section'] = self.fake.random_int(min=0, max=2)
+        data['semester'] = 'spring'
+        data['year'] = 2018
+        data['course_number'] = course.number
+        data['course_version'] = course.version
+        data['state'] = 'draft'
+        data['required_materials'] = self.fake.paragraph(nb_sentences=2)
+        data['optional_materials'] = self.fake.paragraph(nb_sentences=2)
+        data['withdrawl_date'] = self.fake.paragraph(nb_sentences=1)
+        data['grading_policy'] = self.fake.paragraph(nb_sentences=3)
+        #data['attendance_policy'] = self.fake.paragraph(nb_sentences=3)
+        data['cheating_policy'] = self.fake.paragraph(nb_sentences=3)
+        data['extra_policies'] = self.fake.paragraph(nb_sentences=3)
+        data['meeting_time'] = self.fake.paragraph(nb_sentences=1)
+        data['meeting_dates'] = self.fake.paragraph(nb_sentences=1)
+        #data['University_cheating_policy'] = self.fake.paragraph(nb_sentences=3)
+        #data['Students_with_disabilities'] = self.fake.paragraph(nb_sentences=3)
+
+        return data
+
     def setData(self, temp, data): 
         #must reference a course. get a random course
-
         course = Course.query.order_by(func.rand()).first()
-
+        if course is None:
+            raise Exception("There are no courses")
         u = Syllabus()
         if 'section' in data:
-            temp.section = data.section
-        else: 
-            temp.section = self.fake.random_int(min=0, max=50)
-
-
+            temp.section = data['section']
         if 'semester' in data:
-            temp.semester = data.semester
-        else: 
-            temp.semester = 'spring'
-
-
+            temp.semester = data['semester']
         if 'year' in data:
-            temp.year = data.year
-        else: 
-            temp.year = 2018
-
-
-        if 'version' in data:
-            temp.version = data.version
-        else: 
-            temp.version = self.fake.random_int(min=1, max=9)
-
+            temp.year = data['year']
 
         if 'course_number' in data:
-            temp.course_number = data.course_number
-        else: 
-            temp.course_number = course.number
-
-
+            temp.course_number = data['course_number']
         if 'course_version' in data:
-            temp.course_version = data.course_version
-        else: 
-            temp.course_version = course.version
-
+            temp.course_version = data['course_version']
+        
+        # version is generated with this function
+        temp.setVersion()
 
         if 'state' in data:
-            temp.state = data.state
-        else: 
-            temp.state = 'draft'
-
-
+            temp.state = data['state']
         if 'pdf' in data:
-            temp.pdf = data.pdf
-
-
+            temp.pdf = data['pdf']
         if 'calender' in data:
-            temp.calender = data.calender
-
-
+            temp.calender = data['calender']
         if 'schedule' in data:
-            temp.schedule = data.schedule
-
-
+            temp.schedule = data['schedule']
         if 'required_materials' in data:
-            temp.required_materials = data.required_materials
-        else: 
-            temp.required_materials = self.fake.paragraph(nb_sentences=2)
-
-
+            temp.required_materials = data['required_materials']
         if 'optional_materials' in data:
-            temp.optional_materials = data.optional_materials
-        else: 
-            temp.optional_materials = self.fake.paragraph(nb_sentences=2)
-
-
+            temp.optional_materials = data['optional_materials']
         if 'withdrawl_date' in data:
-            temp.withdrawl_date = data.withdrawl_date
-        else: 
-            temp.withdrawl_date = self.fake.paragraph(nb_sentences=1)
-
-
+            temp.withdrawl_date = data['withdrawl_date']
         if 'grading_policy' in data:
-            temp.grading_policy = data.grading_policy
-        else: 
-            temp.grading_policy = self.fake.paragraph(nb_sentences=3)
-
-
+            temp.grading_policy = data['grading_policy']
         if 'attendance_policy' in data:
-            temp.attendance_policy = data.attendance_policy
-        else: 
-            temp.attendance_policy = self.fake.paragraph(nb_sentences=3)
-
-
+            temp.attendance_policy = data['attendance_policy']
         if 'cheating_policy' in data:
-            temp.cheating_policy = data.cheating_policy
-        else: 
-            temp.cheating_policy = self.fake.paragraph(nb_sentences=3)
-
-
+            temp.cheating_policy = data['cheating_policy']
         if 'extra_policies' in data:
-            temp.extra_policies = data.extra_policies
-        else: 
-            temp.extra_policies = self.fake.paragraph(nb_sentences=3)
-
-
+            temp.extra_policies = data['extra_policies']
         if 'meeting_time' in data:
-            temp.meeting_time = data.meeting_time
-        else: 
-            temp.meeting_time = self.fake.paragraph(nb_sentences=1)
-
-
+            temp.meeting_time = data['meeting_time']
         if 'meeting_dates' in data:
-            temp.meeting_dates = data.meeting_dates
-        else: 
-            temp.meeting_dates = self.fake.paragraph(nb_sentences=1)
-
-
+            temp.meeting_dates = data['meeting_dates']
         if 'University_cheating_policy' in data:
-            temp.University_cheating_policy = data.University_cheating_policy
-        else: 
-            temp.University_cheating_policy = self.fake.paragraph(nb_sentences=3)
-
-
+            temp.University_cheating_policy = data['University_cheating_policy']
         if 'Students_with_disabilities' in data:
-            temp.Students_with_disabilities = data.Students_with_disabilities
-        else: 
-            temp.Students_with_disabilities = self.fake.paragraph(nb_sentences=3)
+            temp.Students_with_disabilities = data['Students_with_disabilities']
 
         return temp
 
@@ -471,7 +416,6 @@ class SyllabusFactory(Factory):
         #print('syllabus=', syllabus)
         return syllabus
 
-
     def updateIfDifferent(syllabus, meeting_time=None):
         '''TODO add more fields other than meeting_time
         '''
@@ -510,8 +454,9 @@ def createRandCloCourseAssociation():
 
 def createRandInstructorSyllabusAssociation():
     temp_syllabus = Syllabus.query.order_by(func.rand()).first()
-    temp_instructor = Instructor.query.order_by(func.rand()).first()
-    SyllabusInstructorAssociation.create2(temp_syllabus, temp_instructor, 'grader')
+    #temp_instructor = Instructor.query.order_by(func.rand()).first()
+    temp_instructor = Instructor.query.filter_by(id=36).first()
+    SyllabusInstructorAssociation.create(temp_syllabus, temp_instructor, 'grader')
 
 
 def generateData(num=None):
@@ -532,6 +477,6 @@ def generateData(num=None):
     factories.append(SyllabusFactory())
     #print(factories)
     for factory in factories:
-        factory.addToDB(num)
+        factory.createFakes(num)
 
     flash("added", num, "fake data entries to each table in db")

@@ -3,17 +3,16 @@
 {% block title %}Index{% endblock %}
 
 {% block app_content %}
-    <h1>Instructor Index</h1>
+    <h1>All Instructors</h1>
 
     <ul class="list-group">
 
         {% for instructor in instructors %}
         <li class="list-group-item">
 
-            ID: {{instructor.id}} <br>
-            Name: {{instructor.name}} <br>
-            Email: {{instructor.email}} <br>
-            Phone: {{instructor.phone}} <br>
+            <h3>{{instructor.name}}</h3>
+            {{instructor.email}} <br>
+            {{instructor.phone}} <br>
             Hours: {{instructor.perfered_office_hours}} <br>
         
         </li>

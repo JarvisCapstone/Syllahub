@@ -3,13 +3,42 @@
 {% block title %}Index{% endblock %}
 
 {% block app_content %}
-<h1>Result</h1>
-<ul class="list-group"> 
-    <li class="list-group-item">
-        <h3> Syllabus for {{ syllabus.course_number }} </h3>
-        <p>Section: {{ syllabus.section }}</p>
-        <p>Semester: {{ syllabus.semester }}</p>
-        <p>Year: {{ syllabus.year }}</p>
-        <p>Section {{ syllabus.section }}</p>
-    </li>
+{% if canCurrentUserEdit %}
+
+
+    <div class="float-right">
+        <a class="btn btn-warning float-right" 
+           href="{{ url_for('syllabus.update', 
+                            CNumber = syllabus.course.number, 
+                            CVersion = syllabus.course.version,
+                            sec = syllabus.section, 
+                            semester = syllabus.semester, 
+                            version = syllabus.version, 
+                            year = syllabus.year) }}" 
+           role="button">Update</a>
+        {% if showApproveButton %}
+            <form action="" class="my-3" method="post">
+                {{ approveForm.hidden_tag() }}
+                {{ approveForm.approveSubmit(class_="btn btn-success float-right mt-2") }}
+            </form>        
+        {% endif %}
+
+    </div>
+
+{% endif %}
+
+<h1>
+    Syllabus for CS{{ syllabus.course_number }}-v{{ syllabus.course_version }} 
+</h1>
+
+<h2>{{ syllabus.course.name }}</h2>
+<h6>{{ syllabus.semester }} {{ syllabus.year }}</h6>
+<p>Section: {{ syllabus.section }}</p>
+<p>Version: {{ syllabus.section }}</p>
+<h3>TODO add all fields here in a neat manner</h3>
+<p>State: {{ syllabus.state }}</p>
+<h6>Cheating_policy:</h6> <p>{{ syllabus.University_cheating_policy }}</p>
+<h6>Attendance policy:</h6> <p>{{ syllabus.attendancy_policy }}</p>
+<h6>Students with disabilities:</h6> 
+<p>{{ syllabus.Students_with_disabilities }}</p>
 {% endblock %}

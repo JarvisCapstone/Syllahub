@@ -4,6 +4,14 @@
 
 {% block app_content %}
 <h1>Results:</h1>
+<!--
+<div>
+<select class="form-control mr-sm-2" name="sortBy" onchange="sortSearch(courses)">
+    <option value="new">New</option>
+    <option value="old">Old</option>
+</select>
+</div>
+-->
 <ul class="list-group">
     {% for course in courses %}
         <li class="list-group-item">

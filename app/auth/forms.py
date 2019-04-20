@@ -34,3 +34,8 @@ class assignInstructorToCourse(FlaskForm):
 
 class RequestReloginForm(FlaskForm):
     logout = SubmitField('Logout')
+
+class assignCloToCourse(FlaskForm):
+    courseNumber = StringField('Course Number', validators=[DataRequired()])
+    courseVersion = StringField('Course Version', validators=[DataRequired()])
+    cloID = StringField('Clo ID', validators=[DataRequired()])

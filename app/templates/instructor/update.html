@@ -10,10 +10,8 @@
 <form method=POST>
 
     {{ form.hidden_tag() }}
-    {{ render_field(form.id, "Enter ID") }}
     {{ render_field(form.name, "Enter Name") }}
     {{ render_field(form.phone, "Enter Phone Number") }}
-    {{ render_field(form.email, "Enter Email") }}
     {{ render_field(form.hours, "Enter Office hours") }}
 
     <button class="btn btn-secondary", type="submit">Submit</button>
