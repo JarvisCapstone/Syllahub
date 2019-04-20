@@ -13,7 +13,7 @@ def index():
     courses = Course.query.all()
     return render_template('course/index.html', courses=courses)
 
-@bp.route('/create', methods=['POST'])
+@bp.route('/create', methods=['GET','POST'])
 @login_required
 @admin_required
 def create():
@@ -101,7 +101,7 @@ def update(number, version):
                             course_version = course.version,
                             version = oldSyllabus.version,
                             semester = form.semester.data,
-                            year = form.semester.data,
+                            year = form.year.data,
                             section = form.section.data)
         syllabus.setVersion()
 
