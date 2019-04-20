@@ -13,7 +13,7 @@ def index():
     courses = Course.query.all()
     return render_template('course/index.html', courses=courses)
 
-@bp.route('/create', methods=['POST'])
+@bp.route('/create', methods=['GET','POST'])
 @login_required
 @admin_required
 def create():
