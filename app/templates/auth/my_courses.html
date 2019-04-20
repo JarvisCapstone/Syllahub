@@ -4,26 +4,33 @@
 
 {% block app_content %}
 <h1>My Courses</h1>
+<p>Click on a course to update the syllabus for that course.</p>
 <div class="list-group">
     {% for course in courses %}
-    <a href="{{ url_for('course.read', number=course.number, version=course.version) }}" 
+    <a href="{{ url_for('syllabus.update', 
+            CNumber = course[0].number, 
+            CVersion = course[0].version,
+            sec = course[1].section, 
+            semester = course[1].semester, 
+            version = course[1].version, 
+            year = course[1].year) }}" 
        class="list-group-item list-group-item-action">
-        <h3> {{ course.name }} </h3>
-        <p>Number: {{ course.number }}</p>
-        <p>Version: {{ course.version }}</p>
-        <p>Description: {{ course.description }}</p>
-        <p>Building: {{ course.building }}</p>
-        <p>Room: {{ course.room }}</p>
-        {% if course.is_core %}
+        <h3> {{ course[0].name }} </h3>
+        <p>Number: {{ course[0].number }}</p>
+        <p>Version: {{ course[0].version }}</p>
+        <p>Description: {{ course[0].description }}</p>
+        <p>Building: {{ course[0].building }}</p>
+        <p>Room: {{ course[0].room }}</p>
+        {% if course[0].is_core %}
             <p>Satisfies Kent Core</p>
         {% endif %}
-        {% if course.is_diversity %}
+        {% if course[0].is_diversity %}
             <p>Satisfies Diversity</p>
         {% endif %}
-        {% if course.is_elr %}
+        {% if course[0].is_elr %}
             <p>Satisfies Experimental Learning</p>
         {% endif %}
-        {% if course.is_wi %}
+        {% if course[0].is_wi %}
             <p>Satisfies Writing Intensive</p>
         {% endif %}
     </a>

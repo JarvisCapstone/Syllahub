@@ -7,6 +7,7 @@ from app.instructor.forms import createInstructorForm, deleteInstructorForm, upd
 
 
 @bp.route('/index', methods=['GET', 'POST'])
+@login_required
 def index():
     instructors = Instructor.query.all()
     print(instructors)
@@ -15,6 +16,7 @@ def index():
 
 
 @bp.route('/create', methods=['GET', 'POST'])
+@login_required
 def create():
     form = createInstructorForm()
     if form.validate_on_submit():
@@ -27,12 +29,14 @@ def create():
 
 
 @bp.route('/read/<id>', methods=['GET'])
+@login_required
 def read(id):
     instructor = Instructor.query.filter_by(id=id).first()
     return render_template('/instructor/read.html', instructor=instructor)
 
 
 @bp.route('/update/<id>', methods=['GET', 'POST'])
+@login_required
 def update(id):
     form = updateInstructorForm()
     if form.validate_on_submit():
@@ -50,6 +54,7 @@ def update(id):
 
 
 @bp.route('/delete/<id>', methods=['GET', 'POST'])
+@login_required
 def delete(id):
     form = deleteInstructorForm()
     if form.validate_on_submit():

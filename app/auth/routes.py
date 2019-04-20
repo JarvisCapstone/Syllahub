@@ -7,7 +7,7 @@ from app import db
 from app.auth import bp
 
 from app.auth.forms import LoginForm, RegistrationForm, assignInstructorToCourse, RequestReloginForm, assignCloToCourse
-from app.models import User, SyllabusInstructorAssociation, Syllabus, Instructor, course_clo_table
+from app.models import User, SyllabusInstructorAssociation, Syllabus, Instructor, course_clo_table, Course
 
 
 def redirect_url(default='home.index'):
@@ -119,9 +119,15 @@ def myCourses():
     courses = list()
     for association in associations:
         courseNumsAndVersions.append((association.syllabus_course_number,
-                                    association.syllabus_course_version))
-    for pair in courseNumsAndVersions:
-        courses.append(Course.query.filter_by(number=pair[0], version=pair[1]).first())
+                                    association.syllabus_course_version,
+                                    association.syllabus_section,
+                                    association.syllabus_semester,
+                                    association.syllabus_year,
+                                    association.syllabus_version))
+    for info in courseNumsAndVersions:
+        courses.append( ( Course.query.filter_by(number=info[0], version=info[1]).first(),
+                        Syllabus.query.filter_by(course_number=info[0], course_version=info[1],
+                                                section=info[2], semester=info[3], year=info[4]).first() ) )
     return render_template('auth/my_courses.html', courses=courses)
 
 @bp.route('/requestRelogin', methods=['GET','POST'])

@@ -12,9 +12,10 @@
 </select>
 </div>
 -->
-<ul class="list-group">
+<div class="list-group">
     {% for course in courses %}
-        <li class="list-group-item">
+    <a href="{{ url_for('course.read', number=course.number, version=course.version) }}" 
+    class="list-group-item list-group-item-action">
             <h3> {{ course.name }} </h3>
             <p>Number: {{ course.number }}</p>
             <p>Version: {{ course.version }}</p>
@@ -33,7 +34,7 @@
             {% if course.is_wi %}
                 <p>Satisfies Writing Intensive</p>
             {% endif %}
-        </li>
+        </a>
     {% endfor %}
-</ul>
+</div>
 {% endblock %}
