@@ -5,4 +5,5 @@
 {% block app_content %}
     <h1>Instructor Profile</h1>
     <a type = "button" class= "btn" href="{{ url_for('auth.myCourses') }}" >My Courses</a>
+    <a class="btn btn-warning float-right" href="{{ url_for('user.update') }}">Change Password</a>
 {% endblock %}

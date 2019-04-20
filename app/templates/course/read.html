@@ -3,14 +3,13 @@
 {% block title %}Index{% endblock %}
 {% block app_content %}
 {% if canCurrentUserEdit %}
-
-
     <div class="float-right">
         <a class="btn btn-warning float-right" 
            href="{{ url_for('course.update', number=course.number, version=course.version) }}" 
            role="button">Update</a>
-           {% endif %}
+{% endif %}
 
+{% if syllabusApproved %}
     <a class="btn btn-success float-right" 
        href="{{ url_for('syllabus.read', CNumber=course.number, 
                 CVersion=course.version, version=syllabus.version,
@@ -18,6 +17,7 @@
                 sec=syllabus.section) }}" 
        role="button">View Syllabus</a>
     </div>
+{% endif %}
 
 <h1>Result for version {{ version }} of {{ course.name }}</h1>
 <ul class="list-group">

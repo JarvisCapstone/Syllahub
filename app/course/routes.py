@@ -58,10 +58,13 @@ def read(number, version):
     course = Course.query.filter_by(number=number, version=version) \
                          .first_or_404()
     syllabus= Syllabus.query.filter_by(course_number = number, course_version=version).first()
+    syllabusApproved = False
+    if(syllabus.state=="approved"):
+        syllabusApproved = True
     return render_template('/course/read.html', course=course, 
                            number=number, version=version, 
                            canCurrentUserEdit=canCurrentUserEdit,
-                           syllabus = syllabus)
+                           syllabus = syllabus, syllabusApproved=syllabusApproved)
 
 
 @bp.route('/search', methods=['GET'])

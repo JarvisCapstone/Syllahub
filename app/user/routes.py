@@ -42,6 +42,7 @@ def update():
             currentUser.set_password(form.newPassword.data)
             db.session.add(currentUser)
             db.session.commit()
+            flash("Password Updated!")
         else:
             flash('Invalid Password')
     return render_template('/user/update.html', form=form)

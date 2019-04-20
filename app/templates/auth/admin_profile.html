@@ -6,9 +6,11 @@
     <h1>Admin Profile</h1>
     <a class="btn btn-primary" href="{{ url_for('factory.index') }}">Factory</a>
     <a class="btn btn-primary" href="{{ url_for('instructor.create') }}">Create Instructor</a>
+    <a class="btn btn-primary" href="{{ url_for('course.create') }}">Create Instructor</a>
     <a class="btn btn-primary" href="{{ url_for('course.index') }}">All Courses</a>
     <a class="btn btn-primary" href="{{ url_for('auth.assignInstruct') }}">Assign Instructor to Course</a>
     <a class="btn btn-primary" href="{{ url_for('auth.assignClo') }}">Assign Clo to Course</a>
+    <a class="btn btn-warning float-right" href="{{ url_for('user.update') }}">Change Password</a>
     <h2>Draft Syllabi</h2>
 <div class="list-group">
     {% for syllabi in draftSyllabi %}
