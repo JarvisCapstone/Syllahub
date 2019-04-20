@@ -7,6 +7,7 @@ from app.clo.forms import CreateCloForm, UpdateCloForm, DeleteCloForm
 from app import db
 
 @bp.route('/index', methods=['GET', 'POST'])
+@login_required
 def index():
     clos = Clo.query.all()
     return render_template('clo/index.html', clos=clos)
@@ -14,6 +15,7 @@ def index():
 
 
 @bp.route('/create', methods=['GET', 'POST'])
+@login_required
 def create():
     form = CreateCloForm()
     if form.validate_on_submit():
@@ -26,6 +28,7 @@ def create():
 
 
 @bp.route('/read/<id>', methods=['GET', 'POST'])
+@login_required
 def read(id):
     clo = Clo.query.filter_by(id = id).one()
     flash("CLO Read!")

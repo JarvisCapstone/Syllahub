@@ -93,6 +93,7 @@ def read(CNumber, CVersion, sec, semester, version, year):
 
 @bp.route('/update/<CNumber>/<CVersion>/<sec>/<semester>/<version>/<year>', 
           methods=['GET', 'POST'])
+@login_required
 def update(CNumber, CVersion, sec, semester, version, year):
     form = updateSyllabusForm()
     syllabus = Syllabus.query.filter_by(course_number=CNumber, 
@@ -131,6 +132,7 @@ def update(CNumber, CVersion, sec, semester, version, year):
     return render_template('/syllabus/update.html', form=form)
 
 @bp.route('/delete/<CNumber>/<CVersion>/<sec>/<semester>/<version>/<year>', methods=['GET', 'POST'])
+@login_required
 def delete(CNumber, CVersion, sec, semester, version, year):
     syllabus = Syllabus.query.filter_by(course_number=CNumber, course_version=CVersion, 
                                         section=sec, semester=semester, version=version, 
