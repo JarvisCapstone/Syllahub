@@ -97,11 +97,12 @@ def read(CNumber, CVersion, sec, semester, version, year):
         return redirect(url_for('syllabus.index'))
     '''
     if syllabus is not None:
+        filename = str(CNumber) + semester + str(year)
         binary_pdf = syllabus.pdf
         response = make_response(binary_pdf)
         response.headers['Content-Type']= 'application/pdf'
         response.headers['Content-Disposition'] = \
-            'inline; filename=%s.pdf' % 'course'
+            'inline; filename=%s.pdf' % filename
         return response
 
 @bp.route('/update/<CNumber>/<CVersion>/<sec>/<semester>/<version>/<year>', methods=['GET', 'POST'])

@@ -607,10 +607,10 @@ class Syllabus(db.Model, Timestamp):
         # Convert HTML to PDF
         #syllabusPDF = 'TODO' # = pdfKitFunction(syllabusHTML)
 
-        #self.pdf = pdf.output(dest='S').encode('latin-1')
-        pdf.output('wolves.pdf', 'F')
-        file = open('wolves.pdf', 'rb').read()
-        self.pdf = file
+        self.pdf = pdf.output(dest='S').encode('latin-1')
+        #pdf.output('wolves.pdf', 'F')
+        #file = open('wolves.pdf', 'rb').read()
+        #self.pdf = file
         #db.session.query(Syllabus) \
             #.filter_by(self) \
             #.update({"pdf": (file)})
