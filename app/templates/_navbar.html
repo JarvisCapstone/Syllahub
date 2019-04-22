@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-  <a class="navbar-brand" href="{{ url_for('home.index') }}">Syllahub</a>
+  <a class="navbar-brand text-warning" href="{{ url_for('home.index') }}">Syllahub</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -7,19 +7,19 @@
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('course.index') }}">Courses</a>
+        <a class="nav-link text-warning" href="{{ url_for('course.index') }}">Courses</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('clo.index') }}">CLO's</a>
+        <a class="nav-link text-warning" href="{{ url_for('clo.index') }}">CLO's</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('instructor.index') }}">Instructors</a>
+        <a class="nav-link text-warning" href="{{ url_for('instructor.index') }}">Instructors</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('syllabus.index') }}">Syllabi</a>
+        <a class="nav-link text-warning" href="{{ url_for('syllabus.index') }}">Syllabi</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('user.index') }}">Users</a>
+        <a class="nav-link text-warning" href="{{ url_for('user.index') }}">Users</a>
       </li>
     </ul>
     <form class="form-inline" action="{{ url_for('course.search') }}" method="GET">
@@ -28,22 +28,22 @@
             <option value="new">New</option>
             <option value="old">Old</option>
         </select>
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        <button class="btn btn-warning my-2 my-sm-0" type="submit">Search</button>
       </form>
     <ul class="navbar-nav ml-auto">
       {% if current_user.is_anonymous %}
         <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
+          <a class="nav-link text-warning" href="{{ url_for('auth.login') }}">Login</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
+          <a class="nav-link text-warning" href="{{ url_for('auth.register') }}">Register</a>
         </li>
       {% else %}
         <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('auth.my_profile') }}">My Profile</a>
+          <a class="nav-link text-warning" href="{{ url_for('auth.my_profile') }}">My Profile</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
+        <li class="nav-item" >
+          <a class="nav-link text-warning" href="{{ url_for('auth.logout') }}">Logout</a>
         </li>
       {% endif %}
     </ul>
