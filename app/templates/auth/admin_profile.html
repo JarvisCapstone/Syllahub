@@ -14,10 +14,16 @@
     <h2>Draft Syllabi</h2>
 <div class="list-group">
     {% for syllabi in draftSyllabi %}
-    <a href="{{ url_for('syllabus.read', CNumber=syllabi.course_number, CVersion=syllabi.course_version, 
-        sec=syllabi.section, semester=syllabi.semester, version=syllabi.version, year=syllabi.year) }}" 
-       class="list-group-item list-group-item-action">
-        <p>Syllabus for CS-{{ syllabi.course_number }} is waiting approval.</p>
+    <a class = "list-group">
+        <p>Syllabus for CS-{{ syllabi.course_number }} is waiting approval.
+                <a class="btn btn-primary float-right" href="{{url_for('syllabus.read', 
+                CNumber=syllabi.course_number, CVersion=syllabi.course_version, 
+                sec=syllabi.section, semester=syllabi.semester, 
+                version=syllabi.version, year=syllabi.year) }}">View</a>
+                <form action=""  method="post">
+                        {{ approveForm.approveSubmit(class_="btn btn-success float-right") }}
+                    </form>
+        </p>
     </a>
     {% endfor %}
 </div>

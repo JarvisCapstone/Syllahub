@@ -384,7 +384,8 @@ class Syllabus(db.Model, Timestamp):
     calender = Column(LargeBinary, nullable=True)
     # crn = Column(Integer, index)
     # TODO instroduction_statement(String(500), nullable=True)
-    cheating_policy = Column(String(500), nullable=True) # TODO change name to optional cheating policy, maybe remove
+    cheating_policy = Column(String(500), nullable=True,
+                                        default=currentCheatingPolicy) # TODO change name to optional cheating policy, maybe remove
     extra_policies = Column(String(500), nullable=True) # TODO change to 1000
     grading_policy = Column(String(500), nullable=True)
     meeting_dates = Column(String(100), nullable=True)

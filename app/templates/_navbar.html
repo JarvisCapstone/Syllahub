@@ -7,20 +7,20 @@
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('course.index') }}">Courses</a>
+        <a class="nav-link" href="{{ url_for('course.index') }}">All Courses</a>
       </li>
-      <li class="nav-item">
+     <!-- <li class="nav-item">
         <a class="nav-link" href="{{ url_for('clo.index') }}">CLO's</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="{{ url_for('instructor.index') }}">Instructors</a>
-      </li>
+      </li>-->
       <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('syllabus.index') }}">Syllabi</a>
+        <a class="nav-link" href="{{ url_for('syllabus.index') }}">All Syllabi</a>
       </li>
-      <li class="nav-item">
+      <!--<li class="nav-item">
         <a class="nav-link" href="{{ url_for('user.index') }}">Users</a>
-      </li>
+      </li>-->
     </ul>
     <form class="form-inline" action="{{ url_for('course.search') }}" method="GET">
         <input class="form-control mr-sm-2" name="number" type="search" placeholder="Enter Course Number" aria-label="Search">
