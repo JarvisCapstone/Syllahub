@@ -384,8 +384,7 @@ class Syllabus(db.Model, Timestamp):
     calender = Column(LargeBinary, nullable=True)
     # crn = Column(Integer, index)
     # TODO instroduction_statement(String(500), nullable=True)
-    cheating_policy = Column(String(500), nullable=True,
-                                        default=currentCheatingPolicy) # TODO change name to optional cheating policy, maybe remove
+    cheating_policy = Column(String(500), nullable=True) # TODO change name to optional cheating policy, maybe remove
     extra_policies = Column(String(500), nullable=True) # TODO change to 1000
     grading_policy = Column(String(500), nullable=True)
     meeting_dates = Column(String(100), nullable=True)
@@ -508,8 +507,11 @@ class Syllabus(db.Model, Timestamp):
         pdf.set_font_size(14)
         pdf.cell(0,5, 'Course Description from the University Catalog', ln=1)
         pdf.set_font_size(12)
-        pdf.multi_cell(0,5, 'CS'+str(self.course_number) + ' ' + course.name + ': ' +
-                course.description)    
+        if course.description:
+            pdf.multi_cell(0,5, 'CS'+str(self.course_number) + ' ' + course.name + ': ' +
+                           course.description)
+        else:
+            pdf.multi_cell(0,5, 'CS'+str(self.course_number) + ' ' + course.name + ': ')
         if (course.prerequisites != None):
             pdf.cell(0,5, 'Prerequisite: ' + course.prerequisites, ln=1)
             pdf.cell(0, 5, 'Students without the proper prerequisite(s) risk being deregistered from the class', ln=1)
@@ -572,13 +574,15 @@ class Syllabus(db.Model, Timestamp):
         pdf.cell(0,5, 'https://www.kent.edu/registrar/spring-important-dates', ln=1)
 
         pdf.ln(5)
-        pdf.set_font_size(14)
-        pdf.cell(0,5, 'Attendance Policy', ln=1)
-        pdf.set_font_size(12)
-        pdf.multi_cell(0,5, self.attendance_policy)
+        
+        if self.attendance_policy:
+            pdf.set_font_size(14)
+            pdf.cell(0,5, 'Attendance Policy', ln=1)
+            pdf.set_font_size(12)
+            pdf.multi_cell(0,5, self.attendance_policy)
+            pdf.ln(5)
         #pdf.cell(0,5, 'Attendance Policy goes here', ln=1)
 
-        pdf.ln(5)
         pdf.set_font_size(14)
         pdf.cell(0,5, 'Student Accessability Services', ln=1)
         pdf.set_font_size(12)

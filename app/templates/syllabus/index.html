@@ -7,12 +7,12 @@
 <div class="list-group">
     {% for syllabus in syllabi %}
         <a href="{{ url_for('syllabus.read', 
-                            CNumber = syllabus.course.number, 
-                            CVersion = syllabus.course.version,
-                            sec = syllabus.section, 
-                            semester = syllabus.semester, 
-                            version = syllabus.version, 
-                            year = syllabus.year) }}" 
+                            CNumber=syllabus.course.number, 
+                            CVersion=syllabus.course.version,
+                            sec=syllabus.section, 
+                            semester=syllabus.semester, 
+                            version=syllabus.version, 
+                            year=syllabus.year) }}" 
            class="list-group-item list-group-item-action">
             <h3>CS{{ syllabus.course_number }}-{{ syllabus.course_version }}: {{ syllabus.course.name }} </h3>
             <p>Section: {{ syllabus.section }}</p>

@@ -45,6 +45,7 @@ class Factory(metaclass=ABCMeta):
         temp = self.setData(temp, data)
         db.session.add(temp)
         db.session.commit()
+        return temp
 
     def createFakes(self, num=None):
         num = num or 1
@@ -321,9 +322,11 @@ class SyllabusFactory(Factory):
 
     def setData(self, temp, data): 
         #must reference a course. get a random course
-        course = Course.query.order_by(func.rand()).first()
+        print('setData called')
+        course = Course.query.filter_by(number=data['course_number'], 
+                                        version=data['course_version']).first()
         if course is None:
-            raise Exception("There are no courses")
+            raise Exception("The course does not exist")
         u = Syllabus()
         if 'section' in data:
             temp.section = data['section']
@@ -342,8 +345,8 @@ class SyllabusFactory(Factory):
 
         if 'state' in data:
             temp.state = data['state']
-        if 'pdf' in data:
-            temp.pdf = data['pdf']
+        #if 'pdf' in data:
+        #    temp.pdf = data['pdf']
         if 'calender' in data:
             temp.calender = data['calender']
         if 'schedule' in data:
@@ -360,6 +363,8 @@ class SyllabusFactory(Factory):
             temp.attendance_policy = data['attendance_policy']
         if 'cheating_policy' in data:
             temp.cheating_policy = data['cheating_policy']
+        else:
+            temp.cheating_policy = Syllabus.currentCheatingPolicy
         if 'extra_policies' in data:
             temp.extra_policies = data['extra_policies']
         if 'meeting_time' in data:
@@ -370,10 +375,13 @@ class SyllabusFactory(Factory):
             temp.University_cheating_policy = data['University_cheating_policy']
         if 'Students_with_disabilities' in data:
             temp.Students_with_disabilities = data['Students_with_disabilities']
-
+        else:
+            # must set before database commit so pdf can be generated
+            temp.Students_with_disabilities = Syllabus.currentSASText 
+        temp.setPDF()
         return temp
 
-    def createOrGet(course_number, course_version, section, semester, year, version=None):
+    def createOrGet(self, course_number, course_version, section, semester, year, version=None):
         '''Provided the pk, get a syllabus if it exists, or create one if not
         '''
         syllabus = None
@@ -384,20 +392,27 @@ class SyllabusFactory(Factory):
                 section=section,
                 semester=semester,
                 year=year).all()
-            #print("existingSyllabusList=", existingSyllabusList)
 
             if len(existingSyllabusList) == 0:
-                newSyllabus = Syllabus()
-                newSyllabus.course_number = course_number
-                newSyllabus.course_version = course_version
-                newSyllabus.version = 1 #TODO, remove once autoincrement is changed
-                newSyllabus.section = section
-                newSyllabus.semester = semester
-                newSyllabus.year = year
+                data = {}
+                data['section'] = section
+                data['semester'] = semester
+                data['year'] = year
+                data['course_number'] = course_number
+                data['course_version'] = course_version
+
+                #newSyllabus = Syllabus()
+                #newSyllabus.course_number = course_number
+                #newSyllabus.course_version = course_version
+                #newSyllabus.version = 1 #TODO, remove once autoincrement is changed
+                #newSyllabus.section = section
+                #newSyllabus.semester = semester
+                #newSyllabus.year = year
                
-                db.session.add(newSyllabus)
-                db.session.commit()
-                syllabus = newSyllabus
+                #db.session.add(newSyllabus)
+                #db.session.commit()
+                #syllabus = newSyllabus
+                syllabus = self.create(data)
                 #print('new syllabus added')
             else:
                 # search course list for most recent version

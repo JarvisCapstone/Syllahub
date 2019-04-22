@@ -16,6 +16,16 @@ class Retriever():
                               header=0)
         self.tableDataFrame = tables[1] #table is now a dataframe object
     
+    def getCourseDetails(self):
+        #details = pd.read_html('http://catalog.kent.edu/colleges/as/cs/')
+        from lxml import html
+        import requests
+        page = requests.get('http://catalog.kent.edu/colleges/as/cs/')
+        tree = html.fromstring(page.content)
+        print(tree)
+        block = tree.xpath('//div[@class="sc_sccoursedescs"]/text()')
+        print(block)
+
     def printTable(self):
         print(tableDataFrame)
         #tableJSON = tableDataFrame.to_json(orient="records")
@@ -41,6 +51,10 @@ class Retriever():
         group = self.tableDataFrame.groupby('CRN').aggregate(aggregation_functions)
         return group
 
+    def runTest(self):
+        self.getCourseDetails()
+
+
     def run(self):
         self.getTable()
         grouped = self.group()
@@ -58,7 +72,6 @@ class Retriever():
             if type(instructor) is str:
                 print('instructor=', instructor)
                 #print
-
         '''
         for index, row in grouped.iterrows():
             #    print(index)
@@ -95,7 +108,8 @@ class Retriever():
             #timeStr = 
             #for location in locationList
             #    locationStr += location
-            syllabus = SyllabusFactory.createOrGet(course_number=course.number,
+            sF = SyllabusFactory()
+            syllabus = sF.createOrGet(course_number=course.number,
                                                    course_version=course.version,
                                                    section=section,
                                                    semester=semester,

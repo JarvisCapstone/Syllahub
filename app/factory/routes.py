@@ -28,9 +28,9 @@ def index():
         flash(message)
 
     elif sForm.seedSubmit.data and sForm.validate():
-        flash('Seed Form Validated. TODO')
         r = Retriever()
         r.run()
+        flash('Database seeding success')
         # TODO
 
     elif adminForm.adminSubmit.data and adminForm.validate():

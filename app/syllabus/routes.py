@@ -51,7 +51,8 @@ def create():
     return render_template('syllabus/create.html', form=form)
 
 
-@bp.route('/read/<CNumber>/<CVersion>/<sec>/<semester>/<version>/<year>', methods=['GET', 'POST'])
+@bp.route('/read/<int:CNumber>/<int:CVersion>/<int:sec>/<semester>/<int:version>/<int:year>', 
+          methods=['GET', 'POST'])
 def read(CNumber, CVersion, sec, semester, version, year):
     syllabus = Syllabus.query.filter_by(course_number=CNumber, 
                                         course_version=CVersion, 
@@ -75,7 +76,8 @@ def read(CNumber, CVersion, sec, semester, version, year):
     else:
         return redirect('errors/404.html')
 
-@bp.route('/update/<CNumber>/<CVersion>/<sec>/<semester>/<version>/<year>', methods=['GET', 'POST'])
+@bp.route('/update/<int:CNumber>/<int:CVersion>/<int:sec>/<semester>/<int:version>/<int:year>', 
+          methods=['GET', 'POST'])
 @login_required
 def update(CNumber, CVersion, sec, semester, version, year):
     form = updateSyllabusForm()
@@ -139,7 +141,8 @@ def update(CNumber, CVersion, sec, semester, version, year):
         form.optionalMaterials.data = oldSyllabus.optional_materials
     return render_template('/syllabus/update.html', form=form)
 
-@bp.route('/delete/<CNumber>/<CVersion>/<sec>/<semester>/<version>/<year>', methods=['GET', 'POST'])
+@bp.route('/delete/<int:CNumber>/<int:CVersion>/<int:sec>/<semester>/<int:version>/<int:year>', 
+          methods=['GET', 'POST'])
 @login_required
 def delete(CNumber, CVersion, sec, semester, version, year):
     syllabus = Syllabus.query.filter_by(course_number=CNumber, course_version=CVersion, 
