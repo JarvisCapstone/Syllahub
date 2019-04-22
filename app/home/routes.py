@@ -20,12 +20,12 @@ def index():
 #    users = User.query.all()
 #    return render_template('home/userindex.html', users = users)
 
-@bp.route('/site_map', methods=['GET', 'POST'])
-def site_map():
-    return render_template('home/site_map.html')
+#@bp.route('/site_map', methods=['GET', 'POST'])
+#def site_map():
+#    return render_template('home/site_map.html')
 
-@bp.route('/run', methods=['GET', 'POST'])
-def run():
-    '''used for debugging
-    '''
-    return 'success'
+#@bp.route('/run', methods=['GET', 'POST'])
+#def run():
+#    '''used for debugging
+#    '''
+#    return 'success'
