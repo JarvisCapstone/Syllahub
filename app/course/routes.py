@@ -113,7 +113,11 @@ def update(number, version):
                             version = oldSyllabus.version,
                             semester = form.semester.data,
                             year = form.year.data,
-                            section = form.section.data)
+                            section = form.section.data
+                            cheating_policy = Syllabus.currentCheatingPolicy,
+                            attendance_policy = Syllabus.currentAttendancePolicy,
+                            Students_with_disabilities = Syllabus.currentSASText,
+                            )
         syllabus.setVersion()
 
         db.session.add(course)
