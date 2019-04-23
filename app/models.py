@@ -136,11 +136,27 @@ class SyllabusInstructorAssociation(db.Model):
             instructor: Instructor - 
             job: String - 
         '''
-        new_job = SyllabusInstructorAssociation(job_on_syllabus=job)
-        new_job.instructor = instructor;
-        new_job.syllabus = syllabus;
-        db.session.add(new_job)
-        db.session.commit()
+        # test if already exists
+        
+        sia = SyllabusInstructorAssociation.query.filter_by(
+                  syllabus_course_number = syllabus.course_number,
+                  syllabus_course_version = syllabus.course_version,
+                  syllabus_section = syllabus.section,
+                  syllabus_semester = syllabus.semester,
+                  syllabus_version = syllabus.version,
+                  syllabus_year = syllabus.year,
+                  instructor_id = instructor.id).first()
+        #print('sia=', sia)
+        if not sia:
+            new_job = SyllabusInstructorAssociation(job_on_syllabus=job)
+            new_job.instructor = instructor;
+            new_job.syllabus = syllabus;
+            db.session.add(new_job)
+            db.session.commit()
+
+            #update syllabus pdf
+            syllabus.setPDF()
+            db.session.commit()
 
     def __repr__(self):
         '''returns a printable representation of the object. 
@@ -539,8 +555,9 @@ class Syllabus(db.Model, Timestamp):
             pdf.cell(0,5, 'Phone: ' + str(instructor.phone), ln=1)
             #TODO, include office room in database, nevermind  have it included in office hours
             #pdf.cell(0,5, 'Office: #####', ln=1)
-            pdf.cell(0,5, 'Office Hours: ' + instructor.perfered_office_hours, ln=1)
-            pdf.ln(5)
+            if instructor.perfered_office_hours:
+                pdf.cell(0,5, 'Office Hours: ' + instructor.perfered_office_hours, ln=1)
+                pdf.ln(5)
 
         pdf.set_font_size(14)
         pdf.cell(0,5, 'Course Description from the University Catalog', ln=1)

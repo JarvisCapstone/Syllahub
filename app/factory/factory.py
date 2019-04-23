@@ -344,7 +344,7 @@ class SyllabusFactory(Factory):
 
     def setData(self, temp, data): 
         #must reference a course. get a random course
-        print('setData called')
+        #print('setData called')
         course = Course.query.filter_by(number=data['course_number'], 
                                         version=data['course_version']).first()
         if course is None:

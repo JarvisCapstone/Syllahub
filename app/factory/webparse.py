@@ -3,7 +3,7 @@
 # https://www.kent.edu/cs/office-hours Table for office hours
 import pandas as pd
 import pprint
-from app.models import Course, Syllabus
+from app.models import Course, Syllabus, Instructor
 from app.factory.factory import InstructorFactory, CourseFactory, SyllabusFactory
 from app import db
 
@@ -94,6 +94,20 @@ class Retriever():
                     data['phone'] = int(phoneString)
             i = iFactory.createOrGet(data)
             i.updateIfDifferent(data)
+        
+        # The data online is somewhat incomplete. I manually entered in 
+        # a few faculty below.
+        additionalInstructors = [
+            {
+                'email':'dcsmith1@kent.edu',
+                'phone': 3306720275,
+                'name': 'Smith, Deborah C.',
+            },
+        ]
+        
+        for instructorData in additionalInstructors:
+            i = iFactory.createOrGet(instructorData)
+            i.updateIfDifferent(instructorData)
         return 'done'
 
     def run(self):
@@ -158,5 +172,48 @@ class Retriever():
                                       semester=semester,
                                       year=year,
                                       version='any')
+            #print(row.Instructor)
+            #print('syllabus---------------------------------------------------------------------')
+            for instructorName in row.Instructor:
+                i = None
+                if isinstance(instructorName, str):
+                    #print(instructorName)
+                    i = Instructor.query.filter_by(name=instructorName).first()
+                    if not i:
+                        # Our database seeding information is terrible. Since I
+                        # don't have time to write  neural network to detect 
+                        # simmilar sounding names, This whitelist will have
+                        # to do
+                        simmilarNames = {
+                            'Allouzi, Maha A.': 'Allouzi, Maha',
+                            'Bansal, Arvind K.':'Bansal, Arvind', 
+                            'DeLozier, Gregory S.': 'DeLozier, Greg',
+                            'Dragan, Feodor F.': 'Dragan, Feodor',
+                            'Ghazinour Naini, Kambiz': 'Ghazinour, Kambiz',
+                            'Guarnera, Heather M.':'Guarnera, Heather',
+                            'Haverstock, William D.':'Haverstock, Dale', 
+                            'Hossain, Md Amjad':'Hossain, Amjad Md',
+                            'Lu, Cheng-Chang':'Lu, C.C.',
+                            'Maletic, Jonathan I.': 'Maletic, Jonathan',
+                            'Peyravi, Hassan M.': 'Peyravi, Hassan',
+                            'Samba, Augustine S.': 'Samba, Gus',
+                            'Volkert, L G.': 'Volkert, L. Gwenn',
+                            'Walker, Robert A.':'Walker, Robert',
+                        }
+                        if instructorName in simmilarNames:
+                            i = Instructor.query.filter_by(
+                                name=simmilarNames[instructorName]).first()
+                        else:
+                            #print('unknown instructor:', instructorName)
+                            # TODO
+                            # Carl, Michael and Al Thoubi, Assad Y. are present
+                            # in one table but not the other. I ignored them 
+                            # for now. Sorry Carl and Al
+                            pass
+                #print(i)
+                if i:
+                    syllabus.addInstructor(i, 'instructor')
+                    #print(i)
+
             meeting_time = 'ToDo'
             SyllabusFactory.updateIfDifferent(syllabus, meeting_time) #TODO. once time format is setup
