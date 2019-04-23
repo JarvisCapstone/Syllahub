@@ -5,18 +5,35 @@
 {% block app_content %}
 
 
-<h1>Instructor Result</h1>
+<h1>{{ instructor.name }}</h1>
 {% from "_formhelpers.html" import render_field %}
 
 <ul class="list-group">
     <li class="list-group-item">
 
-        <p>ID: {{ instructor.id}} </p>
-        <p>Name: {{ instructor.name }}</p>
         <p>Email: {{ instructor.email }}</p>
         <p>Phone Number: {{ instructor.phone }}</p>
         <p>Office Hours: {{ instructor.perfered_office_hours }}</p>
-    
+        <hr>
+        <div class="container">
+            
+            <div class="list-group">
+            {% for syllabus in instructor.syllabusList %}
+                    <a class="list-group-item list-group-item-action" 
+                       href=" {{ url_for('syllabus.read', 
+                                         CNumber=syllabus.course.number, 
+                                         CVersion=syllabus.course.version,
+                                         sec=syllabus.section, 
+                                         semester=syllabus.semester, 
+                                         version=syllabus.version, 
+                                         year=syllabus.year) }}">
+                        <h5>
+                            Syllabus for CS{{syllabus.course.number}}
+                        </h5>
+                    </a>
+            {% endfor %}
+            </div>
+        </div>
     </li>
 </ul>
 
