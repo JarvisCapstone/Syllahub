@@ -52,30 +52,4 @@
         {% endfor %}
     </div>
 
-    <hr>
-
-    <h2>Syllabi waiting approval</h2>
-    <ul class="list-group">
-        {% for syllabus in draftSyllabi %}
-        <li class="list-group-item list-group-item-action">
-            Syllabus for CS-{{ syllabus.course_number }}.
-            <a class="btn btn-primary" 
-               href="{{url_for('syllabus.read', 
-                               CNumber=syllabus.course_number, 
-                               CVersion=syllabus.course_version, 
-                               sec=syllabus.section, 
-                               semester=syllabus.semester, 
-                               version=syllabus.version, 
-                               year=syllabus.year) }}">
-                View
-            </a>
-            <form action=""  method="post" style="display:inline">
-                {{ approveForm.approveSubmit(class_="btn btn-success") }}
-            </form>
-            
-        </li>
-        {% endfor %}
-    </ul>
-
-
 {% endblock %}
