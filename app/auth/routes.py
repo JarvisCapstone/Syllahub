@@ -74,8 +74,10 @@ def my_profile():
             syllabus.state = 'approved'
             db.session.commit()
         draftSyllabi = Syllabus.query.filter_by(state='draft').all()
-        return render_template('auth/admin_profile.html', draftSyllabi=draftSyllabi,
-                                approveForm=approveForm)
+        return render_template('auth/admin_profile.html', 
+                               current_user=current_user,
+                               draftSyllabi=draftSyllabi,
+                               approveForm=approveForm)
     else:
         return render_template('auth/instructor_profile.html')
     #return redirect(url_for('auth.index'))
@@ -85,13 +87,14 @@ def my_profile():
 def assignInstruct():
     form = assignInstructorToCourse()
     if form.validate_on_submit():
-        relationship = SyllabusInstructorAssociation(syllabus_course_number = int(form.courseNumber.data), 
-                                                    syllabus_course_version = int(form.courseVersion.data), 
-                                                    syllabus_semester = form.semester.data, 
-                                                    syllabus_year = form.year.data, 
-                                                    syllabus_version = form.syllabusVersion.data, 
-                                                    instructor_id = form.instructorID.data,
-                                                    syllabus_section = form.courseSection.data)
+        relationship = SyllabusInstructorAssociation(
+                           syllabus_course_number = int(form.courseNumber.data), 
+                           syllabus_course_version = int(form.courseVersion.data), 
+                           syllabus_semester = form.semester.data, 
+                           syllabus_year = form.year.data, 
+                           syllabus_version = form.syllabusVersion.data, 
+                           instructor_id = form.instructorID.data,
+                           syllabus_section = form.courseSection.data)
         db.session.add(relationship)
         db.session.commit()
         flash("Assignment Made!")
@@ -103,9 +106,12 @@ def assignInstruct():
 def assignClo():
     form = assignCloToCourse()
     if form.validate_on_submit():
-       # relationship = course_clo_table(course_number = int(form.courseNumber.data),
-       #                                 course_version = int(form.courseVersion.data),
-       #                                 clo_id = int(form.cloID.data))
+        # relationship = course_clo_table(course_number = int(form.courseNumber.data),
+        #                                 course_version = int(form.courseVersion.data),
+        #                                 clo_id = int(form.cloID.data))
+
+        # TODO. this is completly unneeded. delete this and use the models.
+        # TODO. course.clos.append(clo)
         db.session.execute("INSERT INTO course_clo VALUES ("+ (form.courseNumber.data) +
                          ", " + (form.courseVersion.data) + ", " + (form.cloID.data) + ");")
         #db.session.add(relationship)
@@ -118,7 +124,9 @@ def assignClo():
 @bp.route('/myCourses', methods=['GET', 'POST'])
 @login_required
 def myCourses():
-    print (current_user.email)
+    #print (current_user.email)
+    # who wrote this? you can do all of this in one line of code
+    # courses = current_user.courses <--- thats it. delete the rest of this
     user = User.query.filter_by(email=current_user.email).first()
     associations = SyllabusInstructorAssociation.query.filter_by(instructor_id=user.instructor_id).all()
     courseNumsAndVersions = list()

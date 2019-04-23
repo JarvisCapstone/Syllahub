@@ -3,28 +3,79 @@
 {% block title %}My Profile{% endblock %}
 
 {% block app_content %}
-    <h1>Admin Profile</h1>
+    <h1>Profile for {{current_user.email}}</h1>
     <a class="btn btn-primary" href="{{ url_for('factory.index') }}">Factory</a>
     <a class="btn btn-primary" href="{{ url_for('instructor.create') }}">Create Instructor</a>
     <a class="btn btn-primary" href="{{ url_for('course.create') }}">Create Course</a>
     <a class="btn btn-primary" href="{{ url_for('course.index') }}">All Courses</a>
     <a class="btn btn-primary" href="{{ url_for('auth.assignInstruct') }}">Assign Instructor to Course</a>
     <a class="btn btn-primary" href="{{ url_for('auth.assignClo') }}">Assign Clo to Course</a>
-    <a class="btn btn-warning float-right" href="{{ url_for('user.update') }}">Change Password</a>
-    <h2>Draft Syllabi</h2>
-<div class="list-group">
-    {% for syllabi in draftSyllabi %}
-    <a class = "list-group">
-        <p>Syllabus for CS-{{ syllabi.course_number }} is waiting approval.
-                <a class="btn btn-primary float-right" href="{{url_for('syllabus.read', 
-                CNumber=syllabi.course_number, CVersion=syllabi.course_version, 
-                sec=syllabi.section, semester=syllabi.semester, 
-                version=syllabi.version, year=syllabi.year) }}">View</a>
-                <form action=""  method="post">
-                        {{ approveForm.approveSubmit(class_="btn btn-success float-right") }}
+    <a class="btn btn-warning" href="{{ url_for('user.update') }}">Change Password</a>
+    
+    <hr>
+    <h2>Syllabi waiting approval</h2>
+    <div class="card-columns">
+        {% for syllabus in draftSyllabi %}
+            <div class="card border-dark mb-3">
+                <div class="card-body">
+                    <h4 class="card-title">CS:{{ syllabus.course_number }}</h4>
+                    <h6 class="card-title">{{ syllabus.course.name }}</h6>
+                    <p class="card-text">Section {{ syllabus.section }}  Version {{ syllabus.version }} <br>
+                    {{ syllabus.semester }} {{ syllabus.year }}</p>
+
+                    {% for instructor in syllabus.instructorList %}
+                        {{ instructor.name }}
+                    {% endfor %}
+
+
+                    <a class="btn btn-primary w-100 mb-1" 
+                       href="{{url_for('syllabus.read', 
+                                     CNumber=syllabus.course_number, 
+                                     CVersion=syllabus.course_version, 
+                                     sec=syllabus.section, 
+                                     semester=syllabus.semester, 
+                                     version=syllabus.version, 
+                                     year=syllabus.year) }}"
+                    >
+                        View
+                    </a>
+
+                    <form action=""  method="post">
+                        {{ approveForm.approveSubmit(class_="btn btn-success w-100", style_="width:50%") }}
                     </form>
-        </p>
-    </a>
-    {% endfor %}
-</div>
+
+                </div>
+                <div class="card-footer">
+                    <small class="text-muted">Last updated at {{syllabus.updated}}</small>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <hr>
+
+    <h2>Syllabi waiting approval</h2>
+    <ul class="list-group">
+        {% for syllabus in draftSyllabi %}
+        <li class="list-group-item list-group-item-action">
+            Syllabus for CS-{{ syllabus.course_number }}.
+            <a class="btn btn-primary" 
+               href="{{url_for('syllabus.read', 
+                               CNumber=syllabus.course_number, 
+                               CVersion=syllabus.course_version, 
+                               sec=syllabus.section, 
+                               semester=syllabus.semester, 
+                               version=syllabus.version, 
+                               year=syllabus.year) }}">
+                View
+            </a>
+            <form action=""  method="post" style="display:inline">
+                {{ approveForm.approveSubmit(class_="btn btn-success") }}
+            </form>
+            
+        </li>
+        {% endfor %}
+    </ul>
+
+
 {% endblock %}
