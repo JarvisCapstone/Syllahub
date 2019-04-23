@@ -51,9 +51,50 @@ def create():
     return render_template('syllabus/create.html', form=form)
 
 
-@bp.route('/read/<int:CNumber>/<int:CVersion>/<int:sec>/<semester>/<int:version>/<int:year>', 
-          methods=['GET', 'POST'])
+@bp.route('/read/<CNumber>/<CVersion>/<sec>/<semester>/<version>/<year>', methods=['GET', 'POST'])
 def read(CNumber, CVersion, sec, semester, version, year):
+    syllabus = Syllabus.query.filter_by(course_number=CNumber, 
+                                        course_version=CVersion, 
+                                        section=sec, 
+                                        semester=semester, 
+                                        version=version, 
+                                        year=year).first_or_404()
+    showApproveButton = False
+    approveForm = ApproveForm()
+    if approveForm.validate_on_submit():
+        syllabus.state = 'approved'
+        db.session.commit()
+    canCurrentUserEdit = False
+    if current_user.permission == 'admin':
+        canCurrentUserEdit = True
+        if syllabus.state == 'draft':
+            showApproveButton = True
+    i = current_user.instructor
+    if i:
+        for iSyllabus in i.syllabusList:
+            if iSyllabus == syllabus:
+                canCurrentUserEdit = True
+    if syllabus is not None:
+        if showApproveButton:
+            return render_template('/syllabus/read.html', 
+                                   syllabus=syllabus,
+                                   canCurrentUserEdit=canCurrentUserEdit,
+                                   showApproveButton=showApproveButton, 
+                                   approveForm=approveForm)
+        else:
+            return render_template('/syllabus/read.html', 
+                                   syllabus=syllabus,
+                                   canCurrentUserEdit=canCurrentUserEdit,
+                                   showApproveButton=showApproveButton)
+    
+    else:
+        flash('Syllabus Not Found')
+        return redirect(url_for('syllabus.index'))
+
+
+@bp.route('/pdf/<int:CNumber>/<int:CVersion>/<int:sec>/<semester>/<int:version>/<int:year>', 
+          methods=['GET', 'POST'])
+def pdf(CNumber, CVersion, sec, semester, version, year):
     syllabus = Syllabus.query.filter_by(course_number=CNumber, 
                                         course_version=CVersion, 
                                         section=sec, 
