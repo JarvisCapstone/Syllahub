@@ -65,7 +65,7 @@ def read(CNumber, CVersion, sec, semester, version, year):
         syllabus.state = 'approved'
         db.session.commit()
     canCurrentUserEdit = False
-    if not current_user.is_anonymous
+    if not current_user.is_anonymous:
         if current_user.permission == 'admin':
             canCurrentUserEdit = True
             if syllabus.state == 'draft':
