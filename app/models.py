@@ -230,7 +230,6 @@ class Clo(db.Model, Timestamp):
         return '<CLO id={}>'.format(self.id)
 
 
-
 class Course(db.Model, Timestamp):
     '''Course Model
 
@@ -292,7 +291,6 @@ class Course(db.Model, Timestamp):
             self.version = largestVersion + 1
         else:
             self.version = 1
-
 
 
 class Instructor(db.Model, Timestamp):
@@ -531,9 +529,9 @@ class Syllabus(db.Model, Timestamp):
         pdf.cell(0, 5, 'Kent Campus, Section: ' + str(self.section), ln=1, align='C')
         #TODO, fix once room number and building are moved to syllabus
         #TODO, revamp meeting_time once we get delimiter solved
-        if (self.meeting_time != None):
+        if self.meeting_time and course.room and course.building:
             pdf.cell(0, 5, self.meeting_time + ', ' +
-            str(course.room) + ' ' + course.building , ln=1, align='C')
+                str(course.room) + ' ' + course.building , ln=1, align='C')
         else:
             pdf.cell(0, 10, 'This is an online course, there is no meeting times',
                     ln=1, align='C')

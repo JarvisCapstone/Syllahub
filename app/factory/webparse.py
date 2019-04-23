@@ -32,31 +32,23 @@ class Retriever():
             elif 'Office Hours' in row['name']: # Row with table title as data
                 table.drop(index, inplace=True)
 
-        #for index, row in table.iterrows():
-        #    print('--------------------------------------------------')
-        #    print(row)
 
 
-        # remove first row because this is the column headdings
+        # remove first row because this is the column headings
         return table
         #return tables[0] #table is now a dataframe object
 
     
     def getCourseDetails(self):
         #details = pd.read_html('http://catalog.kent.edu/colleges/as/cs/')
-        from lxml import html
-        import requests
-        page = requests.get('http://catalog.kent.edu/colleges/as/cs/')
-        tree = html.fromstring(page.content)
-        print(tree)
-        block = tree.xpath('//div[@class="sc_sccoursedescs"]/text()')
-        print(block)
-
-
-    def iterate(self):
-        for index, row in self.tableDataFrame.iterrows():
-            #print(row)
-            print(row.Crse)
+        #from lxml import html
+        #import requests
+        #page = requests.get('http://catalog.kent.edu/colleges/as/cs/')
+        #tree = html.fromstring(page.content)
+        #print(tree)
+        #block = tree.xpath('//div[@class="sc_sccoursedescs"]/text()')
+        #print(block)
+        pass
 
     def groupSyllabusDataFrame(self, table):
         aggregation_functions = {
@@ -115,25 +107,9 @@ class Retriever():
 
         syllabusTable = self.getSyllabusTable()
         grouped = self.groupSyllabusDataFrame(syllabusTable)
-        #r = grouped.iloc[0]
-        #print(r)
-        #print('------------------------------------------------------')
 
-
-        # Create instructor
-        #print(type(r.Instructor))
-        #for instructor in r.Instructor:
-            #print('type=', type(instructor))
-            # instructors in the list are usually strings or floats = to 'nan'. 
-            # If the input is a string, it is probably a correct instructor. 
-            #if type(instructor) is str:
-                #print('instructor=', instructor)
-                #print
         
         for index, row in grouped.iterrows():
-            #    print(index)
-            #    #row is a series type
-            #x = row.to_dict()
             #See if Course already exists in db. 
             # Primary key is course.number
             # data from web is a string of the format "CS #####" where # are the numbers we want
@@ -145,26 +121,11 @@ class Retriever():
 
             CourseFactory.updateIfDifferent(course, name=row.Title)
             # Create Syllabus if it doesn't already exits
-            # syllabus primary key 
-            #     course_number = Column(Integer, primary_key=True)
-            #     course_version = Column(Integer, primary_key=True)
-            
-            #     section = Column(Integer, primary_key=True) # TODO change to string(3)
-            #     semester = Column(Enum('spring', 'summer', 'fall'), primary_key=True)
-            #     version = Column(Integer, primary_key=True)
-            #     year = Column(Integer, primary_key=True)
             section = row.Sec
             yearAndSemester = row.Semester # has both info Ex: "2019 Spring"
             yearString = yearAndSemester[:4] # get left 4 chars
             year = int(yearString)
             semester = yearAndSemester[5:] # get chars after char 5
-            #print('name=', newCourse.name)
-            # TODO, figure out how we will do time and loc information
-            #locationList = r.Loc
-            #BuildingStr = ""
-            #timeStr = 
-            #for location in locationList
-            #    locationStr += location
             sF = SyllabusFactory()
             syllabus = sF.createOrGet(course_number=course.number,
                                       course_version=course.version,
@@ -172,12 +133,9 @@ class Retriever():
                                       semester=semester,
                                       year=year,
                                       version='any')
-            #print(row.Instructor)
-            #print('syllabus---------------------------------------------------------------------')
             for instructorName in row.Instructor:
                 i = None
                 if isinstance(instructorName, str):
-                    #print(instructorName)
                     i = Instructor.query.filter_by(name=instructorName).first()
                     if not i:
                         # Our database seeding information is terrible. Since I
@@ -204,16 +162,13 @@ class Retriever():
                             i = Instructor.query.filter_by(
                                 name=simmilarNames[instructorName]).first()
                         else:
-                            #print('unknown instructor:', instructorName)
                             # TODO
                             # Carl, Michael and Al Thoubi, Assad Y. are present
                             # in one table but not the other. I ignored them 
                             # for now. Sorry Carl and Al
                             pass
-                #print(i)
                 if i:
                     syllabus.addInstructor(i, 'instructor')
-                    #print(i)
 
             meeting_time = 'ToDo'
             SyllabusFactory.updateIfDifferent(syllabus, meeting_time) #TODO. once time format is setup
