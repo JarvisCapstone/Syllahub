@@ -13,6 +13,7 @@ def user(email):
 
 
 @bp.route('/index', methods=['GET', 'POST'])
+@login_required
 def index():
     users = User.query.all()
     return render_template('user/index.html', users=users)
