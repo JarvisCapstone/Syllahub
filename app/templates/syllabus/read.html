@@ -3,23 +3,23 @@
 {% block title %}Index{% endblock %}
 
 {% block app_content %}
-{% if canCurrentUserEdit %}
 
 
-    <div class="float-right">
+<div class="float-right">
 
-        <a class="float-right" 
-           href="{{ url_for('syllabus.pdf', 
-                            CNumber = syllabus.course.number, 
-                            CVersion = syllabus.course.version,
-                            sec = syllabus.section, 
-                            semester = syllabus.semester, 
-                            version = syllabus.version, 
-                            year = syllabus.year) }}" 
-           role="button">
-            {% include 'syllabus/_pdfSvg.html' %}
-        </a><br>
+    <a class="float-right" 
+       href="{{ url_for('syllabus.pdf', 
+                        CNumber = syllabus.course.number, 
+                        CVersion = syllabus.course.version,
+                        sec = syllabus.section, 
+                        semester = syllabus.semester, 
+                        version = syllabus.version, 
+                        year = syllabus.year) }}" 
+       role="button">
+        {% include 'syllabus/_pdfSvg.html' %}
+    </a><br>
 
+    {% if canCurrentUserEdit %}
         <a class="btn btn-warning float-right my-3" 
            href="{{ url_for('syllabus.update', 
                             CNumber = syllabus.course.number, 
@@ -39,9 +39,9 @@
             </form>        
         {% endif %}
 
-    </div>
+    {% endif %}
+</div>
 
-{% endif %}
 
 <h1>
     Syllabus for CS{{ syllabus.course_number }}-v{{ syllabus.course_version }} 
