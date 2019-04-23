@@ -321,6 +321,44 @@ class Instructor(db.Model, Timestamp):
         syllabus.addInstructor(self,job)
         SyllabusInstructorAssociation.create(syllabus, self, job)
 
+
+    def updateIfDifferent(self, data):
+        '''change any data in instructor if it differs from data
+        Does not update any relationships
+
+        Args:
+            data 
+                a dictionary object that should contain values in the id 
+                or email keys. This is because id and email are the only fields
+                that can uniquely identify an instructor
+        '''
+
+        changed = False
+
+        if 'email' in data:
+            if not self.email == data['email']:
+                self.email = data['email']
+                changed =  True 
+        
+        if 'name' in data:
+            if not self.name == data['name']:
+                self.name = data['name']
+                changed =  True 
+        
+        if 'perfered_office_hours' in data:
+            if not self.perfered_office_hours == data['perfered_office_hours']:
+                self.perfered_office_hours = data['perfered_office_hours']
+                changed =  True 
+        
+        if 'phone' in data:
+            if not self.phone == data['phone']:
+                self.phone = data['phone']
+        
+        if changed:
+            db.session.commit()
+
+
+
     def __repr__(self):
         '''returns a printable representation of the object. 
 

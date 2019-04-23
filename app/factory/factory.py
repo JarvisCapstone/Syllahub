@@ -128,7 +128,7 @@ class InstructorFactory(Factory):
         data={}
         p = self.fake.simple_profile()
         data['name'] = p['name']
-        data['phone'] = random.randint(1000000000,9999999999)   
+        data['phone'] = random.randint(1000000000, 9999999999)   
         data['email'] = p['mail']
         data['perfered_office_hours'] = 'whenever'
 
@@ -150,6 +150,28 @@ class InstructorFactory(Factory):
         db.session.commit()
         if showFlashMessage:
             flash("Deleted {} Instructors".format(num))
+
+    def createOrGet(self, data):
+        '''Given data, get an instructor if he exists, otherwise, create him
+        Args:
+            data is a dictionary object that should contain values in the id 
+                or email keys. This is because id and email are the only fields
+                that can uniquely identify an instructor
+        '''
+        instructor = None
+        if 'id' in data:
+            instructor = Instructor.query.filter_by(id=data['id']).first()
+            if instructor:
+                return instructor
+        elif 'email' in data:
+            instructor = Instructor.query.filter_by(email=data['email']).first()
+            if instructor:
+                return instructor
+        
+        if not instructor:
+            # instructor does not already exist, create him/her
+            instructor = self.create(data)
+            return instructor
 
 
 class CourseFactory(Factory):

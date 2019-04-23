@@ -10,7 +10,6 @@ from app.instructor.forms import createInstructorForm, deleteInstructorForm, upd
 @login_required
 def index():
     instructors = Instructor.query.all()
-    print(instructors)
 
     return render_template('instructor/index.html', instructors=instructors)
 
