@@ -123,6 +123,7 @@ def pdf(CNumber, CVersion, sec, semester, version, year):
 @login_required
 def update(CNumber, CVersion, sec, semester, version, year):
     form = updateSyllabusForm()
+    print("before 404 1")
     oldSyllabus = Syllabus.query.filter_by(course_number=CNumber, 
                                         course_version=CVersion, 
                                         section=sec, semester=semester, 
@@ -145,8 +146,10 @@ def update(CNumber, CVersion, sec, semester, version, year):
         db.session.add(syllabus)
         db.session.commit()
 
+        print("before 404 2")
         instuctor = Instructor.query.filter_by(email=current_user.email).first_or_404()
 
+        print("1)")
         data = {'syllabus_course_number': form.course_number.data,
                 'syllabus_course_version': form.course_version.data,
                 'syllabus_semester':form.semester.data,
@@ -154,7 +157,7 @@ def update(CNumber, CVersion, sec, semester, version, year):
                 'syllabus_version':syllabus.version,
                 'syllabus_section':form.section.data,
                 'instructor_id':instuctor.id}
-
+        print("2")
         SyllabusInstructorAssociation.query.filter_by(syllabus_course_number = oldSyllabus.course_number, 
                                                     syllabus_course_version = oldSyllabus.course_version, 
                                                     syllabus_semester = oldSyllabus.semester, 
@@ -162,9 +165,15 @@ def update(CNumber, CVersion, sec, semester, version, year):
                                                     syllabus_version = oldSyllabus.version, 
                                                     instructor_id = instuctor.id,
                                                     syllabus_section = oldSyllabus.section).update(data)
+        print("3")
         db.session.commit()
         
         flash("Course Updated")
+        print("4")
+
+        return redirect(url_for('/syllabus/index'))
+        #return redirect(url_for('syllabus.read',
+        #    CNumber = CNumber, CVersion = CVersion, sec = sec, semester = semester, version = syllabus.version, year = year))
 
     elif request.method == 'GET':
         form.course_number.data = oldSyllabus.course_number
@@ -181,7 +190,9 @@ def update(CNumber, CVersion, sec, semester, version, year):
         form.gradingPolicy.data = oldSyllabus.grading_policy
         form.requiredMaterials.data = oldSyllabus.required_materials
         form.optionalMaterials.data = oldSyllabus.optional_materials
-    return render_template('/syllabus/update.html', form=form)
+        
+        return render_template('/syllabus/update.html', form=form)
+    return 'gfhdjdjh'
 
 @bp.route('/delete/<int:CNumber>/<int:CVersion>/<int:sec>/<semester>/<int:version>/<int:year>', 
           methods=['GET', 'POST'])
