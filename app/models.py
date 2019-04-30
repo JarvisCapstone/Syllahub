@@ -288,9 +288,12 @@ class Course(db.Model, Timestamp):
         result = conn.execute(s)
         largestVersion = result.first().max_1
         if largestVersion:
+            print('largest')
             self.version = largestVersion + 1
         else:
+            print('else')
             self.version = 1
+        print('self.version', self.version)
 
 
 class Instructor(db.Model, Timestamp):

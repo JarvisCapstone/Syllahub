@@ -147,33 +147,41 @@ def update(CNumber, CVersion, sec, semester, version, year):
         db.session.commit()
 
         print("before 404 2")
-        instuctor = Instructor.query.filter_by(email=current_user.email).first_or_404()
+        #instuctor = Instructor.query.filter_by(email=current_user.email).first_or_404()
 
         print("1)")
-        data = {'syllabus_course_number': form.course_number.data,
-                'syllabus_course_version': form.course_version.data,
-                'syllabus_semester':form.semester.data,
-                'syllabus_year':form.year.data,
-                'syllabus_version':syllabus.version,
-                'syllabus_section':form.section.data,
-                'instructor_id':instuctor.id}
+        #data = {
+        #    'syllabus_course_number': form.course_number.data,
+        #    'syllabus_course_version': form.course_version.data,
+        #    'syllabus_semester':form.semester.data,
+        #    'syllabus_year':form.year.data,
+        #    'syllabus_version':syllabus.version,
+        #    'syllabus_section':form.section.data,
+        #    'instructor_id':instuctor.id
+        #}
         print("2")
-        SyllabusInstructorAssociation.query.filter_by(syllabus_course_number = oldSyllabus.course_number, 
-                                                    syllabus_course_version = oldSyllabus.course_version, 
-                                                    syllabus_semester = oldSyllabus.semester, 
-                                                    syllabus_year = oldSyllabus.year, 
-                                                    syllabus_version = oldSyllabus.version, 
-                                                    instructor_id = instuctor.id,
-                                                    syllabus_section = oldSyllabus.section).update(data)
+        #SyllabusInstructorAssociation.query.filter_by(syllabus_course_number = oldSyllabus.course_number, 
+        #                                            syllabus_course_version = oldSyllabus.course_version, 
+        #                                            syllabus_semester = oldSyllabus.semester, 
+        #                                            syllabus_year = oldSyllabus.year, 
+        #                                            syllabus_version = oldSyllabus.version, 
+        #                                            instructor_id = instuctor.id,
+        #                                            syllabus_section = oldSyllabus.section).update(data)
         print("3")
-        db.session.commit()
+        #db.session.commit()
         
         flash("Course Updated")
-        print("4")
+        print("version", syllabus.version)
 
-        return redirect(url_for('/syllabus/index'))
-        #return redirect(url_for('syllabus.read',
-        #    CNumber = CNumber, CVersion = CVersion, sec = sec, semester = semester, version = syllabus.version, year = year))
+
+        #return redirect(url_for('/syllabus/index'))
+        return redirect(url_for('syllabus.read',
+            CNumber = syllabus.course_number, 
+            CVersion = syllabus.course_version, 
+            sec = syllabus.section, 
+            semester = syllabus.semester, 
+            version = syllabus.version, 
+            year = syllabus.year))
 
     elif request.method == 'GET':
         form.course_number.data = oldSyllabus.course_number
