@@ -398,8 +398,9 @@ class SyllabusFactory(Factory):
         if 'Students_with_disabilities' in data:
             temp.Students_with_disabilities = data['Students_with_disabilities']
         else:
-            # must set before database commit so pdf can be generated
             temp.Students_with_disabilities = Syllabus.currentSASText 
+        
+        # must set before database commit so pdf can be generated
         temp.setPDF()
         return temp
 
@@ -491,8 +492,8 @@ def createRandCloCourseAssociation():
 
 def createRandInstructorSyllabusAssociation():
     temp_syllabus = Syllabus.query.order_by(func.rand()).first()
-    #temp_instructor = Instructor.query.order_by(func.rand()).first()
-    temp_instructor = Instructor.query.filter_by(id=36).first()
+    temp_instructor = Instructor.query.order_by(func.rand()).first()
+    #temp_instructor = Instructor.query.filter_by(id=36).first()
     SyllabusInstructorAssociation.create(temp_syllabus, temp_instructor, 'grader')
 
 

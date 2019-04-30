@@ -32,11 +32,8 @@ class Retriever():
             elif 'Office Hours' in row['name']: # Row with table title as data
                 table.drop(index, inplace=True)
 
-
-
         # remove first row because this is the column headings
         return table
-        #return tables[0] #table is now a dataframe object
 
     
     def getCourseDetails(self):
@@ -126,13 +123,16 @@ class Retriever():
             yearString = yearAndSemester[:4] # get left 4 chars
             year = int(yearString)
             semester = yearAndSemester[5:] # get chars after char 5
+            
             sF = SyllabusFactory()
-            syllabus = sF.createOrGet(course_number=course.number,
-                                      course_version=course.version,
-                                      section=section,
-                                      semester=semester,
-                                      year=year,
-                                      version='any')
+            syllabus = sF.createOrGet(
+                              course_number=course.number,
+                              course_version=course.version,
+                              section=section,
+                              semester=semester,
+                              year=year,
+                              version='any')
+
             for instructorName in row.Instructor:
                 i = None
                 if isinstance(instructorName, str):
