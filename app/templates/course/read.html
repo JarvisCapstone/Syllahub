@@ -5,45 +5,57 @@
 <div class="float-right">
     {% if canCurrentUserEdit %}
         <a class="btn btn-warning float-right" 
-           href="{{ url_for('course.update', number=course.number, version=course.version) }}" 
+           href="{{ url_for('course.update', 
+                            number=course.number, 
+                            version=course.version) }}" 
            role="button">Update</a>
     {% endif %}
 
     {% if syllabusApproved %}
         <a class="btn btn-success float-right" 
-           href="{{ url_for('syllabus.read', CNumber=course.number, 
-                    CVersion=course.version, version=syllabus.version,
-                    semester=syllabus.semester, year=syllabus.year, 
-                    sec=syllabus.section) }}" 
+           href="{{ url_for('syllabus.read', 
+                            CNumber=course.number, 
+                            CVersion=course.version, 
+                            version=syllabus.version,
+                            semester=syllabus.semester, 
+                            year=syllabus.year, 
+                            sec=syllabus.section) }}" 
            role="button">View Current Syllabus</a>
     {% endif %}
 </div>
 
 <h1>{{ course.name }}</h1>
-<ul class="list-group">
-    <li class="list-group-item">
-        <h3> {{ course.name }} </h3>
-        <p>{{ course.number }} version {{ version }} of </p>
-        <p>Description: {{ course.description }}</p>
-        <p>Prerequisites: {{ course.prerequisites }}</p>
-        <p>Building: {{ course.building }}</p>
-        <p>Room: {{ course.room }}</p>
-        {% if course.is_core %}
-            <p>Satisfies Kent Core</p>
-        {% endif %}
-        {% if course.is_diversity %}
-            <p>Satisfies Diversity</p>
-        {% endif %}
-        {% if course.is_elr %}
-            <p>Satisfies Experimental Learning</p>
-        {% endif %}
-        {% if course.is_wi %}
-            <p>Satisfies Writing Intensive</p>
-        {% endif %}
-    </li>
+<h3>CS{{ course.number }}</h3>
 
-    {% for clo in course.clos %}
-        <a href="{{ url_for('clo.read', id=clo.id) }}">CLO:{{ clo.id }}</a>
-    {% endfor %}
+{% if course.description %}
+    <p>{{ course.description }}</p>
+{% endif %}
 
+<p>Prerequisites: {{ course.prerequisites }}</p>
+
+{% if course.is_core %}
+    <p>Satisfies Kent Core</p>
+{% endif %}
+
+{% if course.is_diversity %}
+    <p>Satisfies Diversity</p>
+{% endif %}
+
+{% if course.is_elr %}
+    <p>Satisfies Experimental Learning</p>
+{% endif %}
+
+{% if course.is_wi %}
+    <p>Satisfies Writing Intensive</p>
+{% endif %}
+
+
+{% for clo in course.clos %}
+    <a href="{{ url_for('clo.read', id=clo.id) }}">CLO:{{ clo.id }}</a>
+{% endfor %}
+
+<hr>
+<h6>Version {{ version }}</h6>
+<small>Most recent Update: {{course.created}}</small><br>
+<small>Created at: {{course.created}}</small>
 {% endblock %}
