@@ -6,12 +6,23 @@ apachectl status
 #Apache error log location
 /var/log/httpd/error_log
 
-#Display last 5 lines of Apache Error Log
-tail -n 5 /var/log/httpd/error_log
+#Display last 50 lines of Apache Error Log
+tail -n 50 /var/log/httpd/error_log
 
 
 # activate virtual environment
 workon syllahub
 
+
+#allow mysql remote access 
+# cd /etc/my.cnf.d/
+
+#edited this file to allow access form anywhere
+# mariadb-server.cnf
+#     bind-address=*
+
+
+
 # enter mysql
 mqsyl -u root -p
+
