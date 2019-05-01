@@ -435,22 +435,22 @@ class Syllabus(db.Model, Timestamp):
     
 
     # Non Key Columns
-    attendance_policy = Column(String(500), nullable=True, default=currentAttendancePolicy)
+    attendance_policy = Column(String(1000), nullable=True, default=currentAttendancePolicy)
     calender = Column(LargeBinary, nullable=True)
     # crn = Column(Integer, index)
     # TODO instroduction_statement(String(500), nullable=True)
     cheating_policy = Column(String(500), nullable=True) # TODO change name to optional cheating policy, maybe remove
-    extra_policies = Column(String(500), nullable=True) # TODO change to 1000
+    extra_policies = Column(String(1000), nullable=True)
     grading_policy = Column(String(500), nullable=True)
     meeting_dates = Column(String(100), nullable=True)
     meeting_time = Column(String(100), nullable=True)
     optional_materials = Column(String(256), nullable=True)
-    pdf = Column(LargeBinary, nullable=True) # TODO set to longblob?
+    pdf = Column(LargeBinary, nullable=True)
     required_materials = Column(String(256), nullable=True)
-    # TODO registration_statement(String(600), default=currentRegistrationStatement)
+    # TODO registration_statement(String(1000), default=currentRegistrationStatement)
     schedule = Column(LargeBinary, nullable=True)
     state = Column(Enum('approved', 'draft'), default='draft')
-    Students_with_disabilities = Column(String(500), default=currentSASText) #TODO change to sastext
+    Students_with_disabilities = Column(String(1000), default=currentSASText) #TODO change to sastext
     University_cheating_policy = Column(String(500), 
                                         default=currentCheatingPolicy) # TODO set default to  default=currentCheatingPollicy
     withdrawl_date = Column(String(100), nullable=True)
