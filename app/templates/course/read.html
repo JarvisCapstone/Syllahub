@@ -31,6 +31,32 @@
     <p>{{ course.description }}</p>
 {% endif %}
 
+<h3>
+    All Syllabi
+</h3>
+{% if course.syllabi|length == 0 %}
+    <h6>This course has no associated Syllabi</h6>
+{% else %}
+    <ul>
+        {% for syllabus in course.syllabi %}
+            <li>
+                <a href="{{ url_for('syllabus.read', 
+                            CNumber=course.number, 
+                            CVersion=course.version, 
+                            version=syllabus.version,
+                            semester=syllabus.semester, 
+                            year=syllabus.year, 
+                            sec=syllabus.section) }}">
+                    Section:{{ syllabus.section }}, 
+                    Version {{ syllabus.version }}, 
+                    {{ syllabus.semester }} 
+                    {{ syllabus.year }} 
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
 <p>Prerequisites: {{ course.prerequisites }}</p>
 
 {% if course.is_core %}
