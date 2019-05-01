@@ -16,7 +16,7 @@ login.login_message = 'Please log in to access this page.'
 #Application Factory function
 def create_app(config_class=Config):
     app = Flask(__name__)
-
+    
     """Default config is the variables in the Config class in config.py.
     Use a different argument for testing"""
     app.config.from_object(config_class)
