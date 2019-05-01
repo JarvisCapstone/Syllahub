@@ -1,4 +1,13 @@
-/*h1 {
-color: blue;
-text-align: center;
-}*/
+
+h1{
+  color:gold;
+  text-shadow: -2.5px -2.5px 0 navy, 2.5px -2.5px 0 navy, -2.5px 2.5px 0 navy, 2.5px 2.5px 0 navy;
+  text-align: center;
+}
+
+.navbar {
+  background-image:-webkit-linear-gradient(top, navy, navy); 
+  background-repeat:no-repeat;
+  background-position:top;
+  background-size:auto 1000px;
+}

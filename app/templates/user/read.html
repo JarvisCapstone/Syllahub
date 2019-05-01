@@ -3,5 +3,15 @@
 {% block title %}Index{% endblock %}
 
 {% block app_content %}
-    <h1>Stub user read</h1>
+
+
+<h1>User Result</h1>
+{% from "_formhelpers.html" import render_field %}
+
+<ul class="list-group">
+    <li class="list-group-item">
+        <p>Email: {{ user.email }}</p>
+    </li>
+</ul>
+
 {% endblock %}

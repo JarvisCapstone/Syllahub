@@ -1,7 +1,6 @@
 from app import create_app, db
 from app.models import *
 from app.factory import factory
-from app.syllabusGenerator import syllabusGenerator
 
 app = create_app()
 
@@ -20,5 +19,4 @@ def make_shell_context():
         'User': User, 
 
         'factory': factory, 
-        'syllabusGenerator': syllabusGenerator,
     }

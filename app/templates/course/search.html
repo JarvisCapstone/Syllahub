@@ -4,9 +4,18 @@
 
 {% block app_content %}
 <h1>Results:</h1>
-<ul class="list-group">
+<!--
+<div>
+<select class="form-control mr-sm-2" name="sortBy" onchange="sortSearch(courses)">
+    <option value="new">New</option>
+    <option value="old">Old</option>
+</select>
+</div>
+-->
+<div class="list-group">
     {% for course in courses %}
-        <li class="list-group-item">
+    <a href="{{ url_for('course.read', number=course.number, version=course.version) }}" 
+    class="list-group-item list-group-item-action">
             <h3> {{ course.name }} </h3>
             <p>Number: {{ course.number }}</p>
             <p>Version: {{ course.version }}</p>
@@ -25,7 +34,7 @@
             {% if course.is_wi %}
                 <p>Satisfies Writing Intensive</p>
             {% endif %}
-        </li>
+        </a>
     {% endfor %}
-</ul>
+</div>
 {% endblock %}

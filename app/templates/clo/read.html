@@ -11,6 +11,10 @@
             <p> {{ clo.general }}</p>
         <h3> Specific Description: </h3>
             <p> {{ clo.specific }} </p>
+        <h3>Courses</h3>
+        {% for course in clo.courses %}
+            <a href="{{ url_for('course.read', version=course.version, number=course.number) }}">{{ course.name }}</a>
+        {% endfor %}
     </li>
     
 {% endblock %}

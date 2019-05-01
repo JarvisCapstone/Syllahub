@@ -1,3 +1,4 @@
+from fpdf import FPDF
 from app import db, login
 from enum import Enum
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -6,6 +7,7 @@ from sqlalchemy_utils import Timestamp
 from sqlalchemy import and_, Boolean, Column, Enum, ForeignKey, ForeignKeyConstraint, Integer, LargeBinary, MetaData, String, text
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.sql import select, func
 
 
 @login.user_loader
@@ -134,11 +136,27 @@ class SyllabusInstructorAssociation(db.Model):
             instructor: Instructor - 
             job: String - 
         '''
-        new_job = SyllabusInstructorAssociation(job_on_syllabus=job)
-        new_job.instructor = instructor;
-        new_job.syllabus = syllabus;
-        db.session.add(new_job)
-        db.session.commit()
+        # test if already exists
+        
+        sia = SyllabusInstructorAssociation.query.filter_by(
+                  syllabus_course_number = syllabus.course_number,
+                  syllabus_course_version = syllabus.course_version,
+                  syllabus_section = syllabus.section,
+                  syllabus_semester = syllabus.semester,
+                  syllabus_version = syllabus.version,
+                  syllabus_year = syllabus.year,
+                  instructor_id = instructor.id).first()
+        #print('sia=', sia)
+        if not sia:
+            new_job = SyllabusInstructorAssociation(job_on_syllabus=job)
+            new_job.instructor = instructor;
+            new_job.syllabus = syllabus;
+            db.session.add(new_job)
+            db.session.commit()
+
+            #update syllabus pdf
+            syllabus.setPDF()
+            db.session.commit()
 
     def __repr__(self):
         '''returns a printable representation of the object. 
@@ -212,7 +230,6 @@ class Clo(db.Model, Timestamp):
         return '<CLO id={}>'.format(self.id)
 
 
-
 class Course(db.Model, Timestamp):
     '''Course Model
 
@@ -260,6 +277,23 @@ class Course(db.Model, Timestamp):
         '''
         return '<Course number={} version={}>'.format(self.number, self.version)
 
+    def setVersion(self):
+        '''Sets the version number to one more than the previous
+        '''
+        conn = db.session.connection()
+        meta = db.metadata
+        course = meta.tables['course']
+        s = select([db.func.max(course.c.version)]) \
+                .where(and_(course.c.number == self.number))
+        result = conn.execute(s)
+        largestVersion = result.first().max_1
+        if largestVersion:
+            print('largest')
+            self.version = largestVersion + 1
+        else:
+            print('else')
+            self.version = 1
+        print('self.version', self.version)
 
 
 class Instructor(db.Model, Timestamp):
@@ -304,13 +338,50 @@ class Instructor(db.Model, Timestamp):
         syllabus.addInstructor(self,job)
         SyllabusInstructorAssociation.create(syllabus, self, job)
 
+
+    def updateIfDifferent(self, data):
+        '''change any data in instructor if it differs from data
+        Does not update any relationships
+
+        Args:
+            data 
+                a dictionary object that should contain values in the id 
+                or email keys. This is because id and email are the only fields
+                that can uniquely identify an instructor
+        '''
+
+        changed = False
+
+        if 'email' in data:
+            if not self.email == data['email']:
+                self.email = data['email']
+                changed =  True 
+        
+        if 'name' in data:
+            if not self.name == data['name']:
+                self.name = data['name']
+                changed =  True 
+        
+        if 'perfered_office_hours' in data:
+            if not self.perfered_office_hours == data['perfered_office_hours']:
+                self.perfered_office_hours = data['perfered_office_hours']
+                changed =  True 
+        
+        if 'phone' in data:
+            if not self.phone == data['phone']:
+                self.phone = data['phone']
+        
+        if changed:
+            db.session.commit()
+
+
+
     def __repr__(self):
         '''returns a printable representation of the object. 
 
         Determines the result of when class is called in Print()
         '''
         return '<Instructor id={} name={}>'.format(self.id, self.name)
-
 
 
 class Syllabus(db.Model, Timestamp):
@@ -324,12 +395,14 @@ class Syllabus(db.Model, Timestamp):
     # Primary Keys
     # CRN course_registration_number used as a primary key in school db
     # does not appear on syllabus
+
     course_number = Column(Integer, primary_key=True)
     course_version = Column(Integer, primary_key=True)
     
     section = Column(Integer, primary_key=True) # TODO change to string(3)
     semester = Column(Enum('spring', 'summer', 'fall'), primary_key=True)
-    version = Column(Integer, primary_key=True) # TODO set to autoincrement
+    version = Column(Integer, primary_key=True)
+
     year = Column(Integer, primary_key=True)
     
     # Foreign Keys
@@ -358,11 +431,11 @@ class Syllabus(db.Model, Timestamp):
     currentCheatingPolicy = "University policy 3-01.8 deals with the problem of academic dishonesty, cheating, and plagiarism.  None of these will be tolerated in this class.  The sanctions provided in this policy will be used to deal with any violations.  If you have any questions, please read the policy at http://www.kent.edu/policyreg/administrative-policy-regarding-student-cheating-and-plagiarism and/or ask."
     currentAttendancePolicy = "Regular attendance in class is expected of all students at all levels at the university. While classes are conducted on the premise that regular attendance is expected, the university recognizes certain activities, events, and circumstances as legitimate reasons for absence from class. This policy provides for accommodations in accordance with federal and state laws prohibiting discrimination, including, but not limited to, Section 504 of the Rehabilitation Act of 1973, 29 U.S.C.§794, and its implementing regulation, 34 C.F.R. Part 104; Title II of the Americans with Disabilities Act of 1990, 42 U.S.C. §12131 et seq., and its implementing regulations, 28 C.F.R. Part 35; as well as university policy 5-16. More information can be found at https://www.kent.edu/policyreg/administrative-policy-regarding-class-attendance-and-class-absence"
     currentSASText = "University policy 3-01.3 requires that students with disabilities be provided reasonable accommodations to ensure their equal access to course content.  If you have a documented disability and require accommodations, please contact the instructor at the beginning of the semester to make arrangements for necessary classroom adjustments.  Please note, you must   first verify your eligibility for these through Student Accessibility Services (contact 330-672-3391 or visit www.kent.edu/sas for more information on registration procedures)."
-    # TODO. currentRegistrationStatement = "The official registration deadline for this course can be found at https://www.kent.edu/registrar/calendars-deadlines. University policy requires all students to be officially registered in each class they are attending. Students who are not officially registered for a course by published deadlines should not be attending classes and will not receive credit or a grade for the course. Each student must confirm enrollment by checking his/her class schedule (using Student Tools in FlashLine) prior to the deadline indicated. Registration errors must be corrected prior to the deadline."
+    currentRegistrationStatement = "The official registration deadline for this course can be found at https://www.kent.edu/registrar/calendars-deadlines. University policy requires all students to be officially registered in each class they are attending. Students who are not officially registered for a course by published deadlines should not be attending classes and will not receive credit or a grade for the course. Each student must confirm enrollment by checking his/her class schedule (using Student Tools in FlashLine) prior to the deadline indicated. Registration errors must be corrected prior to the deadline."
+    
+
     # Non Key Columns
-
-
-    attendance_policy = Column(String(500), nullable=True)
+    attendance_policy = Column(String(500), nullable=True, default=currentAttendancePolicy)
     calender = Column(LargeBinary, nullable=True)
     # crn = Column(Integer, index)
     # TODO instroduction_statement(String(500), nullable=True)
@@ -377,15 +450,15 @@ class Syllabus(db.Model, Timestamp):
     # TODO registration_statement(String(600), default=currentRegistrationStatement)
     schedule = Column(LargeBinary, nullable=True)
     state = Column(Enum('approved', 'draft'), default='draft')
-    Students_with_disabilities = Column(String(500)) #TODO change to sastext
-    University_cheating_policy = Column(String(500)) # TODO set default to  default=currentCheatingPollicy
+    Students_with_disabilities = Column(String(500), default=currentSASText) #TODO change to sastext
+    University_cheating_policy = Column(String(500), 
+                                        default=currentCheatingPolicy) # TODO set default to  default=currentCheatingPollicy
     withdrawl_date = Column(String(100), nullable=True)
 
 
     # TODO add building = Column(String(70)) 
     # TODO add room = Column(String(50))
-
-
+    
 
     def addInstructor(self, instructor, job):
         '''Add an association between syllabus and instructor
@@ -396,6 +469,34 @@ class Syllabus(db.Model, Timestamp):
             job: String - 
         '''
         SyllabusInstructorAssociation.create(self, instructor, job)
+
+    def setVersion(self):
+        '''Sets the version number to one more than the previous
+        
+        select max(version)
+        from syllabus
+        where 'course_number = %'
+              'course_version = %'
+              'section = %'
+              'semester = %'
+              'year = %'
+ 
+        '''
+        conn = db.session.connection()
+        meta = db.metadata
+        syllabus = meta.tables['syllabus']
+        s = select([db.func.max(syllabus.c.version)]) \
+                .where(and_(syllabus.c.year == self.year,
+                            syllabus.c.section == self.section, 
+                            syllabus.c.course_version == self.course_version, 
+                            syllabus.c.semester == self.semester,
+                            syllabus.c.course_number == self.course_number))
+        result = conn.execute(s)
+        largestVersion = result.first().max_1
+        if largestVersion:
+            self.version = largestVersion + 1
+        else:
+            self.version = 1
 
     def setPDF(self):
         '''Generates a PDF document and sets self.pdf to it
@@ -409,16 +510,177 @@ class Syllabus(db.Model, Timestamp):
         Returns: 
             a success of failure message
         '''
+        pdf=FPDF()
+
+        course=Course.query.filter_by(number=self.course_number,
+                                    version=self.course_version).first()
+
+        pdf.add_page()
+        pdf.set_font('Arial', 'B', 16)
+        pdf.cell(0, 5, 'CS' + str(self.course_number) + ' ' + course.name, ln=1, align='C')
+        pdf.cell(0, 5, 'Course Syllabus', ln=1, align='C')
+        pdf.ln(5)
+        
+        pdf.set_font_size(14)
+        for instructor in self.instructorList:
+            pdf.cell(0, 10, instructor.name, ln=1, align='C')
+        pdf.ln(5)
+        pdf.set_font('')
+        pdf.cell(0, 5, self.semester + ' ' + str(self.year) + ' Semester', ln=1, align='C')
+        #TODO, make section number a string in database, add check
+        # for section to determine campus
+        pdf.cell(0, 5, 'Kent Campus, Section: ' + str(self.section), ln=1, align='C')
+        #TODO, fix once room number and building are moved to syllabus
+        #TODO, revamp meeting_time once we get delimiter solved
+        if self.meeting_time and course.room and course.building:
+            pdf.cell(0, 5, self.meeting_time + ', ' +
+                str(course.room) + ' ' + course.building , ln=1, align='C')
+        else:
+            pdf.cell(0, 10, 'This is an online course, there is no meeting times',
+                    ln=1, align='C')
+        pdf.ln(10)
+
+        #TODO, optional, once in db
+        #if introduction != null:
+            #pdf.set_font_size(14)
+            #pdf.cell(0,5, 'Instructor Introduction', ln=1)
+            #pdf.set_font_size(12)
+            #pdf.multi_cell(0,5, 'Walker is a very nice man who is teaching this course')
+            #pdf.ln(5)
+
+        pdf.set_font_size(14)
+        pdf.cell(0,5, 'Contact Information', ln=1)
+        pdf.set_font_size(12)
+        for instructor in self.instructorList:
+            pdf.cell(0,5, 'Email: ' + instructor.email, ln=1)
+            pdf.cell(0,5, 'Phone: ' + str(instructor.phone), ln=1)
+            #TODO, include office room in database, nevermind  have it included in office hours
+            #pdf.cell(0,5, 'Office: #####', ln=1)
+            if instructor.perfered_office_hours:
+                pdf.cell(0,5, 'Office Hours: ' + instructor.perfered_office_hours, ln=1)
+                pdf.ln(5)
+
+        pdf.set_font_size(14)
+        pdf.cell(0,5, 'Course Description from the University Catalog', ln=1)
+        pdf.set_font_size(12)
+        if course.description:
+            pdf.multi_cell(0,5, 'CS'+str(self.course_number) + ' ' + course.name + ': ' +
+                           course.description)
+        else:
+            pdf.multi_cell(0,5, 'CS'+str(self.course_number) + ' ' + course.name + ': ')
+        if (course.prerequisites != None):
+            pdf.cell(0,5, 'Prerequisite: ' + course.prerequisites, ln=1)
+            pdf.cell(0, 5, 'Students without the proper prerequisite(s) risk being deregistered from the class', ln=1)
+        pdf.ln(5)
+
+        pdf.set_font_size(14)
+        pdf.cell(0,5, 'Course Learning Outcomes', ln=1)
+        pdf.set_font_size(12)
+        pdf.cell(0,5, 'By the end of this course, you should be able to:', ln=1)
+        for clo in course.clos:
+            pdf.multi_cell(0,5, clo.general)
+        pdf.ln(5)
+
+        if(course.is_core):
+            pdf.ln(5)
+            pdf.multi_cell(0, 5, 'This coourse may be used to satisfy a Kent Core requirement. The Kent Core as a whole is intended to broaden intellectual perspectives, foster ethical and humanitarian values, and prepare students for responsible citizenship and productive careers.')
+        if(course.is_diversity==1):
+            pdf.ln(5)
+            pdf.multi_cell(0, 5, 'This course may be used to satisfy the University Diversity requirement. Diversity courses provide opportunities for students to learn about such matters as the history, culture, values and notable achievements of people other than those of their own national origin, ethnicity, religion, sexual orientaiton, age, gender, physical and mental ability, and social class. Diversity courses also provide opportunities to examine problems and issues that may arise from differences, and opportunities to learn how to deal constructively with them.')
+        if(course.is_wi==1):
+            pdf.ln(5)
+            pdf.multi_cell(0, 5, 'This course may be used to satisfy the Writing Intensive Course (WIC) requirement. The purpose of a writing-intensive course is to assist students in becoming effective writers within their major discipline. A WIC requires a substantial amount of writing, provides opportunities for guided revision, and focuses on writing forms and standards used in the professional life of the discipline.')
+        if(course.is_elr==1):
+            pdf.ln(5)
+            pdf.multi_cell(0, 5, 'This course may be used to fulfill the university\'s Experiential Learning Requirement (ELR) which provides students with the opportunity to initiate lifelong learning through the development and application of academic knowledge and skills in new or different settings. Experiential learning can occur through civic engagement, creative and artistic activities, practical experiences, research, and study abroad/away.')
+        
+        #TODO, required should be moved to course, no syllabus
+        if (self.required_materials != None):
+            pdf.ln(5)
+            pdf.set_font_size(14)
+            pdf.cell(0,5, 'Required Materials', ln=1)
+            pdf.set_font_size(12)
+            pdf.multi_cell(0,5, self.required_materials)
+        if (self.optional_materials != None):
+            pdf.ln(5)
+            pdf.set_font_size(14)
+            pdf.cell(0,5, 'Optional Materials', ln=1)
+            pdf.set_font_size(12)
+            pdf.cell(0,5, self.optional_materials, ln=1)
+
+        #TODO, enforce notnull dates / policies
+        if (self.grading_policy != None):   
+            pdf.ln(5)        
+            pdf.set_font_size(14)
+            pdf.cell(0,5, 'Grading Policy', ln=1)
+            pdf.multi_cell(0,5, self.grading_policy)
+
+        pdf.ln(5)
+        pdf.set_font_size(14)
+        pdf.cell(0,5, 'Registration Date', ln=1)
+        pdf.set_font_size(12)
+        pdf.multi_cell(0, 5, 'University policy requires all students to be officially registered in each class they are attending. Students who are not officially registered for a course by published deadlines should not be attending classes and will not receive credit or a grade for the course. Each student must confirm enrollment by checking his/her class schedule (using Student Tools in FlashLine) prior to the deadline indicated. Registration errors must be corrected prior to the deadline.')
+        pdf.cell(0,5, 'https://www.kent.edu/registrar/fall-your-time-register', ln=1)
+
+        pdf.ln(5)
+        pdf.set_font_size(14)
+        pdf.cell(0,5, 'Withdrawl Date', ln=1)
+        pdf.set_font_size(12)
+        pdf.cell(0, 5, 'The course withdrawal deadline is found below', ln=1)
+        pdf.cell(0,5, 'https://www.kent.edu/registrar/spring-important-dates', ln=1)
+
+        pdf.ln(5)
+        
+        if self.attendance_policy:
+            pdf.set_font_size(14)
+            pdf.cell(0,5, 'Attendance Policy', ln=1)
+            pdf.set_font_size(12)
+            pdf.multi_cell(0,5, self.attendance_policy)
+            pdf.ln(5)
+        #pdf.cell(0,5, 'Attendance Policy goes here', ln=1)
+
+        pdf.set_font_size(14)
+        pdf.cell(0,5, 'Student Accessability Services', ln=1)
+        pdf.set_font_size(12)
+        pdf.multi_cell(0, 5, self.Students_with_disabilities)
+        #pdf.cell(0,5, 'Important info here', ln=1)
+
+        pdf.ln(5)
+        pdf.set_font_size(14)
+        pdf.cell(0,5, 'Academic Integrity', ln=1)
+        pdf.set_font_size(12)
+        pdf.multi_cell(0, 5, self.cheating_policy)
+        #pdf.cell(0,5, "Don't plagarize bad", ln=1)
+
+        if (self.extra_policies != None):
+            pdf.ln(5)
+            pdf.set_font_size(14)
+            pdf.cell(0,5, 'Extra Policies', ln=1)
+            pdf.set_font_size(12)
+            pdf.multi_cell(0,5, self.extra_policies)
+        
+
+        #pdf.output('course.pdf', 'F')
 
         # Convert Model Data to HTML
-        syllabusHTML = 'TODO' # = convertToHTML()
+        #syllabusHTML = 'TODO' # = convertToHTML()
 
         # Convert HTML to PDF
-        syllabusPDF = 'TODO' # = pdfKitFunction(syllabusHTML)
+        #syllabusPDF = 'TODO' # = pdfKitFunction(syllabusHTML)
 
-        self.pdf = syllabusPDF
-        
-        return 'failure'
+        self.pdf = pdf.output(dest='S').encode('latin-1')
+        #pdf.output('wolves.pdf', 'F')
+        #file = open('wolves.pdf', 'rb').read()
+        #self.pdf = file
+        #db.session.query(Syllabus) \
+            #.filter_by(self) \
+            #.update({"pdf": (file)})
+        #db.session.commit()
+
+        if(self.pdf != None):
+            return 'success'
+        else:
+            return 'failure'
 
 
     def __repr__(self):
@@ -436,7 +698,6 @@ class Syllabus(db.Model, Timestamp):
             .format(self.course_number, self.course_version, 
                     self.section, self.semester, 
                     self.version, self.year)
-
 
 
 class User(UserMixin, db.Model, Timestamp):

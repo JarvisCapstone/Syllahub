@@ -34,7 +34,7 @@ def upgrade():
     op.drop_constraint(constraint_name='course_clo_ibfk_2', 
                        table_name='course_clo', 
                        type_='foreignkey')
-    
+
     op.create_foreign_key(constraint_name='course_clo_ibfk_2',
                           source_table='course_clo', 
                           referent_table='course', 

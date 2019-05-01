@@ -3,14 +3,14 @@
 {% block title %}Index{% endblock %}
 
 {% block app_content %}
-    <h1>Stub clo index</h1>
+    <h1>ALL Course Learning Outcomes</h1>
 <ul class="list-group">
     {% for clo in clos %}
         <li class="list-group-item">
-            <h3> {{ clo.id }} </h3>
-            <h3>General Description:</h3>
+            <h3> CLO: {{ clo.id }} </h3>
+            <h6>General Description:</h6>
                 <p> {{ clo.general }}</p>
-            <h3>Specific Description:</h3>
+            <h6>Specific Description:</h6>
                 <p> {{ clo.specific }}</p>
         </li>
     {% endfor %}

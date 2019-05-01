@@ -2,7 +2,7 @@ from app.course import bp
 from flask import render_template, flash, jsonify, request, redirect, url_for
 from flask_login import current_user, login_required
 from app.auth.routes import admin_required
-from app.models import Course
+from app.models import Course, Syllabus
 from app.course.forms import CreateCourseForm, UpdateCourseForm, DeleteCourseForm
 from app import db
 from sqlalchemy import update # TODO, why is this here?
@@ -13,25 +13,34 @@ def index():
     courses = Course.query.all()
     return render_template('course/index.html', courses=courses)
 
-@bp.route('/create', methods=['GET', 'POST'])
+@bp.route('/create', methods=['GET','POST'])
 @login_required
+@admin_required
 def create():
     # TODO authenticate user
     form = CreateCourseForm()
     if form.validate_on_submit():
-        course = Course(number = int(form.courseNumber.data), 
-                        version = int(form.courseVersion.data), 
+        course = Course(number = int(form.courseNumber.data),  
                         name = form.courseName.data, 
                         description = form.courseDescription.data, 
                         prerequisites = form.coursePrereqs.data, 
                         building = form.courseBuilding.data, 
                         room = form.courseRoomNo.data)
-      
+
+        course.setVersion()
         course.is_core = form.isCore.data
         course.is_diversity = form.isDiversity.data
         course.is_elr = form.isELR.data
         course.is_wi = form.isWI.data
 
+        syllabus = Syllabus(course_number = form.courseNumber.data,
+                            course_version = course.version,
+                            semester = form.semester.data,
+                            year = form.year.data,
+                            section = form.section.data)
+        syllabus.setVersion()
+
+        db.session.add(syllabus)
         db.session.add(course)
         db.session.commit()
         # TODO: Handle case, what if course already exists. crash cleanly
@@ -39,56 +48,86 @@ def create():
     return render_template('course/create.html', title="Create Course", 
                            form=form)
 
-@bp.route('/read/<int:number>/<int:version>', methods=['GET'])
+@bp.route('/read/<number>/<version>', methods=['GET'])
 def read(number, version):
+    canCurrentUserEdit = False
+    if(not current_user.is_anonymous):
+        if current_user.permission == 'admin':
+            canCurrentUserEdit = True
+
     course = Course.query.filter_by(number=number, version=version) \
                          .first_or_404()
+    syllabus= Syllabus.query.filter_by(course_number = number, course_version=version).first()
+    syllabusApproved = False
+    if(syllabus.state=="approved"):
+        syllabusApproved = True
     return render_template('/course/read.html', course=course, 
-                           number=number, version=version)
+                           number=number, version=version, 
+                           canCurrentUserEdit=canCurrentUserEdit,
+                           syllabus = syllabus, syllabusApproved=syllabusApproved)
 
 
-@bp.route('/search/<number>/<sortBy>', methods=['GET'])
-def search(number, sortBy):
+@bp.route('/search', methods=['GET'])
+def search():
+    number = request.args.get('number')
+    sortBy = request.args.get('sortBy')
     courses = Course.query.filter_by(number=number).all()
     if (sortBy == 'old'):
         courses.sort(key=lambda x : x.version, reverse=False)
     elif (sortBy == 'new' or form.sortBy == None):
         courses.sort(key=lambda x : x.version, reverse=True)
+        
     return render_template('/course/search.html', courses=courses)
 
 
 @bp.route('/update/<int:number>/<int:version>', methods=['GET', 'POST'])
 @login_required
+@admin_required
 def update(number, version):
     # TODO authenticate user
-    course = Course.query.filter_by(number=number, version=version) \
+    oldCourse = Course.query.filter_by(number=number, version=version) \
                          .first_or_404()
+    oldSyllabus = Syllabus.query.filter_by(course_number=number, course_version=version) \
+                                .first_or_404()
     form = UpdateCourseForm()
     deleteForm = DeleteCourseForm(courseNumber=number, courseVersion=version)
     # if this is a validated post request
     if form.validate_on_submit():
         # update course in database
-        data = {
-            'name':form.courseName.data, 
-            'number':form.courseNumber.data, 
-            'building':form.courseBuilding.data, 
-            'description':form.courseDescription.data,
-            'prerequisites':form.coursePrereqs.data, 
-            'room':form.courseRoomNo.data,
-            'version':form.courseVersion.data, 
-            'is_core':form.isCore.data,
-            'is_diversity':form.isDiversity.data, 
-            'is_elr':form.isELR.data, 
-            'is_wi':form.isWI.data
-        }
-        db.session.query(Course) \
-                  .filter_by(number=number, version=version) \
-                  .update(data)
+        course = Course(number = form.courseNumber.data,
+                        version = oldCourse.version,  
+                        name = form.courseName.data, 
+                        description = form.courseDescription.data, 
+                        prerequisites = form.coursePrereqs.data, 
+                        building = form.courseBuilding.data, 
+                        room = form.courseRoomNo.data)
+
+        course.setVersion()
+        course.is_core = form.isCore.data
+        course.is_diversity = form.isDiversity.data
+        course.is_elr = form.isELR.data
+        course.is_wi = form.isWI.data
+
+        syllabus = Syllabus(course_number = form.courseNumber.data,
+                            course_version = course.version,
+                            version = oldSyllabus.version,
+                            semester = form.semester.data,
+                            year = form.year.data,
+                            section = form.section.data,
+                            cheating_policy = Syllabus.currentCheatingPolicy,
+                            attendance_policy = Syllabus.currentAttendancePolicy,
+                            Students_with_disabilities = Syllabus.currentSASText,
+                            )
+        syllabus.setVersion()
+
+        db.session.add(course)
+        db.session.add(syllabus)
         db.session.commit()
+
         flash("Course Updated")
         # After a successful update, redirect to the read page to show the user
         # the result of their update
-        return redirect(url_for('course.read', number=number, version=version))
+        return redirect(url_for('course.read', number=number, version=course.version))
 
     elif deleteForm.validate_on_submit():
         course = Course.query.filter_by(number=number, version=version) \
@@ -101,17 +140,19 @@ def update(number, version):
     # if this is a get request then the user should recieve a form to use for
     # a future post request
     elif request.method == 'GET':
-        form.courseName.data = course.name
-        form.courseNumber.data = course.number
-        form.courseBuilding.data = course.building
-        form.courseDescription.data = course.description
-        form.coursePrereqs.data = course.prerequisites
-        form.courseRoomNo.data = course.room
-        form.courseVersion.data = course.version
-        form.isCore.data = course.is_core
-        form.isDiversity.data = course.is_diversity
-        form.isELR.data = course.is_elr
-        form.isWI.data = course.is_wi
+        form.courseName.data = oldCourse.name
+        form.courseNumber.data = oldCourse.number
+        form.courseBuilding.data = oldCourse.building
+        form.section.data = oldSyllabus.section
+        form.year.data = oldSyllabus.year
+        form.semester.data = oldSyllabus.semester
+        form.courseDescription.data = oldCourse.description
+        form.coursePrereqs.data = oldCourse.prerequisites
+        form.courseRoomNo.data = oldCourse.room
+        form.isCore.data = oldCourse.is_core
+        form.isDiversity.data = oldCourse.is_diversity
+        form.isELR.data = oldCourse.is_elr
+        form.isWI.data = oldCourse.is_wi
         return render_template('/course/update.html', form=form, 
                                deleteForm=deleteForm) 
     # if not validated and not a post request, send the standards
