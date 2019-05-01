@@ -7,7 +7,6 @@ from app import db
 from app.auth import bp
 
 from app.auth.forms import LoginForm, RegistrationForm, assignInstructorToCourse, RequestReloginForm, assignCloToCourse
-from app.syllabus.forms import ApproveForm
 from app.models import User, SyllabusInstructorAssociation, Syllabus, Instructor, course_clo_table, Course
 
 
@@ -69,15 +68,10 @@ def register():
 @login_required
 def my_profile():
     if current_user.permission == 'admin':
-        approveForm = ApproveForm()
-        if approveForm.validate_on_submit():
-            syllabus.state = 'approved'
-            db.session.commit()
         draftSyllabi = Syllabus.query.filter_by(state='draft').all()
         return render_template('auth/admin_profile.html', 
                                current_user=current_user,
-                               draftSyllabi=draftSyllabi,
-                               approveForm=approveForm)
+                               draftSyllabi=draftSyllabi)
     else:
         return render_template('auth/instructor_profile.html')
     #return redirect(url_for('auth.index'))
