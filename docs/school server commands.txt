@@ -26,3 +26,5 @@ workon syllahub
 # enter mysql
 mqsyl -u root -p
 
+# this was the command that fixed everything. selinux was the problem
+setsebool -P httpd_can_network_connect on
