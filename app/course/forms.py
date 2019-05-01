@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, HiddenField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, HiddenField, IntegerField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 
 class CreateCourseForm(FlaskForm):
@@ -40,3 +40,9 @@ class DeleteCourseForm(FlaskForm):
     submit = SubmitField('Delete Course')
 
     # TODO Add Type Validators
+
+class AssignCloForm(FlaskForm):
+    courseVersion = HiddenField(validators=[DataRequired()])
+    courseNumber = HiddenField(validators=[DataRequired()])
+    cloSelect = SelectField('Clo', coerce=int)
+    assignCloSubmit = SubmitField('Assign CLO to this course')

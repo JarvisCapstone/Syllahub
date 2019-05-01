@@ -33,6 +33,7 @@
 
 <p>Prerequisites: {{ course.prerequisites }}</p>
 
+<hr>
 {% if course.is_core %}
     <p>Satisfies Kent Core</p>
 {% endif %}
@@ -49,10 +50,40 @@
     <p>Satisfies Writing Intensive</p>
 {% endif %}
 
+<hr>
+{% if course.clos|length == 0 %}
+    <h6>This course has no associated CLO's</h6>
+{% else %}
+    <ul>
+        {% for clo in course.clos %}
+            <li>
+                <a href="{{ url_for('clo.read', id=clo.id) }}">CLO:{{ clo.id }} </a>
+                {{ clo.general }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+{% if canCurrentUserEdit %}
+    {% if assignCloForm.cloSelect.choices|length != 0 %}
+        <form class="my-3" method="post">
+            {{ assignCloForm.hidden_tag() }}
+            <div class="form-row align-items-center">
+                <div class="col-auto my-1">
+                    {# assignCloForm.cloSelect #}
 
-{% for clo in course.clos %}
-    <a href="{{ url_for('clo.read', id=clo.id) }}">CLO:{{ clo.id }}</a>
-{% endfor %}
+                    <select class="custom-select mr-sm-2" name="cloSelect" id="cloSelect">
+                        {% for choice in assignCloForm.cloSelect.choices %}
+                            <option value="{{choice[0]}}">{{choice[1]}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-auto my-1">
+                    {{ assignCloForm.assignCloSubmit(class_="btn btn-primary") }}
+                </div>
+            </div>
+        </form>
+    {% endif %}
+{% endif %}
 
 <hr>
 <h6>Version {{ version }}</h6>

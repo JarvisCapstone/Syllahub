@@ -2,10 +2,11 @@ from app.course import bp
 from flask import render_template, flash, jsonify, request, redirect, url_for
 from flask_login import current_user, login_required
 from app.auth.routes import admin_required
-from app.models import Course, Syllabus
-from app.course.forms import CreateCourseForm, UpdateCourseForm, DeleteCourseForm
+from app.models import Course, Clo, Syllabus
+from app.course.forms import AssignCloForm, CreateCourseForm, UpdateCourseForm, DeleteCourseForm
 from app import db
 from sqlalchemy import update # TODO, why is this here?
+from app.auth.forms import assignInstructorToCourse
 
 @bp.route('/', methods=['GET'])
 @bp.route('/index', methods=['GET'])
@@ -48,23 +49,59 @@ def create():
     return render_template('course/create.html', title="Create Course", 
                            form=form)
 
-@bp.route('/read/<number>/<version>', methods=['GET'])
+@bp.route('/read/<number>/<version>', methods=['GET', 'POST'])
 def read(number, version):
+    
+    course = Course.query.filter_by(number=number, version=version) \
+                         .first_or_404()
+    syllabus= Syllabus.query.filter_by(course_number = number, course_version=version).first()
+    
     canCurrentUserEdit = False
     if(not current_user.is_anonymous):
         if current_user.permission == 'admin':
             canCurrentUserEdit = True
 
-    course = Course.query.filter_by(number=number, version=version) \
-                         .first_or_404()
-    syllabus= Syllabus.query.filter_by(course_number = number, course_version=version).first()
     syllabusApproved = False
     if(syllabus.state=="approved"):
         syllabusApproved = True
-    return render_template('/course/read.html', course=course, 
-                           number=number, version=version, 
-                           canCurrentUserEdit=canCurrentUserEdit,
-                           syllabus = syllabus, syllabusApproved=syllabusApproved)
+    
+    if canCurrentUserEdit:
+        assignCloForm = AssignCloForm(courseNumber=number, courseVersion=version)
+        assignableClos = []
+        for clo in Clo.query.order_by('general'):
+            if not clo in course.clos:
+                assignableClos.append(clo)
+        assignCloForm.cloSelect.choices = [(clo.id, clo.general) for clo in assignableClos]
+
+        if assignCloForm.assignCloSubmit.data and assignCloForm.validate():
+            selectedClo = Clo.query.filter_by(id=int(assignCloForm.cloSelect.data)).first_or_404()
+            course.clos.append(selectedClo)
+            db.session.commit()
+            # this is repetitive, but i don't care anymore
+            assignableClos = []
+            for clo in Clo.query.order_by('general'):
+                if not clo in course.clos:
+                    assignableClos.append(clo)
+            assignCloForm.cloSelect.choices = [(clo.id, clo.general) for clo in assignableClos]
+
+        return render_template('/course/read.html', 
+                               course=course, 
+                               number=number, 
+                               version=version, 
+                               canCurrentUserEdit=canCurrentUserEdit,
+                               syllabus = syllabus, 
+                               syllabusApproved=syllabusApproved,
+                               assignCloForm=assignCloForm)
+    else:
+        return render_template('/course/read.html', 
+                               course=course, 
+                               number=number, 
+                               version=version, 
+                               canCurrentUserEdit=canCurrentUserEdit,
+                               syllabus = syllabus, 
+                               syllabusApproved=syllabusApproved)
+
+
 
 
 @bp.route('/search', methods=['GET'])
@@ -84,9 +121,8 @@ def search():
 @login_required
 @admin_required
 def update(number, version):
-    # TODO authenticate user
     oldCourse = Course.query.filter_by(number=number, version=version) \
-                         .first_or_404()
+                            .first_or_404()
     oldSyllabus = Syllabus.query.filter_by(course_number=number, course_version=version) \
                                 .first_or_404()
     form = UpdateCourseForm()
@@ -107,6 +143,9 @@ def update(number, version):
         course.is_diversity = form.isDiversity.data
         course.is_elr = form.isELR.data
         course.is_wi = form.isWI.data
+
+        for clo in oldCourse.clos:
+            course.clos.append(clo)
 
         syllabus = Syllabus(course_number = form.courseNumber.data,
                             course_version = course.version,
