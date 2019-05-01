@@ -33,7 +33,6 @@
 
 <p>Prerequisites: {{ course.prerequisites }}</p>
 
-<hr>
 {% if course.is_core %}
     <p>Satisfies Kent Core</p>
 {% endif %}
@@ -87,6 +86,6 @@
 
 <hr>
 <h6>Version {{ version }}</h6>
-<small>Most recent Update: {{course.created}}</small><br>
+<small>Most recent Update: {{course.updated}}</small><br>
 <small>Created at: {{course.created}}</small>
 {% endblock %}

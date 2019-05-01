@@ -43,17 +43,88 @@
 </div>
 
 
-<h1>
-    Syllabus for CS{{ syllabus.course_number }}-v{{ syllabus.course_version }} 
-</h1>
+<h1>{{ syllabus.course.name }}</h1>
+<h2>
+    <a href="{{ url_for('course.read', 
+                        number=syllabus.course_number, 
+                        version=syllabus.course_version) }}">
+        CS{{ syllabus.course_number }}-v{{ syllabus.course_version }}
+    </a> 
+</h2>
 
-<h2>{{ syllabus.course.name }}</h2>
-<h6>{{ syllabus.semester }} {{ syllabus.year }}</h6>
-<p>Section: {{ syllabus.section }}</p>
-<p>Version: {{ syllabus.version }}</p>
-<p>State: {{ syllabus.state }}</p>
-<h6>Cheating_policy:</h6> <p>{{ syllabus.University_cheating_policy }}</p>
-<h6>Attendance policy:</h6> <p>{{ syllabus.attendancy_policy }}</p>
+<h4>{{ syllabus.semester }} {{ syllabus.year }}</h4>
+<p>
+    Section: {{ syllabus.section }} <br>
+    Version: {{ syllabus.version }} <br>
+    State: {{ syllabus.state }}
+</p>
+<h3>Instructors:</h3>
+{% if syllabus.instructorList |length == 0 %}
+    <h2>This syllabus does not have any associated instructors</h2>
+{% else %}
+    {% for syllabusInstructorAssociation in syllabus.syllabusInstructorAssociationList %}
+        <div class="list-group">
+            <a class="list-group-item list-group-item-action "
+               href=" {{ url_for('instructor.read', id=syllabusInstructorAssociation.instructor.id ) }}">
+                <h5>{{ syllabusInstructorAssociation.job_on_syllabus }}: {{ syllabusInstructorAssociation.instructor.name }}</h5>
+                {{ syllabusInstructorAssociation.instructor.email }} <br>
+                Office Hours: {{ syllabusInstructorAssociation.instructor.perfered_office_hours }}
+            </a>
+        </div>
+    {% endfor %}
+
+{% endif %}
+<hr>
+{% if syllabus.course.description %}
+    <p>{{ syllabus.course.description }}</p>
+    <hr>
+{% endif %}
+
+<h2>Course Learning Outcomes</h2>
+{% if syllabus.course.clos|length == 0 %}
+    <h6>This course has no associated CLO's</h6>
+{% else %}
+    <ul>
+        {% for clo in syllabus.course.clos %}
+            <li>
+                <a href="{{ url_for('clo.read', id=clo.id) }}">CLO:{{ clo.id }} </a>
+                {{ clo.general }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<h6>Withdrawl Date</h6>
+<p>{{ syllabus.withdrawl_date }}</p>
+
+<h6>Calendar</h6>
+<p>{{ syllabus.calender }}</p>
+
+<h6>Extra Policies</h6>
+<p>{{ syllabus.extra_policies }}</p>
+
+<h6>Grading Policy</h6>
+<p>{{ syllabus.grading_policy }}</p>
+
+<h6>Meeting Dates</h6>
+<p>{{ syllabus.meeting_dates }}</p>
+
+<h6>Schedule</h6>
+<p>{{ syllabus.schedule }}</p>
+
+<h6>Required Materials</h6>
+<p>{{ syllabus.required_materials }}</p>
+
+<h6>Optional Materials</h6>
+<p>{{ syllabus.optional_materials }}</p>
+
+<h6>Cheating_policy:</h6> 
+<p>{{ syllabus.University_cheating_policy }}</p>
+
+<h6>Attendance policy:</h6> 
+<p>{{ syllabus.attendancy_policy }}</p>
+
 <h6>Students with disabilities:</h6> 
 <p>{{ syllabus.Students_with_disabilities }}</p>
+
 {% endblock %}

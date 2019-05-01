@@ -5,13 +5,14 @@
 {% block app_content %}
 <h1>User Index</h1>
 
-<ul class="list-group">
+<div class="list-group">
 
     {% for user in users %}
-    <li class="list-group-item">
-        Email: {{user.email}} <br>
-    </li>
+    <a href="{{ url_for('user.read', email=user.email) }}" 
+       class="list-group-item list-group-item-action">
+        {{user.email}} - {{user.name}}
+    </a>
     {% endfor %} 
 </ul>
 
-{% endblock %}
+{% endblock %} 

@@ -5,13 +5,21 @@
 {% block app_content %}
 
 
-<h1>User Result</h1>
-{% from "_formhelpers.html" import render_field %}
+<h1>{{ user.email }}</h1>
+<h3>Status: {{ user.permission }}</h3>
+{% if user.instructor %}
+    {% if user.instructor.name %}
+        <h3>{{ user.instructor.name }}</h3>
+    {% endif %}
 
-<ul class="list-group">
-    <li class="list-group-item">
-        <p>Email: {{ user.email }}</p>
-    </li>
-</ul>
+    {% if user.instructor.perfered_office_hours %}
+        <h3>Office Hours: {{ user.instructor.perfered_office_hours }}</h3>
+    {% endif %}
+{% else %}
+    <h6>This user is not associated with any instructor</h6>
+{% endif %}
+
+<p>Most recent Update: {{user.updated}} <br>
+Has been a Syllahub user since: {{user.created}}</p>
 
 {% endblock %}

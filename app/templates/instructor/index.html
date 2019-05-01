@@ -8,14 +8,11 @@
 <div class="list-group">
 
         {% for instructor in instructors %}
-        <a class="list-group-item list-group-item-action "
+        <a class="list-group-item list-group-item-action"
            href=" {{ url_for('instructor.read', id=instructor.id) }} ">
 
             <h3>{{instructor.name}}</h3>
             {{instructor.email}} <br>
-            {{instructor.phone}} <br>
-            Hours: {{instructor.perfered_office_hours}} <br>
-        
         </a>
         {% endfor %} 
     </ul>

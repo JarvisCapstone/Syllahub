@@ -15,9 +15,11 @@
                             year=syllabus.year) }}" 
            class="list-group-item list-group-item-action">
             <h3>CS{{ syllabus.course_number }}-{{ syllabus.course_version }}: {{ syllabus.course.name }} </h3>
-            <p>Section: {{ syllabus.section }}</p>
-            <p>Version: {{ syllabus.version }}</p>
-            <p>{{ syllabus.semester }} {{ syllabus.year }}</p>
+            <p>
+                Section: {{ syllabus.section }} <br>
+                Version: {{ syllabus.version }} <br>
+                {{ syllabus.semester }} {{ syllabus.year }}
+            </p>
         </li>
     {% endfor %}
 </ul>

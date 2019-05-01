@@ -19,9 +19,19 @@
 
 <h3> Specific Description: </h3>
 <p> {{ clo.specific }} </p>
+<hr>
+
 <h3>Courses</h3>
-{% for course in clo.courses %}
-    <a href="{{ url_for('course.read', version=course.version, number=course.number) }}">{{ course.name }}</a>
-{% endfor %}
-    
+{% if clo.courses|length == 0 %}
+    <h6>This CLO has no associated course</h6>
+{% else %}
+    <ul>
+        {% for course in clo.courses %}
+            <li>
+                <a href="{{ url_for('course.read', version=course.version, number=course.number) }}">{{ course.name }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
 {% endblock %}

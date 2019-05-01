@@ -6,35 +6,35 @@
 
 
 <h1>{{ instructor.name }}</h1>
-{% from "_formhelpers.html" import render_field %}
 
-<ul class="list-group">
-    <li class="list-group-item">
+<h5>{{ instructor.email }}</h5>
+<h5>{{ instructor.phone }}</h5>
+<h5>Office Hours: {{ instructor.perfered_office_hours }}</h5>
+<hr>
 
-        <p>Email: {{ instructor.email }}</p>
-        <p>Phone Number: {{ instructor.phone }}</p>
-        <p>Office Hours: {{ instructor.perfered_office_hours }}</p>
-        <hr>
-        <div class="container">
-            
-            <div class="list-group">
-            {% for syllabus in instructor.syllabusList %}
-                    <a class="list-group-item list-group-item-action" 
-                       href=" {{ url_for('syllabus.read', 
-                                         CNumber=syllabus.course.number, 
-                                         CVersion=syllabus.course.version,
-                                         sec=syllabus.section, 
-                                         semester=syllabus.semester, 
-                                         version=syllabus.version, 
-                                         year=syllabus.year) }}">
-                        <h5>
-                            Syllabus for CS{{syllabus.course.number}}
-                        </h5>
-                    </a>
-            {% endfor %}
-            </div>
-        </div>
-    </li>
-</ul>
+{% if instructor.syllabusList |length == 0 %}
+    <h2>This instructor is not associated with any syllabi</h2>
+{% else %}
+    <h2>All Syllabi related to this instructor:</h2>
+    {% for syllabus in instructor.syllabusList %}
+        <ul>
+            <li>
+                <a href=" {{ url_for('syllabus.read', 
+                                 CNumber=syllabus.course.number, 
+                                 CVersion=syllabus.course.version,
+                                 sec=syllabus.section, 
+                                 semester=syllabus.semester, 
+                                 version=syllabus.version, 
+                                 year=syllabus.year) }}">
+                <h5>
+                    Syllabus v{{ syllabus.version }} for CS{{syllabus.course_number}}-V{{syllabus.course_version}}, {{ syllabus.semester }} {{ syllabus.year }}
+                </h5>
+            </a>
+            </li>
+        </ul>
+    {% endfor %}
+
+{% endif %}
+
 
 {% endblock %}
