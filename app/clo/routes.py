@@ -31,8 +31,14 @@ def create():
 @login_required
 def read(id):
     clo = Clo.query.filter_by(id = id).one()
-    flash("CLO Read!")
-    return render_template('/clo/read.html', title="CLO Read", clo=clo)
+
+    canCurrentUserEdit = False
+    if(not current_user.is_anonymous):
+        if current_user.permission == 'admin':
+            canCurrentUserEdit = True
+
+    return render_template('/clo/read.html', title="CLO Read", clo=clo,
+                           canCurrentUserEdit=canCurrentUserEdit)
 
 
 
@@ -72,6 +78,7 @@ def update(id):
 
 @bp.route('/delete/<id>', methods=['GET', 'POST'])
 @login_required
+@admin_required
 def delete(id):
     # TODO authenticate user
     deleteForm = DeleteCloForm(id=id)

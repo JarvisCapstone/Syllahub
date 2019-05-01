@@ -3,18 +3,25 @@
 {% block title %}Index{% endblock %}
 
 {% block app_content %}
-<h1>Results for {{ clo.id }}</h1>
-<ul class="list-group">
-    <li class="list-group-item">
-        <h3> {{ clo.id }} </h3>
-        <h3> General Description: </h3>
-            <p> {{ clo.general }}</p>
-        <h3> Specific Description: </h3>
-            <p> {{ clo.specific }} </p>
-        <h3>Courses</h3>
-        {% for course in clo.courses %}
-            <a href="{{ url_for('course.read', version=course.version, number=course.number) }}">{{ course.name }}</a>
-        {% endfor %}
-    </li>
+
+<div class="float-right">
+    {% if canCurrentUserEdit %}
+        <a class="btn btn-warning float-right" 
+           href="{{ url_for('clo.update', id=clo.id) }}" 
+           role="button">Update</a>
+    {% endif %}
+</div>
+
+
+<h1>CLO {{ clo.id }}</h1>
+<h3> General Description: </h3>
+<p> {{ clo.general }}</p>
+
+<h3> Specific Description: </h3>
+<p> {{ clo.specific }} </p>
+<h3>Courses</h3>
+{% for course in clo.courses %}
+    <a href="{{ url_for('course.read', version=course.version, number=course.number) }}">{{ course.name }}</a>
+{% endfor %}
     
 {% endblock %}

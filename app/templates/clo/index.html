@@ -3,16 +3,14 @@
 {% block title %}Index{% endblock %}
 
 {% block app_content %}
-    <h1>ALL Course Learning Outcomes</h1>
-<ul class="list-group">
+<h1>All Course Learning Outcomes</h1>
+<div class="list-group">
     {% for clo in clos %}
-        <li class="list-group-item">
+        <a href="{{ url_for('clo.read', id=clo.id) }}" 
+           class="list-group-item">
             <h3> CLO: {{ clo.id }} </h3>
-            <h6>General Description:</h6>
-                <p> {{ clo.general }}</p>
-            <h6>Specific Description:</h6>
-                <p> {{ clo.specific }}</p>
-        </li>
+            <p> {{ clo.general }}</p>
+        </a>
     {% endfor %}
-</ul>
+</div> 
 {% endblock %}
