@@ -20,6 +20,7 @@ workon syllahub
 #edited this file to allow access form anywhere
 # mariadb-server.cnf
 #     bind-address=*
+#this is not needed. change it back
 
 
 

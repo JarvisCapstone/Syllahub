@@ -128,7 +128,7 @@ class InstructorFactory(Factory):
         data={}
         p = self.fake.simple_profile()
         data['name'] = p['name']
-        data['phone'] = random.randint(1000000000, 9999999999)   
+        data['phone'] = self.fake.phone_number() 
         data['email'] = p['mail']
         data['perfered_office_hours'] = 'whenever'
 

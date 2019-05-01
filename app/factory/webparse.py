@@ -79,8 +79,10 @@ class Retriever():
             if isinstance(phoneEnding, str):
                 if len(phoneEnding) == 5:
                     # 330-67#-#### is the kent phone number format
-                    phoneString = '33067' + phoneEnding 
-                    data['phone'] = int(phoneString)
+                    phoneString = '330-67' + phoneEnding 
+                    # add second - char on
+                    phoneString = phoneString[:7] + '-' + phoneString[7:]
+                    data['phone'] = phoneString
             i = iFactory.createOrGet(data)
             i.updateIfDifferent(data)
         
@@ -89,7 +91,7 @@ class Retriever():
         additionalInstructors = [
             {
                 'email':'dcsmith1@kent.edu',
-                'phone': 3306720275,
+                'phone': '330-672-0275',
                 'name': 'Smith, Deborah C.',
             },
         ]

@@ -324,7 +324,7 @@ class Instructor(db.Model, Timestamp):
     # Non Key Columns
     email = Column(String(120), index=True, unique=True)
     name = Column(String(64), index=True)
-    phone = Column(Integer) # TODO change this to string
+    phone = Column(String(25))
     perfered_office_hours = Column(String(256))
     
     def addToSyllabus(self, syllabus, job):
