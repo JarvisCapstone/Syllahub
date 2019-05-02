@@ -200,7 +200,13 @@ def update(CNumber, CVersion, sec, semester, version, year):
         form.optionalMaterials.data = oldSyllabus.optional_materials
         
         return render_template('/syllabus/update.html', form=form)
-    return 'gfhdjdjh'
+    return redirect(url_for('syllabus.read',
+            CNumber = oldSyllabus.course_number, 
+            CVersion = oldSyllabus.course_version, 
+            sec = oldSyllabus.section, 
+            semester = oldSyllabus.semester, 
+            version = oldSyllabus.version, 
+            year = oldSyllabus.year))
 
 @bp.route('/delete/<int:CNumber>/<int:CVersion>/<int:sec>/<semester>/<int:version>/<int:year>', 
           methods=['GET', 'POST'])
